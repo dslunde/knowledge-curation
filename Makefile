@@ -140,6 +140,107 @@ build-images:  ## Build container images
 	$(MAKE) -C "./frontend/" build-image
 
 ###########################################
+# AI Infrastructure Services
+###########################################
+.PHONY: ai-start
+ai-start:  ## AI Services: Start AI Infrastructure (Qdrant, Redis, MailHog)
+	@echo "Start AI Infrastructure services"
+	VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose --profile ai up -d --build
+	@echo "Services available:"
+	@echo "  - Qdrant (Vector DB): http://localhost:6333"
+	@echo "  - Redis (Cache): localhost:6379"
+	@echo "  - MailHog (Email): http://localhost:8025"
+
+.PHONY: ai-stop
+ai-stop:  ## AI Services: Stop AI Infrastructure 
+	@echo "Stop AI Infrastructure services"
+	@docker compose --profile ai stop
+
+.PHONY: ai-status
+ai-status:  ## AI Services: Check Status
+	@echo "Check AI Infrastructure services status"
+	@docker compose --profile ai ps
+
+.PHONY: web-start
+web-start:  ## Web Services: Start Web Application (Frontend, Backend, DB)
+	@echo "Start Web Application services"
+	VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose --profile web up -d --build
+	@echo "Now visit: http://knowledge-curator.localhost"
+
+.PHONY: web-stop
+web-stop:  ## Web Services: Stop Web Application
+	@echo "Stop Web Application services"
+	@docker compose --profile web stop
+
+.PHONY: web-status
+web-status:  ## Web Services: Check Status
+	@echo "Check Web Application services status"
+	@docker compose --profile web ps
+
+.PHONY: integration-start
+integration-start:  ## Integration: Start AI + Web Services 
+	@echo "Start Full Integration Stack"
+	VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose --profile integration up -d --build
+	@echo "Full stack available:"
+	@echo "  - Main Site: http://knowledge-curator.localhost"
+	@echo "  - Classic UI: http://knowledge-curator.localhost/ClassicUI (admin/admin)"
+	@echo "  - API: http://knowledge-curator.localhost/++api++"
+	@echo "  - Qdrant: http://localhost:6333"
+	@echo "  - MailHog: http://localhost:8025"
+
+.PHONY: integration-stop
+integration-stop:  ## Integration: Stop All Services
+	@echo "Stop Full Integration Stack"
+	@docker compose --profile integration stop
+
+.PHONY: integration-status
+integration-status:  ## Integration: Check Status
+	@echo "Check Full Integration Stack status"
+	@docker compose --profile integration ps
+
+.PHONY: full-start
+full-start:  ## Full Stack: Start Everything (Alias for integration-start)
+	$(MAKE) integration-start
+
+.PHONY: full-stop
+full-stop:  ## Full Stack: Stop Everything
+	@echo "Stop All Services"
+	@docker compose down
+
+.PHONY: full-clean
+full-clean:  ## Full Stack: Remove All Services and Volumes
+	@echo "Remove Full Docker Stack"
+	@docker compose down --volumes --remove-orphans
+	@echo "Remove all volume data"
+	@docker volume rm $(PROJECT_NAME)_vol-site-data $(PROJECT_NAME)_vol-qdrant-data $(PROJECT_NAME)_vol-redis-data 2>/dev/null || true
+
+.PHONY: health-check
+health-check:  ## Check Health of All Running Services
+	@echo "Checking service health..."
+	@docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
+
+###########################################
+# Quick Development
+###########################################
+.PHONY: quick-start
+quick-start:  ## Quick Start: Full integration environment in one command
+	@echo "🚀 Starting Knowledge Curator Development Environment..."
+	$(MAKE) integration-start
+	@echo ""
+	@echo "✅ Knowledge Curator is ready!"
+	@echo "🌐 Main Site: http://knowledge-curator.localhost"
+	@echo "🔧 Classic UI: http://knowledge-curator.localhost/ClassicUI (admin/admin)"
+	@echo "📡 API: http://knowledge-curator.localhost/++api++"
+	@echo "🧠 Vector DB: http://localhost:6333"
+	@echo "📧 Email Test: http://localhost:8025"
+
+.PHONY: quick-clean
+quick-clean:  ## Quick Clean: Stop everything and clean up
+	@echo "🧹 Cleaning up Knowledge Curator environment..."
+	$(MAKE) full-clean
+	@echo "✅ Environment cleaned!"
+
+###########################################
 # Local Stack
 ###########################################
 .PHONY: stack-create-site

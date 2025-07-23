@@ -1,12 +1,70 @@
 ---
 name: knowledge-curator
 
+networks:
+  knowledge-net:
+    driver: bridge
+  plone-internal:
+    driver: bridge
+
 services:
+  # ========================================
+  # AI Infrastructure Services
+  # ========================================
+  qdrant:
+    image: qdrant/qdrant:latest
+    profiles: ["ai", "full", "integration"]
+    ports:
+      - "6333:6333"
+      - "6334:6334" 
+    volumes:
+      - vol-qdrant-data:/qdrant/storage
+    networks:
+      - knowledge-net
+    environment:
+      QDRANT__SERVICE__HTTP_PORT: 6333
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    profiles: ["ai", "full", "integration"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - vol-redis-data:/data
+    networks:
+      - knowledge-net
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    profiles: ["ai", "full", "integration", "dev"]
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - knowledge-net
+
+  # ========================================
+  # Web Application Services  
+  # ========================================
   traefik:
     image: traefik:v2.11
-
+    profiles: ["web", "full", "integration"]
     ports:
       - 80:80
+    networks:
+      - knowledge-net
+      - plone-internal
 
     labels:
       - traefik.enable=true
@@ -33,6 +91,9 @@ services:
       - --api
   purger:
     image: ghcr.io/kitconcept/cluster-purger:latest
+    profiles: ["web", "full", "integration"]
+    networks:
+      - plone-internal
     environment:
       PURGER_SERVICE_NAME: varnish
       PURGER_SERVICE_PORT: 80
@@ -42,6 +103,9 @@ services:
   varnish:
     build:
       context: devops/varnish
+    profiles: ["web", "full", "integration"]
+    networks:
+      - plone-internal
     labels:
       - traefik.enable=true
       - traefik.constraint-label=public
@@ -54,6 +118,9 @@ services:
       context: ./frontend
       args:
         - VOLTO_VERSION=${VOLTO_VERSION}
+    profiles: ["web", "full", "integration"]
+    networks:
+      - plone-internal
     environment:
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/Plone
     depends_on:
@@ -80,8 +147,15 @@ services:
       context: ./backend
       args:
         - PLONE_VERSION=${PLONE_VERSION}
+    profiles: ["web", "full", "integration"]
+    networks:
+      - plone-internal
+      - knowledge-net
     environment:
       RELSTORAGE_DSN: "dbname='${DB_NAME:-plone}' user='${DB_NAME:-plone}' host='${DB_HOST:-db}' password='${DB_PASSWORD:-rXvRQLsXRrah}' port='${DB_PORT:-5432}'"
+      REDIS_URL: "redis://redis:6379/0"
+      QDRANT_HOST: "qdrant"
+      QDRANT_PORT: "6333"
     depends_on:
       - db
     labels:
@@ -127,12 +201,22 @@ services:
 
   db:
     image: postgres:14.15
+    profiles: ["web", "full", "integration"]
+    networks:
+      - plone-internal
     environment:
       POSTGRES_USER: plone
       POSTGRES_PASSWORD: rXvRQLsXRrah
       POSTGRES_DB: plone
     volumes:
       - vol-site-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U plone -d plone"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   vol-site-data: {}
+  vol-qdrant-data: {}
+  vol-redis-data: {}
