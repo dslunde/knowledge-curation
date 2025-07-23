@@ -1,1 +1,1 @@
-"""Tests for plone.app.knowledge."""
+"""Tests for knowledge.curator."""

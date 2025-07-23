@@ -1,1 +1,1 @@
-"""Browser views for plone.app.knowledge."""
+"""Browser views for knowledge.curator."""

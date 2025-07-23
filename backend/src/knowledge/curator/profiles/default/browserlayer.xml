@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layers>
-  <layer name="plone.app.knowledge"
-         interface="plone.app.knowledge.interfaces.IPloneAppKnowledgeLayer" />
+  <layer name="knowledge.curator"
+         interface="knowledge.curator.interfaces.IPloneAppKnowledgeLayer" />
 </layers>

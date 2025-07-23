@@ -154,7 +154,7 @@ GET/POST /@@API/spaced-repetition/settings
 ### Python API
 
 ```python
-from plone.app.knowledge.repetition.utilities import ReviewUtilities
+from knowledge.curator.repetition.utilities import ReviewUtilities
 
 # Get items due for review
 items = ReviewUtilities.get_items_due_for_review()

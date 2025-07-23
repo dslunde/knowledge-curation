@@ -166,8 +166,8 @@ POST /@vector-management/rebuild
 ### Python API
 
 ```python
-from plone.app.knowledge.vector.search import SimilaritySearch
-from plone.app.knowledge.vector.management import VectorCollectionManager
+from knowledge.curator.vector.search import SimilaritySearch
+from knowledge.curator.vector.management import VectorCollectionManager
 
 # Search for similar content
 search = SimilaritySearch()
@@ -277,7 +277,7 @@ manager.restore_vectors("/path/to/backup.json")
 
 ### Running Tests
 ```bash
-bin/test -s plone.app.knowledge -t test_vector_operations
+bin/test -s knowledge.curator -t test_vector_operations
 ```
 
 ### Extending

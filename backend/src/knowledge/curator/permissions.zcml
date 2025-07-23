@@ -7,48 +7,48 @@
   <!-- -*- extra stuff goes here -*- -->
 
     <permission
-        id="plone.app.knowledge.AddKnowledgeItem"
-        title="plone.app.knowledge: Add Knowledge Item"
+        id="knowledge.curator.AddKnowledgeItem"
+        title="knowledge.curator: Add Knowledge Item"
         />
 
     <permission
-        id="plone.app.knowledge.AddKnowledgeContainer"
-        title="plone.app.knowledge: Add Knowledge Container"
+        id="knowledge.curator.AddKnowledgeContainer"
+        title="knowledge.curator: Add Knowledge Container"
         />
 
     <permission
-        id="plone.app.knowledge.ManageAISettings"
-        title="plone.app.knowledge: Manage AI Settings"
+        id="knowledge.curator.ManageAISettings"
+        title="knowledge.curator: Manage AI Settings"
         />
 
     <permission
-        id="plone.app.knowledge.AddResearchNote"
-        title="plone.app.knowledge: Add Research Note"
+        id="knowledge.curator.AddResearchNote"
+        title="knowledge.curator: Add Research Note"
         />
 
     <permission
-        id="plone.app.knowledge.AddLearningGoal"
-        title="plone.app.knowledge: Add Learning Goal"
+        id="knowledge.curator.AddLearningGoal"
+        title="knowledge.curator: Add Learning Goal"
         />
 
     <permission
-        id="plone.app.knowledge.AddProjectLog"
-        title="plone.app.knowledge: Add Project Log"
+        id="knowledge.curator.AddProjectLog"
+        title="knowledge.curator: Add Project Log"
         />
 
     <permission
-        id="plone.app.knowledge.AddBookmarkPlus"
-        title="plone.app.knowledge: Add BookmarkPlus"
+        id="knowledge.curator.AddBookmarkPlus"
+        title="knowledge.curator: Add BookmarkPlus"
         />
 
     <permission
-        id="plone.app.knowledge.AddAIAnnotations"
-        title="plone.app.knowledge: Add AI annotations"
+        id="knowledge.curator.AddAIAnnotations"
+        title="knowledge.curator: Add AI annotations"
         />
 
     <permission
-        id="plone.app.knowledge.ViewAIAnnotations"
-        title="plone.app.knowledge: View AI annotations"
+        id="knowledge.curator.ViewAIAnnotations"
+        title="knowledge.curator: View AI annotations"
         />
 
   </configure>

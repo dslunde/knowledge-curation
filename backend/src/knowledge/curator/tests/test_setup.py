@@ -10,7 +10,7 @@ import unittest
 
 
 class TestSetup(unittest.TestCase):
-    """Test that plone.app.knowledge is properly installed."""
+    """Test that knowledge.curator is properly installed."""
 
     layer = PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
 
@@ -20,9 +20,9 @@ class TestSetup(unittest.TestCase):
         self.installer = api.portal.get_tool('portal_quickinstaller')
 
     def test_product_installed(self):
-        """Test if plone.app.knowledge is installed."""
+        """Test if knowledge.curator is installed."""
         self.assertTrue(self.installer.isProductInstalled(
-            'plone.app.knowledge'))
+            'knowledge.curator'))
 
     def test_browserlayer(self):
         """Test that IPloneAppKnowledgeLayer is registered."""
@@ -43,19 +43,19 @@ class TestUninstall(unittest.TestCase):
         self.installer = api.portal.get_tool('portal_quickinstaller')
         roles_before = api.user.get_roles(TEST_USER_ID)
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        self.installer.uninstallProducts(['plone.app.knowledge'])
+        self.installer.uninstallProducts(['knowledge.curator'])
         setRoles(self.portal, TEST_USER_ID, roles_before)
 
     def test_product_uninstalled(self):
-        """Test if plone.app.knowledge is cleanly uninstalled."""
+        """Test if knowledge.curator is cleanly uninstalled."""
         self.assertFalse(self.installer.isProductInstalled(
-            'plone.app.knowledge'))
+            'knowledge.curator'))
 
     def test_browserlayer_removed(self):
         """Test that IPloneAppKnowledgeLayer is removed."""
-        from knowledge.curator.interfaces import \
-            IPloneAppKnowledgeLayer
+        from knowledge.curator.interfaces import (
+            IPloneAppKnowledgeLayer)
         from plone.browserlayer import utils
         self.assertNotIn(
-            IPloneAppKnowledgeLayer,
-            utils.registered_layers())
+           IPloneAppKnowledgeLayer,
+           utils.registered_layers())

@@ -8,7 +8,7 @@ from knowledge.curator.vector.config import get_vector_config
 from typing import List, Dict, Any, Optional, Tuple
 import logging
 
-logger = logging.getLogger("plone.app.knowledge.vector")
+logger = logging.getLogger("knowledge.curator.vector")
 
 
 class SimilaritySearch:

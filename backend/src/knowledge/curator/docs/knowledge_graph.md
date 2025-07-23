@@ -138,7 +138,7 @@ The analysis panel shows:
 ### Shortest Path
 Find the shortest path between two concepts:
 ```python
-from plone.app.knowledge.graph import GraphAlgorithms
+from knowledge.curator.graph import GraphAlgorithms
 
 algo = GraphAlgorithms(graph)
 path = algo.shortest_path(start_uid, end_uid)
@@ -175,7 +175,7 @@ gaps = algo.find_knowledge_gaps(min_importance=0.5)
 
 Register custom relationships:
 ```python
-from plone.app.knowledge.graph import RelationshipManager
+from knowledge.curator.graph import RelationshipManager
 
 manager = RelationshipManager()
 manager.register_custom_relationship(
@@ -230,7 +230,7 @@ KnowledgeGraph.options.nodeColors = {
 ### Creating a Learning Path
 
 ```python
-from plone.app.knowledge.graph import GraphOperations, GraphTraversal
+from knowledge.curator.graph import GraphOperations, GraphTraversal
 
 # Create nodes
 ops = GraphOperations(graph)

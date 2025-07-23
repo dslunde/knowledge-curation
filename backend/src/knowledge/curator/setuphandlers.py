@@ -1,4 +1,4 @@
-"""Post install import steps for plone.app.knowledge."""
+"""Post install import steps for knowledge.curator."""
 
 from Products.CMFPlone.interfaces import INonInstallable
 from zope.interface import implementer
@@ -11,7 +11,7 @@ class HiddenProfiles(object):
     def getNonInstallableProfiles(self):
         """Hide uninstall profile from site-creation and quickinstaller."""
         return [
-            'plone.app.knowledge:uninstall',
+            'knowledge.curator:uninstall',
         ]
 
 

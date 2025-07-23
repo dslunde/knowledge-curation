@@ -1,5 +1,5 @@
 ====================
-plone.app.knowledge
+knowledge.curator
 ====================
 
 Personal Knowledge Curation System for Plone 6.
@@ -24,22 +24,22 @@ Features
 Installation
 ------------
 
-Install plone.app.knowledge by adding it to your buildout::
+Install knowledge.curator by adding it to your buildout::
 
     [buildout]
 
     ...
 
     eggs =
-        plone.app.knowledge
+        knowledge.curator
 
 and then running ``bin/buildout``
 
 Contribute
 ----------
 
-- Issue Tracker: https://github.com/collective/plone.app.knowledge/issues
-- Source Code: https://github.com/collective/plone.app.knowledge
+- Issue Tracker: https://github.com/collective/knowledge.curator/issues
+- Source Code: https://github.com/collective/knowledge.curator
 
 License
 -------

@@ -2,7 +2,7 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-      i18n:domain="plone.app.knowledge"
+      i18n:domain="knowledge.curator"
       metal:use-macro="context/main_template/macros/master">
 
 <body>
@@ -101,12 +101,12 @@
     
     <!-- Include our graph visualization script -->
     <script type="text/javascript"
-            tal:attributes="src string:${context/portal_url}/++resource++plone.app.knowledge/js/knowledge-graph.js">
+            tal:attributes="src string:${context/portal_url}/++resource++knowledge.curator/js/knowledge-graph.js">
     </script>
     
     <!-- Include our graph styles -->
     <link rel="stylesheet" type="text/css"
-          tal:attributes="href string:${context/portal_url}/++resource++plone.app.knowledge/css/knowledge-graph.css" />
+          tal:attributes="href string:${context/portal_url}/++resource++knowledge.curator/css/knowledge-graph.css" />
 
 </metal:main>
 

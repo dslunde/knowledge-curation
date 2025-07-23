@@ -12,7 +12,7 @@ import logging
 import json
 import os
 
-logger = logging.getLogger("plone.app.knowledge.vector")
+logger = logging.getLogger("knowledge.curator.vector")
 
 
 class VectorCollectionManager:

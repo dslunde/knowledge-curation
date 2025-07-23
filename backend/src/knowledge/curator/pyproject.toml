@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "plone.app.knowledge"
+name = "knowledge.curator"
 version = "1.0.0.dev0"
 description = "Personal Knowledge Curation System for Plone"
 readme = "README.rst"
@@ -52,15 +52,15 @@ test = [
 ]
 
 [project.urls]
-PyPI = "https://pypi.python.org/pypi/plone.app.knowledge"
-Source = "https://github.com/collective/plone.app.knowledge"
-Tracker = "https://github.com/collective/plone.app.knowledge/issues"
+PyPI = "https://pypi.python.org/pypi/knowledge.curator"
+Source = "https://github.com/collective/knowledge.curator"
+Tracker = "https://github.com/collective/knowledge.curator/issues"
 
 [project.entry-points]
 "z3c.autoinclude.plugin" = {target = "plone"}
 
 [tool.setuptools.packages.find]
-include = ["plone*"]
+include = ["knowledge*"]
 exclude = ["ez_setup"]
 
 [tool.setuptools.package-data]

@@ -43,12 +43,12 @@ def get_vector_config():
             
             # Override with registry values if they exist
             registry_keys = [
-                ("plone.app.knowledge.vector.qdrant_host", "qdrant_host"),
-                ("plone.app.knowledge.vector.qdrant_port", "qdrant_port"),
-                ("plone.app.knowledge.vector.qdrant_api_key", "qdrant_api_key"),
-                ("plone.app.knowledge.vector.embedding_model", "embedding_model"),
-                ("plone.app.knowledge.vector.default_search_limit", "default_search_limit"),
-                ("plone.app.knowledge.vector.default_score_threshold", "default_score_threshold"),
+                ("knowledge.curator.vector.qdrant_host", "qdrant_host"),
+                ("knowledge.curator.vector.qdrant_port", "qdrant_port"),
+                ("knowledge.curator.vector.qdrant_api_key", "qdrant_api_key"),
+                ("knowledge.curator.vector.embedding_model", "embedding_model"),
+                ("knowledge.curator.vector.default_search_limit", "default_search_limit"),
+                ("knowledge.curator.vector.default_score_threshold", "default_score_threshold"),
             ]
             
             for registry_key, config_key in registry_keys:

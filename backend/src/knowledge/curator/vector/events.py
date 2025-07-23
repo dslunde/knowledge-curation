@@ -14,7 +14,7 @@ from Products.CMFCore.interfaces import IContentish
 from Products.DCWorkflow.interfaces import IAfterTransitionEvent
 import logging
 
-logger = logging.getLogger("plone.app.knowledge.vector")
+logger = logging.getLogger("knowledge.curator.vector")
 
 
 def should_index_content(obj):

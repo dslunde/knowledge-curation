@@ -228,7 +228,7 @@ class TestLearningGoalWorkflow(unittest.TestCase):
         
         # Check that start time was recorded
         annotations = IAnnotations(self.learning_goal)
-        timeline = annotations.get('plone.app.knowledge.learning_timeline', {})
+        timeline = annotations.get('knowledge.curator.learning_timeline', {})
         self.assertIn('started_at', timeline)
         
     def test_pause_and_resume(self):
@@ -292,7 +292,7 @@ class TestLearningGoalWorkflow(unittest.TestCase):
         
         # Check completion was recorded
         annotations = IAnnotations(self.learning_goal)
-        timeline = annotations.get('plone.app.knowledge.learning_timeline', {})
+        timeline = annotations.get('knowledge.curator.learning_timeline', {})
         self.assertIn('completed_at', timeline)
         self.assertEqual(self.learning_goal.progress, 100.0)
         
@@ -317,7 +317,7 @@ class TestLearningGoalWorkflow(unittest.TestCase):
         
         # Check abandonment was recorded
         annotations = IAnnotations(self.learning_goal)
-        self.assertIn('plone.app.knowledge.abandoned', annotations)
+        self.assertIn('knowledge.curator.abandoned', annotations)
         
     def test_completion_guard(self):
         """Test that completion requires minimum progress."""

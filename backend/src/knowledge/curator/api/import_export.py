@@ -148,7 +148,7 @@ class ImportExportService(Service):
         export_data = {
             'version': '1.0',
             'export_date': datetime.now().isoformat(),
-            'exporter': 'plone.app.knowledge',
+            'exporter': 'knowledge.curator',
             'item_count': len(items),
             'items': items
         }

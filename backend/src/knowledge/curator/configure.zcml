@@ -30,25 +30,25 @@
 
   <genericsetup:registerProfile
       name="default"
-      title="plone.app.knowledge"
+      title="Knowledge Curator"
       directory="profiles/default"
-      description="Installs the plone.app.knowledge add-on."
+      description="Installs the Knowledge Curator add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
       post_handler=".setuphandlers.post_install"
       />
 
   <genericsetup:registerProfile
       name="uninstall"
-      title="plone.app.knowledge (uninstall)"
+      title="Knowledge Curator (uninstall)"
       directory="profiles/uninstall"
-      description="Uninstalls the plone.app.knowledge add-on."
+      description="Uninstalls the Knowledge Curator add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
       post_handler=".setuphandlers.uninstall"
       />
 
   <utility
       factory=".setuphandlers.HiddenProfiles"
-      name="plone.app.knowledge-hiddenprofiles"
+      name="knowledge.curator-hiddenprofiles"
       />
 
   <!-- -*- extra stuff goes here -*- -->

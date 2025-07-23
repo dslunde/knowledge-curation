@@ -7,7 +7,7 @@ from Products.CMFCore.WorkflowCore import WorkflowException
 from zope.component import queryAdapter
 import logging
 
-logger = logging.getLogger('plone.app.knowledge.workflow')
+logger = logging.getLogger('knowledge.curator.workflow')
 
 
 def update_embeddings(state_change):
@@ -48,7 +48,7 @@ def suggest_connections(state_change):
         # For now, we'll just add a marker annotation
         from zope.annotation.interfaces import IAnnotations
         annotations = IAnnotations(obj)
-        annotations['plone.app.knowledge.connection_suggestions'] = {
+        annotations['knowledge.curator.connection_suggestions'] = {
             'suggested_at': datetime.now().isoformat(),
             'suggestions': []  # Would contain actual suggestions
         }
@@ -91,10 +91,10 @@ def record_start_time(state_change):
         from zope.annotation.interfaces import IAnnotations
         annotations = IAnnotations(obj)
         
-        if 'plone.app.knowledge.learning_timeline' not in annotations:
-            annotations['plone.app.knowledge.learning_timeline'] = {}
+        if 'knowledge.curator.learning_timeline' not in annotations:
+            annotations['knowledge.curator.learning_timeline'] = {}
         
-        timeline = annotations['plone.app.knowledge.learning_timeline']
+        timeline = annotations['knowledge.curator.learning_timeline']
         timeline['started_at'] = datetime.now().isoformat()
         
         # Initialize progress tracking
@@ -151,7 +151,7 @@ def record_completion_time(state_change):
         from zope.annotation.interfaces import IAnnotations
         annotations = IAnnotations(obj)
         
-        timeline = annotations.get('plone.app.knowledge.learning_timeline', {})
+        timeline = annotations.get('knowledge.curator.learning_timeline', {})
         timeline['completed_at'] = datetime.now().isoformat()
         
         # Calculate duration if start time exists
@@ -161,7 +161,7 @@ def record_completion_time(state_change):
             duration = end - start
             timeline['duration_days'] = duration.days
             
-        annotations['plone.app.knowledge.learning_timeline'] = timeline
+        annotations['knowledge.curator.learning_timeline'] = timeline
         
         # Set final progress to 100%
         obj.progress = 100.0

@@ -3,7 +3,7 @@
 from plone import api
 import logging
 
-logger = logging.getLogger('plone.app.knowledge')
+logger = logging.getLogger('knowledge.curator')
 
 
 def add_spaced_repetition_to_content(context):
@@ -18,7 +18,7 @@ def add_spaced_repetition_to_content(context):
     types_tool = api.portal.get_tool('portal_types')
     
     # Update FTIs to include behavior
-    behavior = 'plone.app.knowledge.spaced_repetition'
+    behavior = 'knowledge.curator.spaced_repetition'
     updated_types = []
     
     for portal_type in portal_types:

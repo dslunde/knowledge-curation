@@ -15,7 +15,7 @@ from typing import Dict, List, Optional, Tuple, Any
 import logging
 import uuid
 
-logger = logging.getLogger("plone.app.knowledge.vector")
+logger = logging.getLogger("knowledge.curator.vector")
 
 
 class QdrantAdapter:

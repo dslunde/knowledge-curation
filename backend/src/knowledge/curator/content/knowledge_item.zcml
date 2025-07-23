@@ -4,7 +4,7 @@
     i18n_domain="knowledge.curator">
 
   <plone:behavior
-      name="plone.app.knowledge.knowledge_item"
+      name="knowledge.curator.knowledge_item"
       title="Knowledge Item"
       description="Knowledge Item content type"
       provides=".knowledge_item.IKnowledgeItem"

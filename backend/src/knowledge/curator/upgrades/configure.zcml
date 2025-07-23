@@ -9,7 +9,7 @@
       source="1"
       destination="2"
       handler=".v2.add_new_content_types"
-      profile="plone.app.knowledge:default"
+      profile="knowledge.curator:default"
       />
 
 </configure>

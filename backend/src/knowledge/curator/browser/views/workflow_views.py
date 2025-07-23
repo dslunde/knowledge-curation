@@ -11,7 +11,7 @@ from zope.interface import Interface
 import json
 import logging
 
-logger = logging.getLogger('plone.app.knowledge.workflow_views')
+logger = logging.getLogger('knowledge.curator.workflow_views')
 
 
 class IWorkflowTransitionForm(Interface):

@@ -16,7 +16,7 @@ from .model import Graph, Node, Edge, NodeType
 from .relationships import RelationshipType
 
 
-GRAPH_ANNOTATION_KEY = 'plone.app.knowledge.graph'
+GRAPH_ANNOTATION_KEY = 'knowledge.curator.graph'
 
 
 class GraphStorage:

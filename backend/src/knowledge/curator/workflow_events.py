@@ -8,7 +8,7 @@ from zope.component import adapter
 from zope.globalrequest import getRequest
 import logging
 
-logger = logging.getLogger('plone.app.knowledge.workflow_events')
+logger = logging.getLogger('knowledge.curator.workflow_events')
 
 
 @adapter(IKnowledgeItem, IActionSucceededEvent)
@@ -81,7 +81,7 @@ def handle_start_connecting(obj):
         # Store suggestions
         from zope.annotation.interfaces import IAnnotations
         annotations = IAnnotations(obj)
-        annotations['plone.app.knowledge.related_items'] = [
+        annotations['knowledge.curator.related_items'] = [
             brain.UID for brain in brains[:10]  # Limit to 10 suggestions
         ]
         
@@ -100,8 +100,8 @@ def handle_publishing(obj):
     from zope.annotation.interfaces import IAnnotations
     annotations = IAnnotations(obj)
     
-    if 'plone.app.knowledge.draft' in annotations:
-        del annotations['plone.app.knowledge.draft']
+    if 'knowledge.curator.draft' in annotations:
+        del annotations['knowledge.curator.draft']
     
     # Log publication
     logger.info(f"Published knowledge item: {obj.absolute_url()}")
@@ -144,7 +144,7 @@ def log_abandonment(obj):
     from datetime import datetime
     
     annotations = IAnnotations(obj)
-    annotations['plone.app.knowledge.abandoned'] = {
+    annotations['knowledge.curator.abandoned'] = {
         'date': datetime.now().isoformat(),
         'progress_at_abandonment': getattr(obj, 'progress', 0),
         'reason': getRequest().form.get('reason', 'Not specified')

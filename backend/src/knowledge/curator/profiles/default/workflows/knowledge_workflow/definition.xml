@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <dc-workflow xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-             i18n:domain="plone.app.knowledge"
+             i18n:domain="knowledge.curator"
              workflow_id="knowledge_workflow"
              title="Knowledge Management Workflow"
              description="Workflow for knowledge items with capture, process, connect, and publish states"
@@ -14,8 +14,8 @@
   <permission>Modify portal content</permission>
   <permission>Delete objects</permission>
   <permission>Add portal content</permission>
-  <permission>plone.app.knowledge: Add AI annotations</permission>
-  <permission>plone.app.knowledge: View AI annotations</permission>
+  <permission>knowledge.curator: Add AI annotations</permission>
+  <permission>knowledge.curator: View AI annotations</permission>
 
   <!-- States -->
   <state state_id="capture" title="Capture" i18n:attributes="title">
@@ -65,7 +65,7 @@
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
     </permission-map>
-    <permission-map name="plone.app.knowledge: Add AI annotations" acquired="False">
+    <permission-map name="knowledge.curator: Add AI annotations" acquired="False">
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
@@ -119,7 +119,7 @@
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
     </permission-map>
-    <permission-map name="plone.app.knowledge: View AI annotations" acquired="False">
+    <permission-map name="knowledge.curator: View AI annotations" acquired="False">
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
@@ -294,15 +294,15 @@
 
   <!-- Scripts -->
   <script script_id="updateEmbeddings" type="External Method"
-          module="plone.app.knowledge.workflow_scripts"
-          function="update_embeddings"/>
+          module="knowledge.curator.workflow_scripts"
+          function="update_embeddings" filename=""/>
 
   <script script_id="suggestConnections" type="External Method"
-          module="plone.app.knowledge.workflow_scripts"
-          function="suggest_connections"/>
+          module="knowledge.curator.workflow_scripts"
+          function="suggest_connections" filename=""/>
 
   <script script_id="validateForPublishing" type="External Method"
-          module="plone.app.knowledge.workflow_scripts"
-          function="validate_for_publishing"/>
+          module="knowledge.curator.workflow_scripts"
+          function="validate_for_publishing" filename=""/>
 
 </dc-workflow>

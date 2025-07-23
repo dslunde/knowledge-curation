@@ -1,1 +1,1 @@
-"""Behaviors for plone.app.knowledge."""
+"""Behaviors for knowledge.curator."""

@@ -7,7 +7,7 @@ from typing import List, Union, Optional, Dict, Any
 import logging
 import numpy as np
 
-logger = logging.getLogger("plone.app.knowledge.vector")
+logger = logging.getLogger("knowledge.curator.vector")
 
 
 class EmbeddingGenerator:

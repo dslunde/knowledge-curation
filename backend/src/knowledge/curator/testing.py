@@ -21,10 +21,10 @@ class PloneAppKnowledgeLayer(PloneSandboxLayer):
         # layer.
         import plone.restapi
         self.loadZCML(package=plone.restapi)
-        self.loadZCML(package=plone.app.knowledge)
+        self.loadZCML(package=knowledge.curator)
 
     def setUpPloneSite(self, portal):
-        applyProfile(portal, 'plone.app.knowledge:default')
+        applyProfile(portal, 'knowledge.curator:default')
 
 
 PLONE_APP_KNOWLEDGE_FIXTURE = PloneAppKnowledgeLayer()

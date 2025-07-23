@@ -1,1 +1,1 @@
-"""API services for plone.app.knowledge."""
+"""API services for knowledge.curator."""

@@ -1,26 +1,20 @@
-"""Upgrade steps for version 2 - Adding new content types."""
+"""Upgrade to version 2: Add new content types."""
 
-from plone import api
+from Products.CMFCore.utils import getToolByName
+from plone.app.upgrade.utils import loadMigrationProfile
 
 
 def add_new_content_types(context):
-    """Add new content types to the site."""
-    setup = api.portal.get_tool('portal_setup')
-    
-    # Import the types
-    setup.runImportStepFromProfile(
-        'profile-plone.app.knowledge:default',
-        'typeinfo'
+    """Add ResearchNote, LearningGoal, ProjectLog, and BookmarkPlus content types."""
+    loadMigrationProfile(
+        context,
+        'profile-knowledge.curator:default',
+        steps=['typeinfo']
     )
     
-    # Import the permissions
-    setup.runImportStepFromProfile(
-        'profile-plone.app.knowledge:default',
-        'rolemap'
+    # Refresh catalog for new content types
+    loadMigrationProfile(
+        context,
+        'profile-knowledge.curator:default',
+        steps=['catalog']
     )
-    
-    # Reindex the catalog
-    catalog = api.portal.get_tool('portal_catalog')
-    catalog.clearFindAndRebuild()
-    
-    return "Added new content types: ResearchNote, LearningGoal, ProjectLog, BookmarkPlus"

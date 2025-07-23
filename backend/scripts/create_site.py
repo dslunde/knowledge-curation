@@ -48,7 +48,7 @@ def create_site():
         return
 
     # Set up the request environment
-    app = makerequest(globals()["app"])
+app = makerequest(globals()["app"])
 
 request = app.REQUEST
 
