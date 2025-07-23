@@ -1,0 +1,358 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      metal:use-macro="context/main_template/macros/master">
+
+<metal:block fill-slot="content-core">
+  <div class="performance-dashboard" tal:define="data view/get_performance_data;
+                                                  summary view/get_performance_summary">
+    
+    <h1>Review Performance</h1>
+    
+    <!-- Period Selector -->
+    <div class="period-selector mb-4">
+      <div class="btn-group" role="group">
+        <a class="btn btn-outline-primary"
+           tal:attributes="class python:'btn btn-primary' if request.get('days', '30') == '7' else 'btn btn-outline-primary';
+                           href string:${context/absolute_url}/@@review-performance?days=7">
+          Last 7 Days
+        </a>
+        <a class="btn btn-outline-primary"
+           tal:attributes="class python:'btn btn-primary' if request.get('days', '30') == '30' else 'btn btn-outline-primary';
+                           href string:${context/absolute_url}/@@review-performance?days=30">
+          Last 30 Days
+        </a>
+        <a class="btn btn-outline-primary"
+           tal:attributes="class python:'btn btn-primary' if request.get('days', '30') == '90' else 'btn btn-outline-primary';
+                           href string:${context/absolute_url}/@@review-performance?days=90">
+          Last 90 Days
+        </a>
+      </div>
+    </div>
+    
+    <!-- Summary Cards -->
+    <div class="summary-cards row mb-4" tal:condition="summary/has_data">
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-primary" tal:content="data/metrics/summary/total_reviews">0</h3>
+            <p class="mb-0">Total Reviews</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-success" tal:content="string:${data/metrics/summary/success_rate}%">0%</h3>
+            <p class="mb-0">Success Rate</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-info" tal:content="data/metrics/streaks/current">0</h3>
+            <p class="mb-0">Current Streak</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-warning" tal:content="string:${data/metrics/summary/average_quality}">0</h3>
+            <p class="mb-0">Avg Quality</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Performance Charts -->
+    <div class="row" tal:condition="summary/has_data">
+      <!-- Quality Distribution -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5>Quality Distribution</h5>
+          </div>
+          <div class="card-body">
+            <canvas id="qualityChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Daily Performance -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5>Daily Performance</h5>
+          </div>
+          <div class="card-body">
+            <canvas id="dailyChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Forgetting Curves -->
+    <div class="forgetting-curves mb-4" tal:condition="data/forgetting_curves">
+      <h3>Forgetting Curves</h3>
+      <div class="card">
+        <div class="card-body">
+          <canvas id="forgettingChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Workload Forecast -->
+    <div class="workload-forecast mb-4">
+      <h3>Upcoming Workload</h3>
+      <div class="card">
+        <div class="card-body">
+          <canvas id="workloadChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Learning Insights -->
+    <div class="learning-insights" tal:condition="data/metrics/progress">
+      <h3>Learning Insights</h3>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Performance Trend</h5>
+            </div>
+            <div class="card-body">
+              <div class="trend-indicator"
+                   tal:attributes="class python:'text-success' if data['metrics']['progress']['trend'] == 'improving' else 'text-danger' if data['metrics']['progress']['trend'] == 'declining' else 'text-warning'">
+                <i tal:attributes="class python:'fas fa-arrow-up' if data['metrics']['progress']['trend'] == 'improving' else 'fas fa-arrow-down' if data['metrics']['progress']['trend'] == 'declining' else 'fas fa-arrow-right'"></i>
+                <span tal:content="data/metrics/progress/trend">Stable</span>
+              </div>
+              <p class="mt-2">
+                Current performance: <strong tal:content="data/metrics/progress/current_performance">0</strong>/5
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Learning Velocity</h5>
+            </div>
+            <div class="card-body">
+              <p>Items per week: <strong tal:content="data/metrics/learning_velocity/items_per_week">0</strong></p>
+              <p>Mastery rate: <strong tal:content="string:${data/metrics/learning_velocity/mastery_rate}%">0%</strong></p>
+              <p>Avg interval growth: <strong tal:content="string:${data/metrics/learning_velocity/average_interval_growth}x">0x</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Empty State -->
+    <div class="empty-state text-center py-5" tal:condition="not:summary/has_data">
+      <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
+      <h3>No Performance Data Yet</h3>
+      <p tal:content="summary/message">Start reviewing items to see your performance metrics!</p>
+      <a href="" tal:attributes="href string:${context/absolute_url}/@@review-queue"
+         class="btn btn-primary mt-3">
+        Start Reviewing
+      </a>
+    </div>
+  </div>
+
+  <!-- Chart.js Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script tal:condition="summary/has_data">
+    jQuery(function($) {
+      var performanceData = <tal:data replace="structure python:modules['json'].dumps(view.get_performance_data())"/>;
+      
+      // Quality Distribution Chart
+      var qualityCtx = document.getElementById('qualityChart').getContext('2d');
+      new Chart(qualityCtx, {
+        type: 'bar',
+        data: {
+          labels: ['0 - Blackout', '1 - Failed', '2 - Hard', '3 - Good', '4 - Easy', '5 - Perfect'],
+          datasets: [{
+            label: 'Percentage',
+            data: [
+              performanceData.metrics.quality_distribution[0],
+              performanceData.metrics.quality_distribution[1],
+              performanceData.metrics.quality_distribution[2],
+              performanceData.metrics.quality_distribution[3],
+              performanceData.metrics.quality_distribution[4],
+              performanceData.metrics.quality_distribution[5]
+            ],
+            backgroundColor: [
+              '#dc3545', '#dc3545', '#ffc107', '#17a2b8', '#28a745', '#28a745'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      // Daily Performance Chart
+      if (performanceData.metrics.daily_stats && performanceData.metrics.daily_stats.length > 0) {
+        var dailyCtx = document.getElementById('dailyChart').getContext('2d');
+        new Chart(dailyCtx, {
+          type: 'line',
+          data: {
+            labels: performanceData.metrics.daily_stats.map(d => d.date),
+            datasets: [{
+              label: 'Reviews',
+              data: performanceData.metrics.daily_stats.map(d => d.reviews),
+              borderColor: '#007bff',
+              fill: false
+            }, {
+              label: 'Success Rate',
+              data: performanceData.metrics.daily_stats.map(d => d.success_rate),
+              borderColor: '#28a745',
+              fill: false,
+              yAxisID: 'y1'
+            }]
+          },
+          options: {
+            responsive: true,
+            interaction: {
+              mode: 'index',
+              intersect: false
+            },
+            scales: {
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left'
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                grid: {
+                  drawOnChartArea: false
+                },
+                ticks: {
+                  callback: function(value) {
+                    return value + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+      
+      // Forgetting Curves Chart
+      if (performanceData.forgetting_curves && performanceData.forgetting_curves.length > 0) {
+        var forgettingCtx = document.getElementById('forgettingChart').getContext('2d');
+        var datasets = performanceData.forgetting_curves.map((curve, index) => ({
+          label: curve.title,
+          data: curve.data.map(d => ({x: d.day, y: d.percentage})),
+          borderColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8'][index % 5],
+          fill: false
+        }));
+        
+        new Chart(forgettingCtx, {
+          type: 'line',
+          data: {
+            datasets: datasets
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                type: 'linear',
+                title: {
+                  display: true,
+                  text: 'Days'
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Retention %'
+                },
+                min: 0,
+                max: 100
+              }
+            }
+          }
+        });
+      }
+      
+      // Workload Forecast Chart
+      if (performanceData.workload_forecast && performanceData.workload_forecast.length > 0) {
+        var workloadCtx = document.getElementById('workloadChart').getContext('2d');
+        new Chart(workloadCtx, {
+          type: 'bar',
+          data: {
+            labels: performanceData.workload_forecast.slice(0, 14).map(d => d.date),
+            datasets: [{
+              label: 'Items Due',
+              data: performanceData.workload_forecast.slice(0, 14).map(d => d.count),
+              backgroundColor: '#007bff'
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+    });
+  </script>
+
+  <style>
+    .performance-dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .summary-cards .card {
+      border: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    
+    .summary-cards .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .summary-cards h3 {
+      font-size: 2.5rem;
+      margin: 0;
+    }
+    
+    .trend-indicator {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .trend-indicator i {
+      margin-right: 10px;
+    }
+    
+    canvas {
+      max-height: 300px;
+    }
+  </style>
+</metal:block>
+
+</html>

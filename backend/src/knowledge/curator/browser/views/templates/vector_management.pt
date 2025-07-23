@@ -1,0 +1,156 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="plone.app.knowledge"
+      metal:use-macro="context/main_template/macros/master">
+
+<body>
+
+<metal:main fill-slot="main">
+    <tal:main-macro metal:define-macro="main">
+
+        <div class="documentDescription">
+            Manage vector database operations for knowledge content
+        </div>
+
+        <div id="content-core">
+            
+            <!-- Health Status -->
+            <div class="box" tal:define="health view/get_health_status">
+                <h2>System Health</h2>
+                <div class="health-status">
+                    <p>
+                        <strong>Overall Status:</strong>
+                        <span tal:condition="health/healthy" class="label label-success">Healthy</span>
+                        <span tal:condition="not:health/healthy" class="label label-danger">Unhealthy</span>
+                    </p>
+                    
+                    <div tal:condition="health/qdrant|nothing">
+                        <strong>Qdrant:</strong>
+                        <span tal:condition="health/qdrant/healthy" class="label label-success">Connected</span>
+                        <span tal:condition="not:health/qdrant/healthy" class="label label-danger">
+                            Error: <span tal:content="health/qdrant/error|string:Connection failed"></span>
+                        </span>
+                    </div>
+                    
+                    <div tal:condition="health/embeddings|nothing">
+                        <strong>Embeddings:</strong>
+                        <span tal:condition="health/embeddings/healthy" class="label label-success">
+                            Model: <span tal:content="health/embeddings/model"></span>
+                            (dim: <span tal:content="health/embeddings/dimension"></span>)
+                        </span>
+                        <span tal:condition="not:health/embeddings/healthy" class="label label-danger">
+                            Error: <span tal:content="health/embeddings/error|string:Model load failed"></span>
+                        </span>
+                    </div>
+                    
+                    <div tal:condition="health/collection|nothing">
+                        <strong>Collection:</strong>
+                        <span tal:condition="health/collection/exists" class="label label-success">
+                            <span tal:content="health/collection/name"></span>
+                        </span>
+                        <span tal:condition="not:health/collection/exists" class="label label-warning">
+                            Not initialized
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Database Info -->
+            <div class="box" tal:define="info view/get_database_info">
+                <h2>Database Statistics</h2>
+                <div tal:condition="info">
+                    <div tal:condition="info/collection_info|nothing">
+                        <p><strong>Total Vectors:</strong> 
+                           <span tal:content="info/collection_info/points_count|string:0"></span>
+                        </p>
+                    </div>
+                    
+                    <div tal:condition="info/content_type_distribution|nothing">
+                        <h3>Content Type Distribution</h3>
+                        <ul>
+                            <li tal:repeat="item python:info['content_type_distribution'].items()">
+                                <span tal:content="python:item[0]"></span>:
+                                <span tal:content="python:item[1]"></span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div tal:condition="info/workflow_state_distribution|nothing">
+                        <h3>Workflow State Distribution</h3>
+                        <ul>
+                            <li tal:repeat="item python:info['workflow_state_distribution'].items()">
+                                <span tal:content="python:item[0]"></span>:
+                                <span tal:content="python:item[1]"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Management Actions -->
+            <div class="box">
+                <h2>Management Actions</h2>
+                
+                <form method="POST" tal:attributes="action string:${context/absolute_url}/@@vector-management">
+                    
+                    <div class="field">
+                        <h3>Initialize Database</h3>
+                        <p class="discreet">Create or verify the vector database collection</p>
+                        <button type="submit" name="action" value="initialize" class="btn btn-primary">
+                            Initialize Database
+                        </button>
+                    </div>
+                    
+                    <hr />
+                    
+                    <div class="field">
+                        <h3>Rebuild Index</h3>
+                        <p class="discreet">Rebuild the entire vector index from existing content</p>
+                        
+                        <div class="field">
+                            <label for="clear_first">
+                                <input type="checkbox" name="clear_first" id="clear_first" value="true" checked="checked" />
+                                Clear existing vectors before rebuilding
+                            </label>
+                        </div>
+                        
+                        <div class="field">
+                            <label for="content_types">Content Types (comma-separated, leave empty for all):</label>
+                            <input type="text" name="content_types" id="content_types" 
+                                   value="BookmarkPlus,ResearchNote,LearningGoal,ProjectLog"
+                                   class="form-control" />
+                        </div>
+                        
+                        <button type="submit" name="action" value="rebuild" class="btn btn-warning"
+                                onclick="return confirm('This will rebuild the entire index. Continue?')">
+                            Rebuild Index
+                        </button>
+                    </div>
+                    
+                </form>
+                
+                <hr />
+                
+                <div class="field">
+                    <h3>Diagnostics</h3>
+                    <a tal:attributes="href string:${context/absolute_url}/@@vector-management?action=health_check"
+                       target="_blank" class="btn btn-default">
+                        View Health Check (JSON)
+                    </a>
+                    <a tal:attributes="href string:${context/absolute_url}/@@vector-management?action=stats"
+                       target="_blank" class="btn btn-default">
+                        View Statistics (JSON)
+                    </a>
+                </div>
+                
+            </div>
+            
+        </div>
+
+    </tal:main-macro>
+</metal:main>
+
+</body>
+</html>

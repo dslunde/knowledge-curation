@@ -1,0 +1,294 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      metal:use-macro="context/main_template/macros/master">
+
+<metal:block fill-slot="content-core">
+  <div class="review-card-container" tal:define="item view/get_item_data"
+       tal:condition="item">
+    
+    <div class="review-header mb-4">
+      <a href="" tal:attributes="href string:${context/absolute_url}/@@review-queue"
+         class="btn btn-link">
+        <i class="fas fa-arrow-left"></i> Back to Queue
+      </a>
+    </div>
+    
+    <div class="review-card">
+      <div class="card shadow-lg">
+        <div class="card-header">
+          <h3 tal:content="item/title">Item Title</h3>
+          <div class="metadata">
+            <span class="badge badge-info" tal:content="item/portal_type">Type</span>
+            <span class="badge badge-secondary" tal:content="item/sr_data/mastery_level">Level</span>
+            <span class="text-muted">
+              Reviews: <span tal:content="item/sr_data/repetitions">0</span>
+            </span>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <!-- Question Phase -->
+          <div class="question-phase" tal:condition="not:item/show_answer">
+            <h4 class="text-primary mb-3" tal:content="item/content/question">Question</h4>
+            <p class="text-muted" tal:content="item/description">Description</p>
+            
+            <div class="mt-4 text-center">
+              <button id="show-answer" class="btn btn-primary btn-lg">
+                Show Answer
+              </button>
+            </div>
+          </div>
+          
+          <!-- Answer Phase -->
+          <div class="answer-phase" tal:condition="item/show_answer" style="display:none;">
+            <h4 class="text-primary mb-3">Answer:</h4>
+            <div class="answer-content p-3 bg-light rounded"
+                 tal:content="structure item/content/answer">
+              Answer
+            </div>
+            
+            <div class="full-content mt-3" tal:condition="item/content/full_content"
+                 style="display:none;">
+              <h5>Full Content:</h5>
+              <div class="p-3 border rounded"
+                   tal:content="structure item/content/full_content">
+                Full content
+              </div>
+            </div>
+            
+            <button id="toggle-full-content" class="btn btn-sm btn-outline-secondary mt-2"
+                    tal:condition="item/content/full_content">
+              Show Full Content
+            </button>
+            
+            <!-- Quality Rating -->
+            <div class="quality-rating mt-4">
+              <h5>How well did you remember?</h5>
+              <div class="rating-buttons text-center">
+                <button class="btn btn-danger quality-btn" data-quality="0">
+                  <span class="d-block">0</span>
+                  <small>Blackout</small>
+                </button>
+                <button class="btn btn-danger quality-btn" data-quality="1">
+                  <span class="d-block">1</span>
+                  <small>Failed</small>
+                </button>
+                <button class="btn btn-warning quality-btn" data-quality="2">
+                  <span class="d-block">2</span>
+                  <small>Hard</small>
+                </button>
+                <button class="btn btn-info quality-btn" data-quality="3">
+                  <span class="d-block">3</span>
+                  <small>Good</small>
+                </button>
+                <button class="btn btn-success quality-btn" data-quality="4">
+                  <span class="d-block">4</span>
+                  <small>Easy</small>
+                </button>
+                <button class="btn btn-success quality-btn" data-quality="5">
+                  <span class="d-block">5</span>
+                  <small>Perfect</small>
+                </button>
+              </div>
+              
+              <div class="quality-descriptions mt-3 text-center text-muted">
+                <small id="quality-desc">Select how well you remembered</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-footer">
+          <div class="d-flex justify-content-between align-items-center">
+            <a tal:attributes="href item/url" target="_blank" class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-external-link-alt"></i> View Item
+            </a>
+            <div class="timer">
+              <i class="fas fa-clock"></i>
+              <span id="timer">00:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Hidden form data -->
+    <input type="hidden" id="item-uid" tal:attributes="value item/uid" />
+    <input type="hidden" id="start-time" tal:attributes="value python:int(modules['time'].time())" />
+  </div>
+
+  <script>
+    jQuery(function($) {
+      var startTime = parseInt($('#start-time').val());
+      var timerInterval;
+      var showAnswerTime;
+      
+      // Start timer
+      function startTimer() {
+        timerInterval = setInterval(function() {
+          var elapsed = Math.floor(Date.now() / 1000) - startTime;
+          var minutes = Math.floor(elapsed / 60);
+          var seconds = elapsed % 60;
+          $('#timer').text(
+            (minutes < 10 ? '0' : '') + minutes + ':' + 
+            (seconds < 10 ? '0' : '') + seconds
+          );
+        }, 1000);
+      }
+      
+      startTimer();
+      
+      // Show answer
+      $('#show-answer').click(function() {
+        showAnswerTime = Math.floor(Date.now() / 1000);
+        $('.question-phase').hide();
+        $('.answer-phase').show();
+      });
+      
+      // Toggle full content
+      $('#toggle-full-content').click(function() {
+        $('.full-content').toggle();
+        $(this).text(
+          $('.full-content').is(':visible') ? 'Hide Full Content' : 'Show Full Content'
+        );
+      });
+      
+      // Quality descriptions
+      var qualityDescriptions = {
+        0: "Complete blackout - no memory of the answer",
+        1: "Incorrect, but remembered when seeing the answer",
+        2: "Incorrect, but the answer was close",
+        3: "Correct, but with significant difficulty",
+        4: "Correct with some hesitation",
+        5: "Perfect response - instant and confident"
+      };
+      
+      // Hover quality descriptions
+      $('.quality-btn').hover(function() {
+        var quality = $(this).data('quality');
+        $('#quality-desc').text(qualityDescriptions[quality]);
+      }, function() {
+        $('#quality-desc').text('Select how well you remembered');
+      });
+      
+      // Submit review
+      $('.quality-btn').click(function() {
+        clearInterval(timerInterval);
+        
+        var quality = $(this).data('quality');
+        var totalTime = Math.floor(Date.now() / 1000) - startTime;
+        var uid = $('#item-uid').val();
+        
+        // Disable buttons
+        $('.quality-btn').prop('disabled', true);
+        
+        // Submit review
+        $.ajax({
+          url: portal_url + '/@@review-card/submit_review',
+          type: 'POST',
+          data: {
+            uid: uid,
+            quality: quality,
+            time_spent: totalTime
+          },
+          success: function(data) {
+            if (data.success) {
+              // Show success message
+              var message = $('<div class="alert alert-success mt-3">' +
+                '<strong>Review submitted!</strong><br>' +
+                'Next review in ' + data.result.new_interval + ' days' +
+                '</div>');
+              $('.quality-rating').after(message);
+              
+              // Redirect to next item or queue
+              setTimeout(function() {
+                if (data.next_item) {
+                  window.location.href = portal_url + '/@@review-card?uid=' + data.next_item.uid;
+                } else {
+                  window.location.href = portal_url + '/@@review-queue';
+                }
+              }, 1500);
+            }
+          },
+          error: function() {
+            alert('Error submitting review. Please try again.');
+            $('.quality-btn').prop('disabled', false);
+          }
+        });
+      });
+      
+      // Keyboard shortcuts
+      $(document).keypress(function(e) {
+        if ($('.answer-phase').is(':visible') && !$('.quality-btn').prop('disabled')) {
+          var key = String.fromCharCode(e.which);
+          if (key >= '0' && key <= '5') {
+            $('.quality-btn[data-quality="' + key + '"]').click();
+          }
+        } else if ($('.question-phase').is(':visible')) {
+          if (e.which == 32) { // Space bar
+            e.preventDefault();
+            $('#show-answer').click();
+          }
+        }
+      });
+    });
+  </script>
+
+  <style>
+    .review-card-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .review-card .card {
+      min-height: 400px;
+    }
+    
+    .rating-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .quality-btn {
+      width: 80px;
+      padding: 10px;
+      transition: transform 0.2s;
+    }
+    
+    .quality-btn:hover:not(:disabled) {
+      transform: scale(1.1);
+    }
+    
+    .quality-btn span {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .quality-btn small {
+      font-size: 0.7rem;
+    }
+    
+    .answer-content {
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    
+    .timer {
+      font-size: 1.2rem;
+      color: #6c757d;
+    }
+    
+    .metadata {
+      margin-top: 10px;
+    }
+    
+    .metadata > * {
+      margin-right: 10px;
+    }
+  </style>
+</metal:block>
+
+</html>

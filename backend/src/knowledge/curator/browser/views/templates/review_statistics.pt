@@ -1,0 +1,357 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      metal:use-macro="context/main_template/macros/master">
+
+<metal:block fill-slot="content-core">
+  <div class="statistics-dashboard" tal:define="stats view/get_statistics">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>Review Statistics</h1>
+      <a href="" tal:attributes="href string:${context/absolute_url}/@@review-statistics/export_statistics"
+         class="btn btn-outline-primary">
+        <i class="fas fa-download"></i> Export Data
+      </a>
+    </div>
+    
+    <!-- Adaptive Schedule -->
+    <div class="adaptive-schedule mb-5">
+      <h2>Adaptive Learning Schedule</h2>
+      
+      <!-- Optimal Review Times -->
+      <div class="card mb-3" tal:condition="stats/schedule/optimal_times/best_review_times">
+        <div class="card-header">
+          <h5>Optimal Review Times</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Best Performance Times:</h6>
+              <ul class="list-unstyled">
+                <li tal:repeat="time stats/schedule/optimal_times/best_review_times">
+                  <i class="fas fa-clock text-success"></i>
+                  <span tal:content="time/time">00:00</span>
+                  <small class="text-muted">(Performance: <span tal:content="time/performance_score">0</span>)</small>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6" tal:condition="stats/schedule/optimal_times/avoid_times">
+              <h6>Times to Avoid:</h6>
+              <ul class="list-unstyled">
+                <li tal:repeat="time stats/schedule/optimal_times/avoid_times">
+                  <i class="fas fa-times-circle text-danger"></i>
+                  <span tal:content="time/time">00:00</span>
+                  <small class="text-muted">(Performance: <span tal:content="time/performance_score">0</span>)</small>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="mt-3">
+            <p>Optimal session length: <strong tal:content="string:${stats/schedule/optimal_times/optimal_session_length} minutes">20 minutes</strong></p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Weekly Schedule -->
+      <div class="card mb-3" tal:condition="stats/schedule/optimal_times/suggested_schedule">
+        <div class="card-header">
+          <h5>Suggested Weekly Schedule</h5>
+        </div>
+        <div class="card-body">
+          <div class="schedule-grid">
+            <div class="schedule-item" tal:repeat="day stats/schedule/optimal_times/suggested_schedule">
+              <strong tal:content="day/day">Monday</strong>:
+              <span tal:content="day/time">00:00</span>
+              (<span tal:content="string:${day/duration} min">20 min</span>)
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recommendations -->
+      <div class="recommendations" tal:condition="stats/schedule/recommendations">
+        <h6>Recommendations:</h6>
+        <ul>
+          <li tal:repeat="rec stats/schedule/recommendations" tal:content="rec">Recommendation</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Items at Risk -->
+    <div class="at-risk-items mb-5" tal:condition="stats/at_risk_items">
+      <h2>Items at Risk of Being Forgotten</h2>
+      <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong tal:content="python:len(stats['at_risk_items'])">0</strong> items need urgent review
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Risk Level</th>
+              <th>Retention</th>
+              <th>Last Review</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr tal:repeat="item stats/at_risk_items">
+              <td>
+                <a tal:attributes="href item/item/url" tal:content="item/item/title">Title</a>
+              </td>
+              <td>
+                <span class="badge"
+                      tal:attributes="class python:'badge-danger' if item['risk_level'] == 'critical' else 'badge-warning' if item['risk_level'] == 'high' else 'badge-info'"
+                      tal:content="item/risk_level">Risk</span>
+              </td>
+              <td>
+                <span tal:content="string:${python:round(item['sr_data']['retention_score']*100)}%">0%</span>
+              </td>
+              <td tal:content="python:item['sr_data'].get('last_review', 'Never')">Never</td>
+              <td>
+                <a class="btn btn-sm btn-primary"
+                   tal:attributes="href string:${context/absolute_url}/@@review-card?uid=${item/item/uid}">
+                  Review Now
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Learning Velocity -->
+    <div class="learning-velocity mb-5">
+      <h2>Learning Progress</h2>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <h3 class="text-primary" tal:content="stats/learning_velocity/items_per_week">0</h3>
+              <p>Items per Week</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <h3 class="text-success" tal:content="string:${stats/learning_velocity/mastery_rate}%">0%</h3>
+              <p>Mastery Rate</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <h3 class="text-info" tal:content="string:${stats/learning_velocity/average_interval_growth}x">0x</h3>
+              <p>Interval Growth</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Difficulty Distribution -->
+    <div class="difficulty-distribution mb-5" tal:condition="stats/difficulty_distribution/distribution">
+      <h2>Difficulty Analysis</h2>
+      <div class="card">
+        <div class="card-body">
+          <canvas id="difficultyChart"></canvas>
+          
+          <div class="mt-3" tal:condition="stats/difficulty_distribution/struggling_items">
+            <h6>Items You're Struggling With:</h6>
+            <div class="struggling-items">
+              <div class="alert alert-info" tal:repeat="item stats/difficulty_distribution/struggling_items">
+                <strong>Item #<span tal:content="item/item_id">ID</span></strong><br/>
+                Recent qualities: <span tal:content="python:', '.join(str(q) for q in item['recent_qualities'])">0,0,0</span><br/>
+                Ease factor: <span tal:content="item/ease_factor">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Time Patterns -->
+    <div class="time-patterns mb-5" tal:condition="stats/time_patterns">
+      <h2>Performance by Time</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Best Hours</h5>
+            </div>
+            <div class="card-body">
+              <canvas id="hourChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Best Days</h5>
+            </div>
+            <div class="card-body">
+              <canvas id="dayChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-3">
+        <p>Consistency Score: <strong tal:content="string:${stats/time_patterns/consistency_score}%">0%</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    jQuery(function($) {
+      var statsData = <tal:data replace="structure python:modules['json'].dumps(view.get_statistics())"/>;
+      
+      // Difficulty Distribution Chart
+      if (statsData.difficulty_distribution && statsData.difficulty_distribution.distribution) {
+        var difficultyCtx = document.getElementById('difficultyChart').getContext('2d');
+        new Chart(difficultyCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Very Hard', 'Hard', 'Medium', 'Easy'],
+            datasets: [{
+              data: [
+                statsData.difficulty_distribution.distribution.very_hard,
+                statsData.difficulty_distribution.distribution.hard,
+                statsData.difficulty_distribution.distribution.medium,
+                statsData.difficulty_distribution.distribution.easy
+              ],
+              backgroundColor: ['#dc3545', '#ffc107', '#17a2b8', '#28a745']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      }
+      
+      // Hour Performance Chart
+      if (statsData.time_patterns && statsData.time_patterns.best_hours) {
+        var hourCtx = document.getElementById('hourChart').getContext('2d');
+        var hourData = statsData.time_patterns.best_hours.concat(statsData.time_patterns.worst_hours || []);
+        hourData.sort((a, b) => a.hour - b.hour);
+        
+        new Chart(hourCtx, {
+          type: 'bar',
+          data: {
+            labels: hourData.map(h => h.hour + ':00'),
+            datasets: [{
+              label: 'Average Quality',
+              data: hourData.map(h => h.average_quality),
+              backgroundColor: hourData.map(h => 
+                h.average_quality >= 4 ? '#28a745' : 
+                h.average_quality >= 3 ? '#17a2b8' : 
+                '#dc3545'
+              )
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 5
+              }
+            }
+          }
+        });
+      }
+      
+      // Day Performance Chart
+      if (statsData.time_patterns && statsData.time_patterns.best_days) {
+        var dayCtx = document.getElementById('dayChart').getContext('2d');
+        var dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        var dayData = statsData.time_patterns.best_days.sort((a, b) => 
+          dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day)
+        );
+        
+        new Chart(dayCtx, {
+          type: 'radar',
+          data: {
+            labels: dayData.map(d => d.day),
+            datasets: [{
+              label: 'Average Quality',
+              data: dayData.map(d => d.average_quality),
+              borderColor: '#007bff',
+              backgroundColor: 'rgba(0, 123, 255, 0.2)'
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 5
+              }
+            }
+          }
+        });
+      }
+    });
+  </script>
+
+  <style>
+    .statistics-dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    
+    .schedule-item {
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 5px;
+    }
+    
+    .struggling-items {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    canvas {
+      max-height: 300px;
+    }
+    
+    .at-risk-items table {
+      font-size: 0.9rem;
+    }
+    
+    .recommendations ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    
+    .recommendations li {
+      padding-left: 25px;
+      position: relative;
+      margin-bottom: 10px;
+    }
+    
+    .recommendations li:before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: #007bff;
+      font-weight: bold;
+    }
+  </style>
+</metal:block>
+
+</html>

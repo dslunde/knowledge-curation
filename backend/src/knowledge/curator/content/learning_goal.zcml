@@ -1,0 +1,17 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="knowledge.curator">
+
+  <class class=".learning_goal.LearningGoal">
+    <require
+        permission="zope2.View"
+        interface="knowledge.curator.interfaces.ILearningGoal"
+        />
+    <require
+        permission="zope2.View"
+        set_schema="knowledge.curator.interfaces.ILearningGoal"
+        />
+  </class>
+
+</configure>

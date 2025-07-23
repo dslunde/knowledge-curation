@@ -1,0 +1,15 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="knowledge.curator">
+
+  <genericsetup:upgradeStep
+      title="Add new content types"
+      description="Adds ResearchNote, LearningGoal, ProjectLog, and BookmarkPlus content types"
+      source="1"
+      destination="2"
+      handler=".v2.add_new_content_types"
+      profile="plone.app.knowledge:default"
+      />
+
+</configure>

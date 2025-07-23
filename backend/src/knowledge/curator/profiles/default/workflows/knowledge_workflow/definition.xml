@@ -1,0 +1,308 @@
+<?xml version="1.0"?>
+<dc-workflow xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+             i18n:domain="plone.app.knowledge"
+             workflow_id="knowledge_workflow"
+             title="Knowledge Management Workflow"
+             description="Workflow for knowledge items with capture, process, connect, and publish states"
+             state_variable="review_state"
+             initial_state="capture"
+             i18n:attributes="title; description">
+
+  <!-- Permissions -->
+  <permission>View</permission>
+  <permission>Access contents information</permission>
+  <permission>Modify portal content</permission>
+  <permission>Delete objects</permission>
+  <permission>Add portal content</permission>
+  <permission>plone.app.knowledge: Add AI annotations</permission>
+  <permission>plone.app.knowledge: View AI annotations</permission>
+
+  <!-- States -->
+  <state state_id="capture" title="Capture" i18n:attributes="title">
+    <description i18n:translate="">Initial state for gathering information</description>
+    <exit-transition transition_id="start_processing"/>
+    <permission-map name="View" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+      <permission-role>Contributor</permission-role>
+    </permission-map>
+    <permission-map name="Access contents information" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+      <permission-role>Contributor</permission-role>
+    </permission-map>
+    <permission-map name="Modify portal content" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+    </permission-map>
+    <permission-map name="Delete objects" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+    </permission-map>
+  </state>
+
+  <state state_id="process" title="Process" i18n:attributes="title">
+    <description i18n:translate="">Analyzing and refining content</description>
+    <exit-transition transition_id="back_to_capture"/>
+    <exit-transition transition_id="start_connecting"/>
+    <permission-map name="View" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+      <permission-role>Reviewer</permission-role>
+    </permission-map>
+    <permission-map name="Access contents information" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+      <permission-role>Reviewer</permission-role>
+    </permission-map>
+    <permission-map name="Modify portal content" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+    </permission-map>
+    <permission-map name="plone.app.knowledge: Add AI annotations" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+    </permission-map>
+  </state>
+
+  <state state_id="connect" title="Connect" i18n:attributes="title">
+    <description i18n:translate="">Linking to other knowledge items</description>
+    <exit-transition transition_id="back_to_process"/>
+    <exit-transition transition_id="ready_to_publish"/>
+    <permission-map name="View" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+      <permission-role>Reviewer</permission-role>
+    </permission-map>
+    <permission-map name="Access contents information" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+      <permission-role>Reviewer</permission-role>
+    </permission-map>
+    <permission-map name="Modify portal content" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+    </permission-map>
+  </state>
+
+  <state state_id="published" title="Published" i18n:attributes="title">
+    <description i18n:translate="">Ready for sharing/public consumption</description>
+    <exit-transition transition_id="retract"/>
+    <exit-transition transition_id="revise"/>
+    <permission-map name="View" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+      <permission-role>Reviewer</permission-role>
+      <permission-role>Member</permission-role>
+      <permission-role>Anonymous</permission-role>
+    </permission-map>
+    <permission-map name="Access contents information" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+      <permission-role>Reviewer</permission-role>
+      <permission-role>Member</permission-role>
+      <permission-role>Anonymous</permission-role>
+    </permission-map>
+    <permission-map name="Modify portal content" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+    </permission-map>
+    <permission-map name="plone.app.knowledge: View AI annotations" acquired="False">
+      <permission-role>Manager</permission-role>
+      <permission-role>Owner</permission-role>
+      <permission-role>Editor</permission-role>
+      <permission-role>Reviewer</permission-role>
+      <permission-role>Member</permission-role>
+    </permission-map>
+  </state>
+
+  <!-- Transitions -->
+  <transition transition_id="start_processing"
+              title="Start Processing"
+              new_state="process"
+              trigger="USER"
+              before_script=""
+              after_script="updateEmbeddings"
+              i18n:attributes="title">
+    <description i18n:translate="">Move to processing phase to analyze and refine content</description>
+    <action url="%(content_url)s/content_status_modify?workflow_action=start_processing"
+            category="workflow"
+            i18n:translate="">Start Processing</action>
+    <guard>
+      <guard-permission>Modify portal content</guard-permission>
+      <guard-expression>python:object.title and (object.text or object.source_url)</guard-expression>
+    </guard>
+  </transition>
+
+  <transition transition_id="back_to_capture"
+              title="Back to Capture"
+              new_state="capture"
+              trigger="USER"
+              before_script=""
+              after_script=""
+              i18n:attributes="title">
+    <description i18n:translate="">Return to capture state for more information gathering</description>
+    <action url="%(content_url)s/content_status_modify?workflow_action=back_to_capture"
+            category="workflow"
+            i18n:translate="">Back to Capture</action>
+    <guard>
+      <guard-permission>Modify portal content</guard-permission>
+    </guard>
+  </transition>
+
+  <transition transition_id="start_connecting"
+              title="Start Connecting"
+              new_state="connect"
+              trigger="USER"
+              before_script=""
+              after_script="suggestConnections"
+              i18n:attributes="title">
+    <description i18n:translate="">Begin connecting to other knowledge items</description>
+    <action url="%(content_url)s/content_status_modify?workflow_action=start_connecting"
+            category="workflow"
+            i18n:translate="">Start Connecting</action>
+    <guard>
+      <guard-permission>Modify portal content</guard-permission>
+      <guard-expression>python:object.ai_summary or object.embedding_vector</guard-expression>
+    </guard>
+  </transition>
+
+  <transition transition_id="back_to_process"
+              title="Back to Process"
+              new_state="process"
+              trigger="USER"
+              before_script=""
+              after_script=""
+              i18n:attributes="title">
+    <description i18n:translate="">Return to processing for more refinement</description>
+    <action url="%(content_url)s/content_status_modify?workflow_action=back_to_process"
+            category="workflow"
+            i18n:translate="">Back to Process</action>
+    <guard>
+      <guard-permission>Modify portal content</guard-permission>
+    </guard>
+  </transition>
+
+  <transition transition_id="ready_to_publish"
+              title="Publish"
+              new_state="published"
+              trigger="USER"
+              before_script="validateForPublishing"
+              after_script=""
+              i18n:attributes="title">
+    <description i18n:translate="">Publish for public consumption</description>
+    <action url="%(content_url)s/content_status_modify?workflow_action=ready_to_publish"
+            category="workflow"
+            i18n:translate="">Publish</action>
+    <guard>
+      <guard-permission>Modify portal content</guard-permission>
+      <guard-expression>python:len(object.tags) > 0</guard-expression>
+    </guard>
+  </transition>
+
+  <transition transition_id="retract"
+              title="Retract"
+              new_state="connect"
+              trigger="USER"
+              before_script=""
+              after_script=""
+              i18n:attributes="title">
+    <description i18n:translate="">Retract from public view</description>
+    <action url="%(content_url)s/content_status_modify?workflow_action=retract"
+            category="workflow"
+            i18n:translate="">Retract</action>
+    <guard>
+      <guard-permission>Modify portal content</guard-permission>
+    </guard>
+  </transition>
+
+  <transition transition_id="revise"
+              title="Revise"
+              new_state="process"
+              trigger="USER"
+              before_script=""
+              after_script=""
+              i18n:attributes="title">
+    <description i18n:translate="">Send back for revision</description>
+    <action url="%(content_url)s/content_status_modify?workflow_action=revise"
+            category="workflow"
+            i18n:translate="">Revise</action>
+    <guard>
+      <guard-permission>Modify portal content</guard-permission>
+    </guard>
+  </transition>
+
+  <!-- Variables -->
+  <variable variable_id="action" for_catalog="False" for_status="True" update_always="True">
+    <description>Previous transition</description>
+    <default>
+      <expression>transition/getId|nothing</expression>
+    </default>
+    <guard>
+    </guard>
+  </variable>
+
+  <variable variable_id="actor" for_catalog="False" for_status="True" update_always="True">
+    <description>The ID of the user who performed the last transition</description>
+    <default>
+      <expression>user/getId</expression>
+    </default>
+    <guard>
+    </guard>
+  </variable>
+
+  <variable variable_id="comments" for_catalog="False" for_status="True" update_always="True">
+    <description>Comment about the last transition</description>
+    <default>
+      <expression>python:state_change.kwargs.get('comment', '')</expression>
+    </default>
+    <guard>
+    </guard>
+  </variable>
+
+  <variable variable_id="review_history" for_catalog="False" for_status="False" update_always="False">
+    <description>Provides access to workflow history</description>
+    <default>
+      <expression>state_change/getHistory</expression>
+    </default>
+    <guard>
+      <guard-permission>Request review</guard-permission>
+      <guard-permission>Review portal content</guard-permission>
+    </guard>
+  </variable>
+
+  <variable variable_id="time" for_catalog="False" for_status="True" update_always="True">
+    <description>When the previous transition was performed</description>
+    <default>
+      <expression>state_change/getDateTime</expression>
+    </default>
+    <guard>
+    </guard>
+  </variable>
+
+  <!-- Scripts -->
+  <script script_id="updateEmbeddings" type="External Method"
+          module="plone.app.knowledge.workflow_scripts"
+          function="update_embeddings"/>
+
+  <script script_id="suggestConnections" type="External Method"
+          module="plone.app.knowledge.workflow_scripts"
+          function="suggest_connections"/>
+
+  <script script_id="validateForPublishing" type="External Method"
+          module="plone.app.knowledge.workflow_scripts"
+          function="validate_for_publishing"/>
+
+</dc-workflow>

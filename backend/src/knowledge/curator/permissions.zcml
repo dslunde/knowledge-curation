@@ -1,0 +1,56 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:zcml="http://namespaces.zope.org/zcml"
+  i18n_domain="plone">
+
+  <configure zcml:condition="installed AccessControl.security">
+  <!-- -*- extra stuff goes here -*- -->
+
+    <permission
+        id="plone.app.knowledge.AddKnowledgeItem"
+        title="plone.app.knowledge: Add Knowledge Item"
+        />
+
+    <permission
+        id="plone.app.knowledge.AddKnowledgeContainer"
+        title="plone.app.knowledge: Add Knowledge Container"
+        />
+
+    <permission
+        id="plone.app.knowledge.ManageAISettings"
+        title="plone.app.knowledge: Manage AI Settings"
+        />
+
+    <permission
+        id="plone.app.knowledge.AddResearchNote"
+        title="plone.app.knowledge: Add Research Note"
+        />
+
+    <permission
+        id="plone.app.knowledge.AddLearningGoal"
+        title="plone.app.knowledge: Add Learning Goal"
+        />
+
+    <permission
+        id="plone.app.knowledge.AddProjectLog"
+        title="plone.app.knowledge: Add Project Log"
+        />
+
+    <permission
+        id="plone.app.knowledge.AddBookmarkPlus"
+        title="plone.app.knowledge: Add BookmarkPlus"
+        />
+
+    <permission
+        id="plone.app.knowledge.AddAIAnnotations"
+        title="plone.app.knowledge: Add AI annotations"
+        />
+
+    <permission
+        id="plone.app.knowledge.ViewAIAnnotations"
+        title="plone.app.knowledge: View AI annotations"
+        />
+
+  </configure>
+
+</configure>

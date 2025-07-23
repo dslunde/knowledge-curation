@@ -1,0 +1,15 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    i18n_domain="knowledge.curator">
+
+  <!-- Graph Storage Adapter -->
+  <adapter
+      factory=".storage.GraphStorage"
+      for="*"
+      provides=".interfaces.IGraphStorage"
+      />
+
+  <!-- Include browser views -->
+  <include package="knowledge.curator.browser" />
+
+</configure>

@@ -1,0 +1,108 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="plone.app.knowledge"
+      metal:use-macro="context/main_template/macros/master">
+
+<body>
+  <metal:content-core fill-slot="content-core">
+    <div class="bulk-workflow">
+      <h2 i18n:translate="">Bulk Workflow Transition</h2>
+      
+      <div class="selected-items mb-4">
+        <p i18n:translate="">
+          <span i18n:name="count" tal:content="python:len(request.get('uids', []))">0</span>
+          items selected for bulk transition.
+        </p>
+      </div>
+      
+      <form method="post" 
+            action=""
+            tal:define="transitions view/get_available_transitions"
+            tal:condition="transitions">
+        
+        <input type="hidden" name="uids:list" 
+               tal:repeat="uid python:request.get('uids', [])"
+               tal:attributes="value uid" />
+        
+        <div class="form-group">
+          <label for="transition" i18n:translate="">Select Transition</label>
+          <select name="transition" id="transition" class="form-control" required>
+            <option value="" i18n:translate="">-- Select a transition --</option>
+            <option tal:repeat="trans transitions"
+                    tal:attributes="value trans/id"
+                    tal:content="trans/title">Transition</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="comment" i18n:translate="">Comment (optional)</label>
+          <textarea name="comment" 
+                    id="comment" 
+                    class="form-control" 
+                    rows="3"
+                    i18n:attributes="placeholder">Add a comment about this bulk transition...</textarea>
+        </div>
+        
+        <div class="alert alert-warning">
+          <p i18n:translate="">
+            <strong>Warning:</strong> This action will apply the selected transition to all selected items.
+            Make sure all items are in a valid state for this transition.
+          </p>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" 
+                  class="btn btn-primary"
+                  i18n:translate="">Apply Transition</button>
+          <a class="btn btn-secondary" 
+             tal:attributes="href context/absolute_url"
+             i18n:translate="">Cancel</a>
+        </div>
+      </form>
+      
+      <div class="alert alert-info" tal:condition="not:transitions">
+        <p i18n:translate="">
+          No common transitions available for the selected items.
+          This may mean the items are in different workflow states.
+        </p>
+      </div>
+    </div>
+    
+    <script type="text/javascript">
+    (function($) {
+      $(document).ready(function() {
+        $('form').on('submit', function(e) {
+          e.preventDefault();
+          var $form = $(this);
+          var $submit = $form.find('button[type="submit"]');
+          
+          $submit.prop('disabled', true).text('Processing...');
+          
+          $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            success: function(data) {
+              if (data.success) {
+                alert(data.message);
+                window.location.href = '${context/absolute_url}';
+              } else {
+                alert('Error: ' + data.message);
+                $submit.prop('disabled', false).text('Apply Transition');
+              }
+            },
+            error: function() {
+              alert('An error occurred during the transition.');
+              $submit.prop('disabled', false).text('Apply Transition');
+            }
+          });
+        });
+      });
+    })(jQuery);
+    </script>
+  </metal:content-core>
+</body>
+</html>

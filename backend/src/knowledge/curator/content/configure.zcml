@@ -1,0 +1,24 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="knowledge.curator">
+
+  <!-- Knowledge Item content type -->
+  <include file="knowledge_item.zcml" />
+  
+  <!-- Knowledge Container content type -->
+  <!-- <include file="knowledge_container.zcml" /> -->
+  
+  <!-- Research Note content type -->
+  <include file="research_note.zcml" />
+  
+  <!-- Learning Goal content type -->
+  <include file="learning_goal.zcml" />
+  
+  <!-- Project Log content type -->
+  <include file="project_log.zcml" />
+  
+  <!-- BookmarkPlus content type -->
+  <include file="bookmark_plus.zcml" />
+
+</configure>

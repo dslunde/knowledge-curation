@@ -1,0 +1,1 @@
+"""Behaviors for plone.app.knowledge."""

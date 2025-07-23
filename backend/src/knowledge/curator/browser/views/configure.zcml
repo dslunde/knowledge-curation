@@ -1,0 +1,128 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="knowledge.curator">
+
+  <!-- Research Note Views -->
+  <browser:page
+      name="view"
+      for="knowledge.curator.interfaces.IResearchNote"
+      class=".research_note.ResearchNoteView"
+      template="templates/research_note.pt"
+      permission="zope2.View"
+      />
+
+  <!-- Learning Goal Views -->
+  <browser:page
+      name="view"
+      for="knowledge.curator.interfaces.ILearningGoal"
+      class=".learning_goal.LearningGoalView"
+      template="templates/learning_goal.pt"
+      permission="zope2.View"
+      />
+
+  <!-- Project Log Views -->
+  <browser:page
+      name="view"
+      for="knowledge.curator.interfaces.IProjectLog"
+      class=".project_log.ProjectLogView"
+      template="templates/project_log.pt"
+      permission="zope2.View"
+      />
+
+  <!-- BookmarkPlus Views -->
+  <browser:page
+      name="view"
+      for="knowledge.curator.interfaces.IBookmarkPlus"
+      class=".bookmark_plus.BookmarkPlusView"
+      template="templates/bookmark_plus.pt"
+      permission="zope2.View"
+      />
+
+  <!-- Workflow Views -->
+  <browser:page
+      name="workflow-transition"
+      for="*"
+      class=".workflow_views.WorkflowTransitionFormView"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      name="publish-transition"
+      for="*"
+      class=".workflow_views.PublishTransitionFormView"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      name="workflow-history"
+      for="*"
+      class=".workflow_views.WorkflowHistoryView"
+      template="templates/workflow_history.pt"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      name="bulk-workflow"
+      for="*"
+      class=".workflow_views.BulkWorkflowView"
+      template="templates/bulk_workflow.pt"
+      permission="zope2.View"
+      />
+
+  <!-- Vector Database Management Views -->
+  <browser:page
+      name="vector-management"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".vector_management.VectorManagementView"
+      template="templates/vector_management.pt"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      name="vector-search"
+      for="*"
+      class=".vector_management.VectorSearchView"
+      template="templates/vector_search.pt"
+      permission="zope2.View"
+      />
+
+  <!-- Spaced Repetition Views -->
+  <browser:page
+      name="review-queue"
+      for="*"
+      class=".review_interface.ReviewQueueView"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      name="review-card"
+      for="*"
+      class=".review_interface.ReviewCardView"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      name="review-performance"
+      for="*"
+      class=".review_interface.ReviewPerformanceView"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      name="review-statistics"
+      for="*"
+      class=".review_interface.ReviewStatisticsView"
+      permission="zope2.View"
+      />
+
+  <!-- Knowledge Graph Views -->
+  <browser:page
+      name="knowledge-graph"
+      for="*"
+      class=".knowledge_graph.KnowledgeGraphView"
+      template="templates/knowledge_graph.pt"
+      permission="zope2.View"
+      />
+
+</configure>

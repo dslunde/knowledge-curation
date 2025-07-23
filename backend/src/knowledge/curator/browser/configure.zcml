@@ -1,0 +1,24 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="knowledge.curator">
+
+  <!-- Set overrides folder for Just-a-Bunch-Of-Templates product -->
+  <include package="z3c.jbot" file="meta.zcml" />
+  <browser:jbot
+      directory="overrides"
+      layer="knowledge.curator.interfaces.IPloneAppKnowledgeLayer"
+      />
+
+  <!-- Publish static files -->
+  <plone:static
+      name="knowledge.curator"
+      type="plone"
+      directory="static"
+      />
+
+  <!-- Include views -->
+  <include package=".views" />
+
+</configure>

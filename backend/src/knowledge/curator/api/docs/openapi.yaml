@@ -1,0 +1,1351 @@
+openapi: 3.0.3
+info:
+  title: Plone Knowledge Management API
+  description: |
+    RESTful API for managing knowledge content in Plone.
+    
+    This API provides endpoints for:
+    - Knowledge graph visualization and management
+    - Semantic and similarity search
+    - Learning analytics and progress tracking
+    - Bulk operations on knowledge items
+    - Spaced repetition learning system
+    - Import/export functionality
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://your-site.com/plone
+    description: Production server
+  - url: http://localhost:8080/Plone
+    description: Development server
+
+security:
+  - basicAuth: []
+  - bearerAuth: []
+
+tags:
+  - name: Knowledge Graph
+    description: Graph visualization and connection management
+  - name: Search
+    description: Semantic and similarity search endpoints
+  - name: Analytics
+    description: Learning analytics and statistics
+  - name: Bulk Operations
+    description: Bulk actions on multiple items
+  - name: Spaced Repetition
+    description: Spaced repetition learning system
+  - name: Import/Export
+    description: Data import and export operations
+
+paths:
+  /@knowledge-graph:
+    get:
+      tags:
+        - Knowledge Graph
+      summary: Get knowledge graph
+      description: Returns the complete knowledge graph with nodes and edges
+      operationId: getKnowledgeGraph
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeGraph'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /{path}/@knowledge-graph/connections:
+    get:
+      tags:
+        - Knowledge Graph
+      summary: Get item connections
+      description: Returns all connections for a specific item
+      operationId: getItemConnections
+      parameters:
+        - $ref: '#/components/parameters/PathParameter'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectionList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /{path}/@knowledge-graph/suggest:
+    get:
+      tags:
+        - Knowledge Graph
+      summary: Suggest connections
+      description: Suggests potential connections based on content similarity
+      operationId: suggestConnections
+      parameters:
+        - $ref: '#/components/parameters/PathParameter'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectionSuggestions'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /@knowledge-graph/visualize:
+    get:
+      tags:
+        - Knowledge Graph
+      summary: Get visualization data
+      description: Returns graph data optimized for visualization
+      operationId: getVisualizationData
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisualizationData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /@knowledge-search:
+    post:
+      tags:
+        - Search
+      summary: Search knowledge base
+      description: Perform semantic, similarity, or fulltext search
+      operationId: searchKnowledge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResults'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /@knowledge-search/semantic:
+    get:
+      tags:
+        - Search
+      summary: Semantic search (GET)
+      description: Perform semantic search using query parameters
+      operationId: semanticSearchGet
+      parameters:
+        - name: q
+          in: query
+          description: Search query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of results
+          schema:
+            type: integer
+            default: 20
+        - name: types
+          in: query
+          description: Comma-separated list of content types
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResults'
+
+  /{path}/@knowledge-search/similar:
+    get:
+      tags:
+        - Search
+      summary: Find similar items
+      description: Find items similar to the current context
+      operationId: findSimilar
+      parameters:
+        - $ref: '#/components/parameters/PathParameter'
+        - name: limit
+          in: query
+          description: Maximum number of results
+          schema:
+            type: integer
+            default: 10
+        - name: threshold
+          in: query
+          description: Similarity threshold (0-1)
+          schema:
+            type: number
+            default: 0.7
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResults'
+
+  /@knowledge-analytics:
+    get:
+      tags:
+        - Analytics
+      summary: Get analytics overview
+      description: Returns overview statistics of the knowledge base
+      operationId: getAnalyticsOverview
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsOverview'
+
+  /@knowledge-analytics/statistics:
+    get:
+      tags:
+        - Analytics
+      summary: Get learning statistics
+      description: Returns detailed learning statistics
+      operationId: getLearningStatistics
+      parameters:
+        - name: days
+          in: query
+          description: Number of days to include
+          schema:
+            type: integer
+            default: 30
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningStatistics'
+
+  /@knowledge-analytics/forgetting-curve:
+    get:
+      tags:
+        - Analytics
+      summary: Get forgetting curve data
+      description: Returns items sorted by retention score
+      operationId: getForgettingCurve
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgettingCurveData'
+
+  /@knowledge-analytics/progress:
+    get:
+      tags:
+        - Analytics
+      summary: Get progress timeline
+      description: Returns learning progress over time
+      operationId: getProgressTimeline
+      parameters:
+        - name: days
+          in: query
+          description: Number of days to include
+          schema:
+            type: integer
+            default: 90
+        - name: interval
+          in: query
+          description: Grouping interval
+          schema:
+            type: string
+            enum: [day, week, month]
+            default: week
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressTimeline'
+
+  /@knowledge-bulk/workflow:
+    post:
+      tags:
+        - Bulk Operations
+      summary: Bulk workflow transition
+      description: Perform workflow transitions on multiple items
+      operationId: bulkWorkflowTransition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkWorkflowRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOperationResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /@knowledge-bulk/tag:
+    post:
+      tags:
+        - Bulk Operations
+      summary: Bulk tag operations
+      description: Add, remove, or replace tags on multiple items
+      operationId: bulkTagOperation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkTagRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOperationResult'
+
+  /@knowledge-bulk/delete:
+    post:
+      tags:
+        - Bulk Operations
+      summary: Bulk delete
+      description: Delete multiple items
+      operationId: bulkDelete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkDeleteRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOperationResult'
+
+  /@knowledge-bulk/connect:
+    post:
+      tags:
+        - Bulk Operations
+      summary: Bulk connect items
+      description: Create connections between multiple items
+      operationId: bulkConnect
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkConnectRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkOperationResult'
+
+  /@spaced-repetition/review:
+    get:
+      tags:
+        - Spaced Repetition
+      summary: Get review items
+      description: Returns items due for review
+      operationId: getReviewItems
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of items
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewItems'
+    
+    post:
+      tags:
+        - Spaced Repetition
+      summary: Update review
+      description: Update review performance for an item
+      operationId: updateReview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewUpdate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewUpdateResult'
+
+  /@spaced-repetition/schedule:
+    get:
+      tags:
+        - Spaced Repetition
+      summary: Get review schedule
+      description: Returns upcoming review schedule
+      operationId: getReviewSchedule
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewSchedule'
+
+  /@spaced-repetition/performance:
+    get:
+      tags:
+        - Spaced Repetition
+      summary: Get performance statistics
+      description: Returns spaced repetition performance metrics
+      operationId: getPerformanceStats
+      parameters:
+        - name: days
+          in: query
+          description: Number of days to include
+          schema:
+            type: integer
+            default: 30
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceStatistics'
+
+  /@knowledge-io/export:
+    get:
+      tags:
+        - Import/Export
+      summary: Export content
+      description: Export knowledge content in various formats
+      operationId: exportContent
+      parameters:
+        - name: format
+          in: query
+          description: Export format
+          required: true
+          schema:
+            type: string
+            enum: [json, csv, opml, markdown, roam]
+        - name: types
+          in: query
+          description: Comma-separated list of content types
+          schema:
+            type: string
+        - name: include_embeddings
+          in: query
+          description: Include embedding vectors (JSON only)
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successful export
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportData'
+            text/csv:
+              schema:
+                type: string
+            text/x-opml:
+              schema:
+                type: string
+            text/markdown:
+              schema:
+                type: string
+
+  /@knowledge-io/import:
+    post:
+      tags:
+        - Import/Export
+      summary: Import content
+      description: Import knowledge content from file
+      operationId: importContent
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                format:
+                  type: string
+                  enum: [json, csv, opml]
+                merge_strategy:
+                  type: string
+                  enum: [skip, update, duplicate]
+                  default: skip
+              required:
+                - file
+                - format
+      responses:
+        '200':
+          description: Successful import
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportResult'
+
+  /@knowledge-io/validate:
+    post:
+      tags:
+        - Import/Export
+      summary: Validate import file
+      description: Validate import file before importing
+      operationId: validateImport
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                format:
+                  type: string
+                  enum: [json, csv, opml]
+              required:
+                - file
+                - format
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResult'
+
+  /@knowledge-io/formats:
+    get:
+      tags:
+        - Import/Export
+      summary: Get supported formats
+      description: Returns list of supported import and export formats
+      operationId: getSupportedFormats
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportedFormats'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PathParameter:
+      name: path
+      in: path
+      description: Path to the content item
+      required: true
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        type:
+          type: string
+          description: Error type
+        details:
+          type: object
+          description: Additional error details
+      required:
+        - error
+
+    KnowledgeGraph:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/GraphNode'
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/GraphEdge'
+        count:
+          type: integer
+          description: Total number of nodes
+
+    GraphNode:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Node UID
+        title:
+          type: string
+        type:
+          type: string
+          description: Content type
+        url:
+          type: string
+        description:
+          type: string
+        review_state:
+          type: string
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+        progress:
+          type: integer
+          description: Progress percentage (0-100)
+        status:
+          type: string
+
+    GraphEdge:
+      type: object
+      properties:
+        source:
+          type: string
+          description: Source node UID
+        target:
+          type: string
+          description: Target node UID
+        type:
+          type: string
+          enum: [connection, related]
+
+    ConnectionList:
+      type: object
+      properties:
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/Connection'
+        count:
+          type: integer
+
+    Connection:
+      type: object
+      properties:
+        uid:
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+        url:
+          type: string
+        connection_type:
+          type: string
+          enum: [direct, related, reference]
+
+    ConnectionSuggestions:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SuggestedConnection'
+        count:
+          type: integer
+
+    SuggestedConnection:
+      type: object
+      properties:
+        uid:
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+        url:
+          type: string
+        similarity:
+          type: number
+          description: Similarity score (0-1)
+        description:
+          type: string
+
+    VisualizationData:
+      type: object
+      properties:
+        graph:
+          $ref: '#/components/schemas/KnowledgeGraph'
+        visualization:
+          type: object
+          properties:
+            width:
+              type: integer
+            height:
+              type: integer
+            force:
+              type: object
+              properties:
+                charge:
+                  type: number
+                linkDistance:
+                  type: number
+                gravity:
+                  type: number
+
+    SearchRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [semantic, similarity, fulltext]
+        query:
+          type: string
+          description: Search query (not required for similarity search)
+        uid:
+          type: string
+          description: Source UID for similarity search
+        limit:
+          type: integer
+          default: 20
+        threshold:
+          type: number
+          description: Similarity threshold (0-1)
+        portal_types:
+          type: array
+          items:
+            type: string
+        filters:
+          type: object
+          properties:
+            review_state:
+              type: array
+              items:
+                type: string
+            tags:
+              type: array
+              items:
+                type: string
+            date_range:
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: date
+                end:
+                  type: string
+                  format: date
+
+    SearchResults:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchResult'
+        items_total:
+          type: integer
+        query:
+          type: string
+        search_type:
+          type: string
+
+    SearchResult:
+      type: object
+      properties:
+        uid:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        url:
+          type: string
+        portal_type:
+          type: string
+        review_state:
+          type: string
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+        similarity_score:
+          type: number
+        tags:
+          type: array
+          items:
+            type: string
+
+    AnalyticsOverview:
+      type: object
+      properties:
+        total_items:
+          type: integer
+        by_type:
+          type: object
+          additionalProperties:
+            type: integer
+        by_state:
+          type: object
+          additionalProperties:
+            type: integer
+        recent_activity:
+          type: array
+          items:
+            type: object
+        top_tags:
+          type: array
+          items:
+            type: array
+            items:
+              oneOf:
+                - type: string
+                - type: integer
+        connections:
+          type: integer
+
+    LearningStatistics:
+      type: object
+      properties:
+        period_days:
+          type: integer
+        learning_goals:
+          type: object
+          properties:
+            total:
+              type: integer
+            completed:
+              type: integer
+            in_progress:
+              type: integer
+            planned:
+              type: integer
+            average_progress:
+              type: number
+            by_priority:
+              type: object
+              additionalProperties:
+                type: integer
+        research_notes:
+          type: object
+          properties:
+            total:
+              type: integer
+            with_insights:
+              type: integer
+            with_connections:
+              type: integer
+            average_connections:
+              type: number
+        bookmarks:
+          type: object
+          properties:
+            total:
+              type: integer
+            by_status:
+              type: object
+              additionalProperties:
+                type: integer
+            by_importance:
+              type: object
+              additionalProperties:
+                type: integer
+        generated_at:
+          type: string
+          format: date-time
+
+    ForgettingCurveData:
+      type: object
+      properties:
+        forgetting_curve:
+          type: array
+          items:
+            type: object
+            properties:
+              uid:
+                type: string
+              title:
+                type: string
+              type:
+                type: string
+              days_since_review:
+                type: integer
+              retention_score:
+                type: number
+              review_recommended:
+                type: boolean
+              last_review:
+                type: string
+                format: date-time
+              url:
+                type: string
+        review_groups:
+          type: object
+          properties:
+            urgent:
+              type: array
+              items:
+                type: object
+            soon:
+              type: array
+              items:
+                type: object
+            later:
+              type: array
+              items:
+                type: object
+            good:
+              type: integer
+        total_items:
+          type: integer
+
+    ProgressTimeline:
+      type: object
+      properties:
+        progress:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: string
+              created:
+                type: integer
+              modified:
+                type: integer
+              by_type:
+                type: object
+                additionalProperties:
+                  type: integer
+        interval:
+          type: string
+        days:
+          type: integer
+
+    BulkWorkflowRequest:
+      type: object
+      properties:
+        uids:
+          type: array
+          items:
+            type: string
+        transition:
+          type: string
+        comment:
+          type: string
+      required:
+        - uids
+        - transition
+
+    BulkTagRequest:
+      type: object
+      properties:
+        uids:
+          type: array
+          items:
+            type: string
+        mode:
+          type: string
+          enum: [add, remove, replace]
+        add_tags:
+          type: array
+          items:
+            type: string
+        remove_tags:
+          type: array
+          items:
+            type: string
+      required:
+        - uids
+
+    BulkDeleteRequest:
+      type: object
+      properties:
+        uids:
+          type: array
+          items:
+            type: string
+      required:
+        - uids
+
+    BulkConnectRequest:
+      type: object
+      properties:
+        source_uids:
+          type: array
+          items:
+            type: string
+        target_uids:
+          type: array
+          items:
+            type: string
+        connection_type:
+          type: string
+          enum: [unidirectional, bidirectional]
+      required:
+        - source_uids
+        - target_uids
+
+    BulkOperationResult:
+      type: object
+      properties:
+        operation:
+          type: string
+        results:
+          type: object
+          properties:
+            successful:
+              type: array
+              items:
+                type: object
+            failed:
+              type: array
+              items:
+                type: object
+            unauthorized:
+              type: array
+              items:
+                type: object
+        summary:
+          type: object
+          properties:
+            total:
+              type: integer
+            successful:
+              type: integer
+            failed:
+              type: integer
+            unauthorized:
+              type: integer
+
+    ReviewItems:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewItem'
+        total_due:
+          type: integer
+        next_review_date:
+          type: string
+          format: date-time
+
+    ReviewItem:
+      type: object
+      properties:
+        uid:
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+        url:
+          type: string
+        description:
+          type: string
+        sr_data:
+          type: object
+          properties:
+            interval:
+              type: integer
+            repetitions:
+              type: integer
+            ease_factor:
+              type: number
+            last_review:
+              type: string
+              format: date-time
+            next_review:
+              type: string
+              format: date-time
+            retention_score:
+              type: number
+
+    ReviewUpdate:
+      type: object
+      properties:
+        uid:
+          type: string
+        quality:
+          type: integer
+          minimum: 0
+          maximum: 5
+        time_spent:
+          type: integer
+          description: Time spent in seconds
+      required:
+        - uid
+        - quality
+
+    ReviewUpdateResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        uid:
+          type: string
+        sr_data:
+          type: object
+          properties:
+            interval:
+              type: integer
+            repetitions:
+              type: integer
+            ease_factor:
+              type: number
+            next_review:
+              type: string
+              format: date-time
+            quality:
+              type: integer
+
+    ReviewSchedule:
+      type: object
+      properties:
+        schedule:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              items:
+                type: array
+                items:
+                  type: object
+              overdue:
+                type: boolean
+        forecast:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              count:
+                type: integer
+              is_today:
+                type: boolean
+        statistics:
+          type: object
+          properties:
+            total_scheduled:
+              type: integer
+            overdue:
+              type: integer
+            today:
+              type: integer
+
+    PerformanceStatistics:
+      type: object
+      properties:
+        period_days:
+          type: integer
+        statistics:
+          type: object
+          properties:
+            total_reviews:
+              type: integer
+            successful_reviews:
+              type: integer
+            failed_reviews:
+              type: integer
+            average_quality:
+              type: number
+            average_time_spent:
+              type: number
+            items_in_system:
+              type: integer
+            mature_items:
+              type: integer
+            success_rate:
+              type: number
+            daily_stats:
+              type: array
+              items:
+                type: object
+            quality_distribution:
+              type: object
+              additionalProperties:
+                type: integer
+
+    ExportData:
+      type: object
+      properties:
+        version:
+          type: string
+        export_date:
+          type: string
+          format: date-time
+        exporter:
+          type: string
+        item_count:
+          type: integer
+        items:
+          type: array
+          items:
+            type: object
+
+    ImportResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        results:
+          type: object
+          properties:
+            imported:
+              type: integer
+            skipped:
+              type: integer
+            updated:
+              type: integer
+            errors:
+              type: array
+              items:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  error:
+                    type: string
+
+    ValidationResult:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        summary:
+          type: object
+
+    SupportedFormats:
+      type: object
+      properties:
+        export:
+          type: array
+          items:
+            type: object
+            properties:
+              format:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              mime_type:
+                type: string
+              extension:
+                type: string
+        import:
+          type: array
+          items:
+            type: object
+            properties:
+              format:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              mime_type:
+                type: string
