@@ -294,15 +294,15 @@
 
   <!-- Scripts -->
   <script script_id="updateEmbeddings" type="External Method"
-          module="knowledge.curator.workflow_scripts"
+          module="workflow_scripts"
           function="update_embeddings" filename=""/>
 
   <script script_id="suggestConnections" type="External Method"
-          module="knowledge.curator.workflow_scripts"
+          module="workflow_scripts"
           function="suggest_connections" filename=""/>
 
   <script script_id="validateForPublishing" type="External Method"
-          module="knowledge.curator.workflow_scripts"
+          module="workflow_scripts"
           function="validate_for_publishing" filename=""/>
 
 </dc-workflow>

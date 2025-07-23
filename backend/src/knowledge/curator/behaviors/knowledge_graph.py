@@ -17,9 +17,25 @@ class IKnowledgeGraphBehavior(model.Schema):
     directives.fieldset(
         'knowledge_graph',
         label=_(u'Knowledge Graph'),
-        fields=['related_concepts', 'concept_weight', 'graph_metadata'],
+        fields=['connections', 'embedding_vector', 'related_concepts', 'concept_weight', 'graph_metadata'],
     )
     
+    connections = schema.List(
+        title=_(u'Connections'),
+        description=_(u'Related notes and content (UIDs)'),
+        value_type=schema.TextLine(),
+        required=False,
+        default=[],
+    )
+
+    embedding_vector = schema.List(
+        title=_(u'Embedding Vector'),
+        description=_(u'AI-generated embedding vector for similarity search'),
+        value_type=schema.Float(),
+        required=False,
+        readonly=True,
+    )
+
     related_concepts = schema.List(
         title=_(u'Related Concepts'),
         description=_(u'Concepts related to this content'),
@@ -50,31 +66,37 @@ class IKnowledgeGraphBehavior(model.Schema):
 @implementer(IKnowledgeGraphBehavior)
 @adapter(Interface)
 class KnowledgeGraphBehavior(object):
-    """Adapter for knowledge graph behavior."""
+    """Knowledge graph behavior adapter."""
     
     def __init__(self, context):
         self.context = context
     
     @property
+    def connections(self):
+        """Get connections."""
+        return getattr(self.context, 'connections', [])
+    
+    @connections.setter
+    def connections(self, value):
+        """Set connections."""
+        self.context.connections = value
+    
+    @property
+    def embedding_vector(self):
+        """Get embedding vector."""
+        return getattr(self.context, 'embedding_vector', [])
+    
+    @embedding_vector.setter 
+    def embedding_vector(self, value):
+        """Set embedding vector."""
+        self.context.embedding_vector = value
+    
+    @property
     def related_concepts(self):
+        """Get related concepts."""
         return getattr(self.context, 'related_concepts', [])
     
     @related_concepts.setter
     def related_concepts(self, value):
+        """Set related concepts."""
         self.context.related_concepts = value
-    
-    @property
-    def concept_weight(self):
-        return getattr(self.context, 'concept_weight', 1.0)
-    
-    @concept_weight.setter
-    def concept_weight(self, value):
-        self.context.concept_weight = value
-    
-    @property
-    def graph_metadata(self):
-        return getattr(self.context, 'graph_metadata', {})
-    
-    @graph_metadata.setter
-    def graph_metadata(self, value):
-        self.context.graph_metadata = value

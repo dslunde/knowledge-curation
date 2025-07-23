@@ -1,34 +1,20 @@
-"""Module where all interfaces, events and exceptions live."""
+"""Interfaces for knowledge.curator."""
 
+from plone.autoform.interfaces import IFormFieldProvider
 from plone.app.textfield import RichText
 from plone.supermodel import model
+from plone import api
 from zope import schema
-from zope.interface import Interface
-from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+from zope.interface import Interface, provider
 
 from knowledge.curator import _
 
 
-class IPloneAppKnowledgeLayer(IDefaultBrowserLayer):
-    """Marker interface that defines a browser layer."""
+class IKnowledgeCuratorLayer(Interface):
+    """Browser layer for knowledge.curator"""
 
 
-class IAIService(Interface):
-    """Interface for AI service utilities."""
-    
-    def generate_embedding(text):
-        """Generate embedding vector for given text."""
-    
-    def generate_summary(text, max_length=150):
-        """Generate AI summary for given text."""
-    
-    def calculate_similarity(vector1, vector2):
-        """Calculate similarity between two embedding vectors."""
-    
-    def search_similar(query, limit=10):
-        """Search for similar content based on query."""
-
-
+@provider(IFormFieldProvider)
 class IResearchNote(model.Schema):
     """Schema for Research Note content type."""
 
@@ -38,8 +24,8 @@ class IResearchNote(model.Schema):
     )
 
     description = schema.Text(
-        title=_(u'Summary'),
-        description=_(u'A brief summary of the research note'),
+        title=_(u'Description'),
+        description=_(u'Brief description of the research note'),
         required=False,
     )
 
@@ -71,30 +57,11 @@ class IResearchNote(model.Schema):
         default=[],
     )
 
-    connections = schema.List(
-        title=_(u'Connections'),
-        description=_(u'Related notes and content (UIDs)'),
-        value_type=schema.TextLine(),
-        required=False,
-        default=[],
-    )
-
-    embedding_vector = schema.List(
-        title=_(u'Embedding Vector'),
-        description=_(u'AI-generated embedding vector for similarity search'),
-        value_type=schema.Float(),
-        required=False,
-        readonly=True,
-    )
-
-    ai_summary = schema.Text(
-        title=_(u'AI Summary'),
-        description=_(u'AI-generated summary of the content'),
-        required=False,
-        readonly=True,
-    )
+    # NOTE: ai_summary, connections, embedding_vector are provided by behaviors
+    # to avoid duplication conflicts
 
 
+@provider(IFormFieldProvider)
 class ILearningGoal(model.Schema):
     """Schema for Learning Goal content type."""
 
@@ -115,15 +82,12 @@ class ILearningGoal(model.Schema):
         required=False,
     )
 
-    milestones = schema.List(
-        title=_(u'Milestones'),
-        description=_(u'List of milestones to achieve this goal'),
-        value_type=schema.Dict(
-            value_type=schema.Field(),
-            key_type=schema.TextLine()
-        ),
+    priority = schema.Choice(
+        title=_(u'Priority'),
+        description=_(u'Priority level of this goal'),
+        vocabulary='knowledge.curator.priority_vocabulary',
         required=False,
-        default=[],
+        default='medium',
     )
 
     progress = schema.Int(
@@ -135,29 +99,30 @@ class ILearningGoal(model.Schema):
         max=100,
     )
 
+    milestones = schema.List(
+        title=_(u'Milestones'),
+        description=_(u'List of milestones to achieve this goal'),
+        value_type=schema.Text(),
+        required=False,
+        default=[],
+    )
+
     related_notes = schema.List(
         title=_(u'Related Notes'),
-        description=_(u'Related research notes (UIDs)'),
+        description=_(u'Research notes related to this goal'),
         value_type=schema.TextLine(),
         required=False,
         default=[],
     )
 
-    priority = schema.Choice(
-        title=_(u'Priority'),
-        description=_(u'Priority level of this goal'),
-        values=['low', 'medium', 'high'],
-        required=True,
-        default='medium',
-    )
-
     reflection = schema.Text(
         title=_(u'Reflection'),
-        description=_(u'Reflection or summary of what was learned'),
+        description=_(u'Personal reflection on the learning process'),
         required=False,
     )
 
 
+@provider(IFormFieldProvider)
 class IProjectLog(model.Schema):
     """Schema for Project Log content type."""
 
@@ -168,52 +133,48 @@ class IProjectLog(model.Schema):
 
     description = schema.Text(
         title=_(u'Description'),
-        description=_(u'Project overview'),
+        description=_(u'Project description'),
         required=True,
     )
 
     start_date = schema.Date(
         title=_(u'Start Date'),
         description=_(u'Project start date'),
-        required=True,
+        required=False,
+    )
+
+    status = schema.Choice(
+        title=_(u'Status'),
+        description=_(u'Current status of the project'),
+        vocabulary='knowledge.curator.project_status_vocabulary',
+        required=False,
+        default='planning',
     )
 
     entries = schema.List(
         title=_(u'Log Entries'),
-        description=_(u'Chronological project log entries'),
-        value_type=schema.Dict(
-            value_type=schema.Field(),
-            key_type=schema.TextLine()
-        ),
+        description=_(u'Project log entries'),
+        value_type=schema.Text(),
         required=False,
         default=[],
     )
 
     deliverables = schema.List(
         title=_(u'Deliverables'),
-        description=_(u'List of project deliverables'),
+        description=_(u'Project deliverables'),
         value_type=schema.Text(),
         required=False,
         default=[],
     )
 
-    learnings = schema.List(
-        title=_(u'Key Learnings'),
-        description=_(u'Key learnings from this project'),
-        value_type=schema.Text(),
+    learnings = schema.Text(
+        title=_(u'Learnings'),
+        description=_(u'What was learned from this project'),
         required=False,
-        default=[],
-    )
-
-    status = schema.Choice(
-        title=_(u'Status'),
-        description=_(u'Current project status'),
-        values=['planning', 'active', 'paused', 'completed', 'archived'],
-        required=True,
-        default='planning',
     )
 
 
+@provider(IFormFieldProvider)
 class IBookmarkPlus(model.Schema):
     """Schema for BookmarkPlus content type."""
 
@@ -228,12 +189,6 @@ class IBookmarkPlus(model.Schema):
         required=True,
     )
 
-    description = schema.Text(
-        title=_(u'Description'),
-        description=_(u'Description of the bookmarked resource'),
-        required=False,
-    )
-
     tags = schema.List(
         title=_(u'Tags'),
         description=_(u'Tags for categorization'),
@@ -242,39 +197,90 @@ class IBookmarkPlus(model.Schema):
         default=[],
     )
 
-    notes = RichText(
+    notes = schema.Text(
         title=_(u'Notes'),
-        description=_(u'Personal notes about this resource'),
+        description=_(u'Personal notes about this bookmark'),
         required=False,
     )
 
     read_status = schema.Choice(
         title=_(u'Read Status'),
-        description=_(u'Reading status of the resource'),
-        values=['unread', 'reading', 'read'],
-        required=True,
+        description=_(u'Whether you have read this content'),
+        vocabulary='knowledge.curator.read_status_vocabulary',
+        required=False,
         default='unread',
     )
 
     importance = schema.Choice(
         title=_(u'Importance'),
-        description=_(u'Importance level of this resource'),
-        values=['low', 'medium', 'high', 'critical'],
-        required=True,
+        description=_(u'How important is this bookmark'),
+        vocabulary='knowledge.curator.importance_vocabulary',
+        required=False,
         default='medium',
     )
 
-    embedding_vector = schema.List(
-        title=_(u'Embedding Vector'),
-        description=_(u'AI-generated embedding vector for similarity search'),
-        value_type=schema.Float(),
-        required=False,
-        readonly=True,
-    )
+    # NOTE: ai_summary, embedding_vector are provided by behaviors
+    # to avoid duplication conflicts
 
-    ai_summary = schema.Text(
-        title=_(u'AI Summary'),
-        description=_(u'AI-generated summary of the content'),
-        required=False,
-        readonly=True,
-    )
+
+# Additional interfaces for the system
+
+class IKnowledgeGraph(Interface):
+    """Interface for knowledge graph functionality."""
+
+    def add_connection(source_uid, target_uid, relationship_type='related'):
+        """Add a connection between two content items."""
+
+    def remove_connection(source_uid, target_uid):
+        """Remove a connection between two content items."""
+
+    def get_connections(uid):
+        """Get all connections for a content item."""
+
+    def get_related_items(uid, max_items=10):
+        """Get related items based on connections and similarity."""
+
+
+class IVectorSearch(Interface):
+    """Interface for vector-based similarity search."""
+
+    def generate_embedding(text):
+        """Generate embedding vector for text."""
+
+    def update_embedding(uid, embedding):
+        """Update embedding for content item."""
+
+    def find_similar(embedding, max_results=10):
+        """Find similar content based on embedding."""
+
+
+class IAIService(Interface):
+    """Interface for AI service utilities."""
+    
+    def generate_embedding(text):
+        """Generate embedding vector for given text."""
+    
+    def generate_summary(text, max_length=150):
+        """Generate AI summary for given text."""
+    
+    def calculate_similarity(vector1, vector2):
+        """Calculate similarity between two embedding vectors."""
+    
+    def search_similar(query, limit=10):
+        """Search for similar content based on query."""
+
+
+class IAIEnhanced(Interface):
+    """Interface for AI enhancement features."""
+
+    def generate_summary(content):
+        """Generate AI summary of content."""
+
+    def extract_key_insights(content):
+        """Extract key insights from content."""
+
+    def suggest_tags(content):
+        """Suggest tags based on content analysis."""
+
+    def analyze_sentiment(content):
+        """Analyze sentiment of content."""

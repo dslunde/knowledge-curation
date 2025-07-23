@@ -333,19 +333,19 @@
 
   <!-- Scripts -->
   <script script_id="recordStartTime" type="External Method"
-          module="knowledge.curator.workflow_scripts"
+          module="workflow_scripts"
           function="record_start_time" filename=""/>
 
   <script script_id="calculateProgress" type="External Method"
-          module="knowledge.curator.workflow_scripts"
+          module="workflow_scripts"
           function="calculate_progress" filename=""/>
 
   <script script_id="validateCompletion" type="External Method"
-          module="knowledge.curator.workflow_scripts"
+          module="workflow_scripts"
           function="validate_completion" filename=""/>
 
   <script script_id="recordCompletionTime" type="External Method"
-          module="knowledge.curator.workflow_scripts"
+          module="workflow_scripts"
           function="record_completion_time" filename=""/>
 
 </dc-workflow>
