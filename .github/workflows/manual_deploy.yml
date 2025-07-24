@@ -9,6 +9,9 @@ on:
         default: 'knowledge-curator.lundandco.net'
         type: string
 
+env:
+  DEFAULT_ENVIRONMENT: 'knowledge-curator.lundandco.net'
+
 jobs:
 
   meta:
@@ -22,14 +25,17 @@ jobs:
 
       - name: Set Env Vars
         id: vars
+        env:
+          LIVE_ENV: ${{ vars.LIVE_ENV }}
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
           # Use workflow input, fallback to vars.LIVE_ENV, or use default
-          if [ -n "${{ github.event.inputs.environment }}" ]; then
-            ENVIRONMENT="${{ github.event.inputs.environment }}"
-          elif [ -n "${{ vars.LIVE_ENV }}" ]; then
-            ENVIRONMENT="${{ vars.LIVE_ENV }}"
+          if [ -n "${INPUT_ENVIRONMENT}" ]; then
+            ENVIRONMENT="${INPUT_ENVIRONMENT}"
+          elif [ -n "${LIVE_ENV}" ]; then
+            ENVIRONMENT="${LIVE_ENV}"
           else
-            ENVIRONMENT="knowledge-curator.lundandco.net"
+            ENVIRONMENT="${DEFAULT_ENVIRONMENT}"
           fi
           echo "ENVIRONMENT=${ENVIRONMENT}" >> $GITHUB_OUTPUT
           echo "STACK_NAME=${ENVIRONMENT//./-}" >> $GITHUB_OUTPUT
@@ -45,29 +51,32 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate deployment secrets
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH: ${{ secrets.DEPLOY_SSH }}
         run: |
-          if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then
+          if [ -z "${DEPLOY_HOST}" ]; then
             echo "::error::DEPLOY_HOST secret is not configured"
             exit 1
           fi
-          if [ -z "${{ secrets.DEPLOY_USER }}" ]; then
+          if [ -z "${DEPLOY_USER}" ]; then
             echo "::error::DEPLOY_USER secret is not configured"
             exit 1
           fi
-          if [ -z "${{ secrets.DEPLOY_SSH }}" ]; then
+          if [ -z "${DEPLOY_SSH}" ]; then
             echo "::error::DEPLOY_SSH secret is not configured"
             exit 1
           fi
 
       - name: Set deployment parameters
         id: deploy-params
+        env:
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          ENV_FILE: ${{ secrets.ENV_FILE }}
         run: |
-          echo "remote_port=${{ secrets.DEPLOY_PORT || 22 }}" >> $GITHUB_OUTPUT
-          if [ -n "${{ secrets.ENV_FILE }}" ]; then
-            echo "env_file=${{ secrets.ENV_FILE }}" >> $GITHUB_OUTPUT
-          else
-            echo "env_file=" >> $GITHUB_OUTPUT
-          fi
+          echo "remote_port=${DEPLOY_PORT:-22}" >> $GITHUB_OUTPUT
+          echo "env_file=${ENV_FILE}" >> $GITHUB_OUTPUT
 
       - name: Deploy to cluster
         uses: kitconcept/docker-stack-deploy@v1.2.0
