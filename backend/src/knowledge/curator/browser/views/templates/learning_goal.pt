@@ -1,85 +1,121 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
       i18n:domain="knowledge.curator"
-      metal:use-macro="context/main_template/macros/master">
-<body>
+>
+  <body>
 
-<metal:main fill-slot="main">
-    <h1 class="documentFirstHeading" tal:content="context/title">Title</h1>
-    
-    <div class="documentDescription" tal:content="context/description">
+    <metal:main fill-slot="main">
+      <h1 class="documentFirstHeading"
+          tal:content="context/title"
+      >Title</h1>
+
+      <div class="documentDescription"
+           tal:content="context/description"
+      >
         Description
-    </div>
+      </div>
 
-    <div id="goal-metadata" class="metadata-section">
+      <div class="metadata-section"
+           id="goal-metadata"
+      >
         <div class="field">
-            <label i18n:translate="">Priority:</label>
-            <span tal:attributes="class string:priority ${view/get_priority_class}"
-                  tal:content="context/priority">Priority</span>
+          <label i18n:translate="">Priority:</label>
+          <span tal:content="context/priority"
+                tal:attributes="
+                  class string:priority ${view/get_priority_class};
+                "
+          >Priority</span>
         </div>
-        
-        <div class="field" tal:condition="context/target_date">
-            <label i18n:translate="">Target Date:</label>
-            <span tal:content="python:context.target_date.strftime('%B %d, %Y')">Date</span>
-            <span tal:condition="view/is_overdue" class="overdue-warning">
-                (Overdue)
-            </span>
-        </div>
-    </div>
 
-    <div id="progress-section">
+        <div class="field"
+             tal:condition="context/target_date"
+        >
+          <label i18n:translate="">Target Date:</label>
+          <span tal:content="python:context.target_date.strftime('%B %d, %Y')">Date</span>
+          <span class="overdue-warning"
+                tal:condition="view/is_overdue"
+          >
+                (Overdue)
+          </span>
+        </div>
+      </div>
+
+      <div id="progress-section">
         <h2 i18n:translate="">Progress</h2>
         <div class="progress-bar">
-            <div class="progress-fill" 
-                 tal:attributes="style string:width: ${view/get_progress_percentage}%">
-                <span tal:content="string:${view/get_progress_percentage}%">0%</span>
-            </div>
+          <div class="progress-fill"
+               tal:attributes="
+                 style string:width: ${view/get_progress_percentage}%;
+               "
+          >
+            <span tal:content="string:${view/get_progress_percentage}%">0%</span>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <div id="milestones-section" tal:condition="view/get_milestones">
+      <div id="milestones-section"
+           tal:condition="view/get_milestones"
+      >
         <h2 i18n:translate="">Milestones</h2>
-        
-        <div class="pending-milestones" tal:condition="view/get_pending_milestones">
-            <h3 i18n:translate="">Pending</h3>
-            <ul>
-                <li tal:repeat="milestone view/get_pending_milestones">
-                    <strong tal:content="milestone/title">Title</strong>
-                    <div tal:content="milestone/description">Description</div>
-                    <div tal:condition="milestone/target_date" class="milestone-date">
-                        Target: <span tal:content="python:milestone['target_date']">Date</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        
-        <div class="completed-milestones" tal:condition="view/get_completed_milestones">
-            <h3 i18n:translate="">Completed</h3>
-            <ul>
-                <li tal:repeat="milestone view/get_completed_milestones" class="completed">
-                    <strong tal:content="milestone/title">Title</strong>
-                    <div tal:content="milestone/description">Description</div>
-                    <div tal:condition="milestone/completed_date" class="milestone-date">
-                        Completed: <span tal:content="python:milestone['completed_date']">Date</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
 
-    <div id="related-notes" tal:condition="view/get_related_notes">
+        <div class="pending-milestones"
+             tal:condition="view/get_pending_milestones"
+        >
+          <h3 i18n:translate="">Pending</h3>
+          <ul>
+            <li tal:repeat="milestone view/get_pending_milestones">
+              <strong tal:content="milestone/title">Title</strong>
+              <div tal:content="milestone/description">Description</div>
+              <div class="milestone-date"
+                   tal:condition="milestone/target_date"
+              >
+                        Target:
+                <span tal:content="python:milestone['target_date']">Date</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="completed-milestones"
+             tal:condition="view/get_completed_milestones"
+        >
+          <h3 i18n:translate="">Completed</h3>
+          <ul>
+            <li class="completed"
+                tal:repeat="milestone view/get_completed_milestones"
+            >
+              <strong tal:content="milestone/title">Title</strong>
+              <div tal:content="milestone/description">Description</div>
+              <div class="milestone-date"
+                   tal:condition="milestone/completed_date"
+              >
+                        Completed:
+                <span tal:content="python:milestone['completed_date']">Date</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="related-notes"
+           tal:condition="view/get_related_notes"
+      >
         <h2 i18n:translate="">Related Research Notes</h2>
         <ul>
-            <li tal:repeat="note view/get_related_notes">
-                <a tal:attributes="href note/getURL"
-                   tal:content="note/Title">Note Title</a>
-            </li>
+          <li tal:repeat="note view/get_related_notes">
+            <a tal:content="note/Title"
+               tal:attributes="
+                 href note/getURL;
+               "
+            >Note Title</a>
+          </li>
         </ul>
-    </div>
+      </div>
 
-</metal:main>
+    </metal:main>
 
-</body>
+  </body>
 </html>

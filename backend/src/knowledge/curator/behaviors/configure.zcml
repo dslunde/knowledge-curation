@@ -1,15 +1,16 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:plone="http://namespaces.plone.org/plone"
-    i18n_domain="knowledge.curator">
+    i18n_domain="knowledge.curator"
+    >
 
   <!-- AI Enhancement behavior -->
   <plone:behavior
       name="knowledge.curator.ai_enhanced"
       title="AI Enhanced"
       description="Adds AI enhancement capabilities to content"
-      provides=".ai_enhanced.IAIEnhancedBehavior"
       factory=".ai_enhanced.AIEnhancedBehavior"
+      provides=".ai_enhanced.IAIEnhancedBehavior"
       />
 
   <!-- Knowledge Graph Behavior -->
@@ -17,8 +18,8 @@
       name="knowledge.curator.knowledge_graph"
       title="Knowledge Graph"
       description="Adds knowledge graph relationship capabilities"
-      provides=".knowledge_graph.IKnowledgeGraphBehavior"
       factory=".knowledge_graph.KnowledgeGraphBehavior"
+      provides=".knowledge_graph.IKnowledgeGraphBehavior"
       for="plone.dexterity.interfaces.IDexterityContent"
       />
 
@@ -29,8 +30,8 @@
       name="knowledge.curator.spaced_repetition"
       title="Spaced Repetition"
       description="Enables spaced repetition learning with SM-2 algorithm"
-      provides=".spaced_repetition.ISpacedRepetition"
       factory=".spaced_repetition.SpacedRepetition"
+      provides=".spaced_repetition.ISpacedRepetition"
       for="plone.dexterity.interfaces.IDexterityContent"
       />
 

@@ -1,55 +1,69 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
       i18n:domain="knowledge.curator"
-      metal:use-macro="context/main_template/macros/master">
+>
 
-<body>
-  <metal:content-core fill-slot="content-core">
-    <div class="workflow-history">
-      <h2 i18n:translate="">Workflow History</h2>
-      
-      <div class="current-state mb-4">
-        <strong i18n:translate="">Current State:</strong>
-        <span class="badge badge-primary" tal:content="context/review_state|string:Unknown">State</span>
+  <body>
+    <metal:content-core fill-slot="content-core">
+      <div class="workflow-history">
+        <h2 i18n:translate="">Workflow History</h2>
+
+        <div class="current-state mb-4">
+          <strong i18n:translate="">Current State:</strong>
+          <span class="badge badge-primary"
+                tal:content="context/review_state|string:Unknown"
+          >State</span>
+        </div>
+
+        <table class="table table-striped"
+               tal:condition="view/history"
+        >
+          <thead>
+            <tr>
+              <th i18n:translate="">Date</th>
+              <th i18n:translate="">Action</th>
+              <th i18n:translate="">User</th>
+              <th i18n:translate="">State</th>
+              <th i18n:translate="">Comments</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr tal:repeat="item view/history">
+              <td tal:content="python:view.format_date(item['time'])">Date</td>
+              <td>
+                <span class="badge badge-info"
+                      tal:content="item/action"
+                >Action</span>
+              </td>
+              <td tal:content="item/actor">User</td>
+              <td>
+                <span class="badge badge-secondary"
+                      tal:content="item/review_state"
+                >State</span>
+              </td>
+              <td tal:content="item/comments">Comments</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="alert alert-info"
+             tal:condition="not:view/history"
+        >
+          <p i18n:translate="">No workflow history available.</p>
+        </div>
+
+        <div class="form-actions mt-4">
+          <a class="btn btn-primary"
+             tal:attributes="
+               href context/absolute_url;
+             "
+             i18n:translate=""
+          >Back to Item</a>
+        </div>
       </div>
-      
-      <table class="table table-striped" tal:condition="view/history">
-        <thead>
-          <tr>
-            <th i18n:translate="">Date</th>
-            <th i18n:translate="">Action</th>
-            <th i18n:translate="">User</th>
-            <th i18n:translate="">State</th>
-            <th i18n:translate="">Comments</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr tal:repeat="item view/history">
-            <td tal:content="python:view.format_date(item['time'])">Date</td>
-            <td>
-              <span class="badge badge-info" tal:content="item/action">Action</span>
-            </td>
-            <td tal:content="item/actor">User</td>
-            <td>
-              <span class="badge badge-secondary" tal:content="item/review_state">State</span>
-            </td>
-            <td tal:content="item/comments">Comments</td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <div class="alert alert-info" tal:condition="not:view/history">
-        <p i18n:translate="">No workflow history available.</p>
-      </div>
-      
-      <div class="form-actions mt-4">
-        <a class="btn btn-primary" 
-           tal:attributes="href context/absolute_url"
-           i18n:translate="">Back to Item</a>
-      </div>
-    </div>
-  </metal:content-core>
-</body>
+    </metal:content-core>
+  </body>
 </html>

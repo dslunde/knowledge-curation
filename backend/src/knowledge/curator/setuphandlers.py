@@ -5,13 +5,13 @@ from zope.interface import implementer
 
 
 @implementer(INonInstallable)
-class HiddenProfiles(object):
+class HiddenProfiles:
     """Hidden GenericSetup profiles."""
 
     def getNonInstallableProfiles(self):
         """Hide uninstall profile from site-creation and quickinstaller."""
         return [
-            'knowledge.curator:uninstall',
+            "knowledge.curator:uninstall",
         ]
 
 

@@ -1,7 +1,8 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:plone="http://namespaces.plone.org/plone"
-    i18n_domain="knowledge.curator">
+    i18n_domain="knowledge.curator"
+    >
 
   <class class=".research_note.ResearchNote">
     <require

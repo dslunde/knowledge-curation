@@ -1,74 +1,104 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
       i18n:domain="knowledge.curator"
-      metal:use-macro="context/main_template/macros/master">
-<body>
+>
+  <body>
 
-<metal:main fill-slot="main">
-    <h1 class="documentFirstHeading" tal:content="context/title">Title</h1>
-    
-    <div class="documentDescription" tal:content="context/description">
+    <metal:main fill-slot="main">
+      <h1 class="documentFirstHeading"
+          tal:content="context/title"
+      >Title</h1>
+
+      <div class="documentDescription"
+           tal:content="context/description"
+      >
         Description
-    </div>
+      </div>
 
-    <div id="bookmark-metadata" class="metadata-section">
+      <div class="metadata-section"
+           id="bookmark-metadata"
+      >
         <div class="field">
-            <label i18n:translate="">URL:</label>
-            <a tal:attributes="href context/url" 
-               tal:content="context/url"
-               target="_blank"
-               class="bookmark-url">URL</a>
+          <label i18n:translate="">URL:</label>
+          <a class="bookmark-url"
+             target="_blank"
+             tal:content="context/url"
+             tal:attributes="
+               href context/url;
+             "
+          >URL</a>
         </div>
-        
-        <div class="field">
-            <label i18n:translate="">Status:</label>
-            <span tal:attributes="class string:status ${view/get_status_class}"
-                  tal:content="context/read_status">Status</span>
-        </div>
-        
-        <div class="field">
-            <label i18n:translate="">Importance:</label>
-            <span tal:attributes="class string:importance ${view/get_importance_class}"
-                  tal:content="context/importance">Importance</span>
-        </div>
-        
-        <div class="field" tal:condition="view/get_read_date_formatted">
-            <label i18n:translate="">Read Date:</label>
-            <span tal:content="view/get_read_date_formatted">Date</span>
-        </div>
-        
-        <div class="field" tal:condition="view/get_reading_duration">
-            <label i18n:translate="">Reading Duration:</label>
-            <span tal:content="string:${view/get_reading_duration} days">Duration</span>
-        </div>
-        
-        <div class="field" tal:condition="context/tags">
-            <label i18n:translate="">Tags:</label>
-            <span tal:repeat="tag context/tags">
-                <span class="tag" tal:content="tag">Tag</span>
-            </span>
-        </div>
-    </div>
 
-    <div id="bookmark-notes" tal:condition="view/has_notes">
+        <div class="field">
+          <label i18n:translate="">Status:</label>
+          <span tal:content="context/read_status"
+                tal:attributes="
+                  class string:status ${view/get_status_class};
+                "
+          >Status</span>
+        </div>
+
+        <div class="field">
+          <label i18n:translate="">Importance:</label>
+          <span tal:content="context/importance"
+                tal:attributes="
+                  class string:importance ${view/get_importance_class};
+                "
+          >Importance</span>
+        </div>
+
+        <div class="field"
+             tal:condition="view/get_read_date_formatted"
+        >
+          <label i18n:translate="">Read Date:</label>
+          <span tal:content="view/get_read_date_formatted">Date</span>
+        </div>
+
+        <div class="field"
+             tal:condition="view/get_reading_duration"
+        >
+          <label i18n:translate="">Reading Duration:</label>
+          <span tal:content="string:${view/get_reading_duration} days">Duration</span>
+        </div>
+
+        <div class="field"
+             tal:condition="context/tags"
+        >
+          <label i18n:translate="">Tags:</label>
+          <span tal:repeat="tag context/tags">
+            <span class="tag"
+                  tal:content="tag"
+            >Tag</span>
+          </span>
+        </div>
+      </div>
+
+      <div id="bookmark-notes"
+           tal:condition="view/has_notes"
+      >
         <h2 i18n:translate="">Notes</h2>
         <div tal:content="structure context/notes/output">
             Notes content
         </div>
-    </div>
+      </div>
 
-    <div class="bookmark-actions">
+      <div class="bookmark-actions">
         <tal:unread condition="python:context.read_status == 'unread'">
-            <button class="mark-reading" i18n:translate="">Mark as Reading</button>
+          <button class="mark-reading"
+                  i18n:translate=""
+          >Mark as Reading</button>
         </tal:unread>
         <tal:reading condition="python:context.read_status == 'reading'">
-            <button class="mark-read" i18n:translate="">Mark as Read</button>
+          <button class="mark-read"
+                  i18n:translate=""
+          >Mark as Read</button>
         </tal:reading>
-    </div>
+      </div>
 
-</metal:main>
+    </metal:main>
 
-</body>
+  </body>
 </html>

@@ -1,12 +1,13 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <dc-workflow xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-             i18n:domain="knowledge.curator"
-             workflow_id="learning_goal_workflow"
-             title="Learning Goal Workflow"
              description="Workflow for learning goals with planning, active, review, and completed states"
-             state_variable="review_state"
              initial_state="planning"
-             i18n:attributes="title; description">
+             state_variable="review_state"
+             title="Learning Goal Workflow"
+             workflow_id="learning_goal_workflow"
+             i18n:attributes="title; description"
+             i18n:domain="knowledge.curator"
+>
 
   <!-- Permissions -->
   <permission>View</permission>
@@ -16,86 +17,122 @@
   <permission>Add portal content</permission>
 
   <!-- States -->
-  <state state_id="planning" title="Planning" i18n:attributes="title">
+  <state state_id="planning"
+         title="Planning"
+         i18n:attributes="title"
+  >
     <description i18n:translate="">Planning phase for the learning goal</description>
-    <exit-transition transition_id="activate"/>
-    <permission-map name="View" acquired="False">
+    <exit-transition transition_id="activate" />
+    <permission-map acquired="False"
+                    name="View"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
     </permission-map>
-    <permission-map name="Access contents information" acquired="False">
+    <permission-map acquired="False"
+                    name="Access contents information"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
     </permission-map>
-    <permission-map name="Modify portal content" acquired="False">
+    <permission-map acquired="False"
+                    name="Modify portal content"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
     </permission-map>
-    <permission-map name="Delete objects" acquired="False">
+    <permission-map acquired="False"
+                    name="Delete objects"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
     </permission-map>
   </state>
 
-  <state state_id="active" title="Active" i18n:attributes="title">
+  <state state_id="active"
+         title="Active"
+         i18n:attributes="title"
+  >
     <description i18n:translate="">Currently working on this learning goal</description>
-    <exit-transition transition_id="start_review"/>
-    <exit-transition transition_id="pause"/>
-    <exit-transition transition_id="abandon"/>
-    <permission-map name="View" acquired="False">
+    <exit-transition transition_id="start_review" />
+    <exit-transition transition_id="pause" />
+    <exit-transition transition_id="abandon" />
+    <permission-map acquired="False"
+                    name="View"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
       <permission-role>Member</permission-role>
     </permission-map>
-    <permission-map name="Access contents information" acquired="False">
+    <permission-map acquired="False"
+                    name="Access contents information"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
       <permission-role>Member</permission-role>
     </permission-map>
-    <permission-map name="Modify portal content" acquired="False">
+    <permission-map acquired="False"
+                    name="Modify portal content"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
     </permission-map>
-    <permission-map name="Add portal content" acquired="False">
+    <permission-map acquired="False"
+                    name="Add portal content"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
     </permission-map>
   </state>
 
-  <state state_id="review" title="Review" i18n:attributes="title">
+  <state state_id="review"
+         title="Review"
+         i18n:attributes="title"
+  >
     <description i18n:translate="">Reviewing progress and outcomes</description>
-    <exit-transition transition_id="complete"/>
-    <exit-transition transition_id="back_to_active"/>
-    <permission-map name="View" acquired="False">
+    <exit-transition transition_id="complete" />
+    <exit-transition transition_id="back_to_active" />
+    <permission-map acquired="False"
+                    name="View"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
       <permission-role>Reviewer</permission-role>
     </permission-map>
-    <permission-map name="Access contents information" acquired="False">
+    <permission-map acquired="False"
+                    name="Access contents information"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
       <permission-role>Reviewer</permission-role>
     </permission-map>
-    <permission-map name="Modify portal content" acquired="False">
+    <permission-map acquired="False"
+                    name="Modify portal content"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
     </permission-map>
   </state>
 
-  <state state_id="completed" title="Completed" i18n:attributes="title">
+  <state state_id="completed"
+         title="Completed"
+         i18n:attributes="title"
+  >
     <description i18n:translate="">Learning goal has been completed</description>
-    <exit-transition transition_id="reopen"/>
-    <permission-map name="View" acquired="False">
+    <exit-transition transition_id="reopen" />
+    <permission-map acquired="False"
+                    name="View"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
@@ -103,7 +140,9 @@
       <permission-role>Member</permission-role>
       <permission-role>Anonymous</permission-role>
     </permission-map>
-    <permission-map name="Access contents information" acquired="False">
+    <permission-map acquired="False"
+                    name="Access contents information"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
@@ -111,180 +150,220 @@
       <permission-role>Member</permission-role>
       <permission-role>Anonymous</permission-role>
     </permission-map>
-    <permission-map name="Modify portal content" acquired="False">
+    <permission-map acquired="False"
+                    name="Modify portal content"
+    >
       <permission-role>Manager</permission-role>
     </permission-map>
   </state>
 
-  <state state_id="paused" title="Paused" i18n:attributes="title">
+  <state state_id="paused"
+         title="Paused"
+         i18n:attributes="title"
+  >
     <description i18n:translate="">Learning goal is temporarily paused</description>
-    <exit-transition transition_id="resume"/>
-    <exit-transition transition_id="abandon"/>
-    <permission-map name="View" acquired="False">
+    <exit-transition transition_id="resume" />
+    <exit-transition transition_id="abandon" />
+    <permission-map acquired="False"
+                    name="View"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
     </permission-map>
-    <permission-map name="Access contents information" acquired="False">
+    <permission-map acquired="False"
+                    name="Access contents information"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
       <permission-role>Editor</permission-role>
     </permission-map>
-    <permission-map name="Modify portal content" acquired="False">
+    <permission-map acquired="False"
+                    name="Modify portal content"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
     </permission-map>
   </state>
 
-  <state state_id="abandoned" title="Abandoned" i18n:attributes="title">
+  <state state_id="abandoned"
+         title="Abandoned"
+         i18n:attributes="title"
+  >
     <description i18n:translate="">Learning goal has been abandoned</description>
-    <exit-transition transition_id="reopen"/>
-    <permission-map name="View" acquired="False">
+    <exit-transition transition_id="reopen" />
+    <permission-map acquired="False"
+                    name="View"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
     </permission-map>
-    <permission-map name="Access contents information" acquired="False">
+    <permission-map acquired="False"
+                    name="Access contents information"
+    >
       <permission-role>Manager</permission-role>
       <permission-role>Owner</permission-role>
     </permission-map>
-    <permission-map name="Modify portal content" acquired="False">
+    <permission-map acquired="False"
+                    name="Modify portal content"
+    >
       <permission-role>Manager</permission-role>
     </permission-map>
   </state>
 
   <!-- Transitions -->
-  <transition transition_id="activate"
+  <transition after_script="recordStartTime"
+              before_script=""
+              new_state="active"
               title="Activate"
-              new_state="active"
+              transition_id="activate"
               trigger="USER"
-              before_script=""
-              after_script="recordStartTime"
-              i18n:attributes="title">
+              i18n:attributes="title"
+  >
     <description i18n:translate="">Start working on this learning goal</description>
-    <action url="%(content_url)s/content_status_modify?workflow_action=activate"
-            category="workflow"
-            i18n:translate="">Activate</action>
+    <action category="workflow"
+            url="%(content_url)s/content_status_modify?workflow_action=activate"
+            i18n:translate=""
+    >Activate</action>
     <guard>
       <guard-permission>Modify portal content</guard-permission>
-      <guard-expression>python:object.milestones and len(object.milestones) > 0</guard-expression>
+      <guard-expression>python:object.milestones and len(object.milestones) &gt; 0</guard-expression>
     </guard>
   </transition>
 
-  <transition transition_id="start_review"
-              title="Start Review"
+  <transition after_script="calculateProgress"
+              before_script=""
               new_state="review"
+              title="Start Review"
+              transition_id="start_review"
               trigger="USER"
-              before_script=""
-              after_script="calculateProgress"
-              i18n:attributes="title">
+              i18n:attributes="title"
+  >
     <description i18n:translate="">Begin reviewing the learning goal progress</description>
-    <action url="%(content_url)s/content_status_modify?workflow_action=start_review"
-            category="workflow"
-            i18n:translate="">Start Review</action>
+    <action category="workflow"
+            url="%(content_url)s/content_status_modify?workflow_action=start_review"
+            i18n:translate=""
+    >Start Review</action>
     <guard>
       <guard-permission>Modify portal content</guard-permission>
     </guard>
   </transition>
 
-  <transition transition_id="complete"
-              title="Complete"
-              new_state="completed"
-              trigger="USER"
+  <transition after_script="recordCompletionTime"
               before_script="validateCompletion"
-              after_script="recordCompletionTime"
-              i18n:attributes="title">
+              new_state="completed"
+              title="Complete"
+              transition_id="complete"
+              trigger="USER"
+              i18n:attributes="title"
+  >
     <description i18n:translate="">Mark learning goal as completed</description>
-    <action url="%(content_url)s/content_status_modify?workflow_action=complete"
-            category="workflow"
-            i18n:translate="">Complete</action>
+    <action category="workflow"
+            url="%(content_url)s/content_status_modify?workflow_action=complete"
+            i18n:translate=""
+    >Complete</action>
     <guard>
       <guard-permission>Modify portal content</guard-permission>
-      <guard-expression>python:object.progress >= 80</guard-expression>
+      <guard-expression>python:object.progress &gt;= 80</guard-expression>
     </guard>
   </transition>
 
-  <transition transition_id="back_to_active"
+  <transition after_script=""
+              before_script=""
+              new_state="active"
               title="Back to Active"
-              new_state="active"
+              transition_id="back_to_active"
               trigger="USER"
-              before_script=""
-              after_script=""
-              i18n:attributes="title">
+              i18n:attributes="title"
+  >
     <description i18n:translate="">Continue working on the learning goal</description>
-    <action url="%(content_url)s/content_status_modify?workflow_action=back_to_active"
-            category="workflow"
-            i18n:translate="">Back to Active</action>
+    <action category="workflow"
+            url="%(content_url)s/content_status_modify?workflow_action=back_to_active"
+            i18n:translate=""
+    >Back to Active</action>
     <guard>
       <guard-permission>Modify portal content</guard-permission>
     </guard>
   </transition>
 
-  <transition transition_id="pause"
-              title="Pause"
+  <transition after_script=""
+              before_script=""
               new_state="paused"
+              title="Pause"
+              transition_id="pause"
               trigger="USER"
-              before_script=""
-              after_script=""
-              i18n:attributes="title">
+              i18n:attributes="title"
+  >
     <description i18n:translate="">Temporarily pause this learning goal</description>
-    <action url="%(content_url)s/content_status_modify?workflow_action=pause"
-            category="workflow"
-            i18n:translate="">Pause</action>
+    <action category="workflow"
+            url="%(content_url)s/content_status_modify?workflow_action=pause"
+            i18n:translate=""
+    >Pause</action>
     <guard>
       <guard-permission>Modify portal content</guard-permission>
     </guard>
   </transition>
 
-  <transition transition_id="resume"
-              title="Resume"
+  <transition after_script=""
+              before_script=""
               new_state="active"
+              title="Resume"
+              transition_id="resume"
               trigger="USER"
-              before_script=""
-              after_script=""
-              i18n:attributes="title">
+              i18n:attributes="title"
+  >
     <description i18n:translate="">Resume working on this learning goal</description>
-    <action url="%(content_url)s/content_status_modify?workflow_action=resume"
-            category="workflow"
-            i18n:translate="">Resume</action>
+    <action category="workflow"
+            url="%(content_url)s/content_status_modify?workflow_action=resume"
+            i18n:translate=""
+    >Resume</action>
     <guard>
       <guard-permission>Modify portal content</guard-permission>
     </guard>
   </transition>
 
-  <transition transition_id="abandon"
-              title="Abandon"
+  <transition after_script=""
+              before_script=""
               new_state="abandoned"
+              title="Abandon"
+              transition_id="abandon"
               trigger="USER"
-              before_script=""
-              after_script=""
-              i18n:attributes="title">
+              i18n:attributes="title"
+  >
     <description i18n:translate="">Abandon this learning goal</description>
-    <action url="%(content_url)s/content_status_modify?workflow_action=abandon"
-            category="workflow"
-            i18n:translate="">Abandon</action>
+    <action category="workflow"
+            url="%(content_url)s/content_status_modify?workflow_action=abandon"
+            i18n:translate=""
+    >Abandon</action>
     <guard>
       <guard-permission>Modify portal content</guard-permission>
     </guard>
   </transition>
 
-  <transition transition_id="reopen"
-              title="Reopen"
-              new_state="planning"
-              trigger="USER"
+  <transition after_script=""
               before_script=""
-              after_script=""
-              i18n:attributes="title">
+              new_state="planning"
+              title="Reopen"
+              transition_id="reopen"
+              trigger="USER"
+              i18n:attributes="title"
+  >
     <description i18n:translate="">Reopen this learning goal</description>
-    <action url="%(content_url)s/content_status_modify?workflow_action=reopen"
-            category="workflow"
-            i18n:translate="">Reopen</action>
+    <action category="workflow"
+            url="%(content_url)s/content_status_modify?workflow_action=reopen"
+            i18n:translate=""
+    >Reopen</action>
     <guard>
       <guard-permission>Modify portal content</guard-permission>
     </guard>
   </transition>
 
   <!-- Variables -->
-  <variable variable_id="action" for_catalog="False" for_status="True" update_always="True">
+  <variable for_catalog="False"
+            for_status="True"
+            update_always="True"
+            variable_id="action"
+  >
     <description>Previous transition</description>
     <default>
       <expression>transition/getId|nothing</expression>
@@ -293,7 +372,11 @@
     </guard>
   </variable>
 
-  <variable variable_id="actor" for_catalog="False" for_status="True" update_always="True">
+  <variable for_catalog="False"
+            for_status="True"
+            update_always="True"
+            variable_id="actor"
+  >
     <description>The ID of the user who performed the last transition</description>
     <default>
       <expression>user/getId</expression>
@@ -302,7 +385,11 @@
     </guard>
   </variable>
 
-  <variable variable_id="comments" for_catalog="False" for_status="True" update_always="True">
+  <variable for_catalog="False"
+            for_status="True"
+            update_always="True"
+            variable_id="comments"
+  >
     <description>Comment about the last transition</description>
     <default>
       <expression>python:state_change.kwargs.get('comment', '')</expression>
@@ -311,7 +398,11 @@
     </guard>
   </variable>
 
-  <variable variable_id="review_history" for_catalog="False" for_status="False" update_always="False">
+  <variable for_catalog="False"
+            for_status="False"
+            update_always="False"
+            variable_id="review_history"
+  >
     <description>Provides access to workflow history</description>
     <default>
       <expression>state_change/getHistory</expression>
@@ -322,7 +413,11 @@
     </guard>
   </variable>
 
-  <variable variable_id="time" for_catalog="False" for_status="True" update_always="True">
+  <variable for_catalog="False"
+            for_status="True"
+            update_always="True"
+            variable_id="time"
+  >
     <description>When the previous transition was performed</description>
     <default>
       <expression>state_change/getDateTime</expression>
@@ -332,20 +427,32 @@
   </variable>
 
   <!-- Scripts -->
-  <script script_id="recordStartTime" type="External Method"
+  <script filename=""
+          function="record_start_time"
           module="workflow_scripts"
-          function="record_start_time" filename=""/>
+          script_id="recordStartTime"
+          type="External Method"
+  />
 
-  <script script_id="calculateProgress" type="External Method"
+  <script filename=""
+          function="calculate_progress"
           module="workflow_scripts"
-          function="calculate_progress" filename=""/>
+          script_id="calculateProgress"
+          type="External Method"
+  />
 
-  <script script_id="validateCompletion" type="External Method"
+  <script filename=""
+          function="validate_completion"
           module="workflow_scripts"
-          function="validate_completion" filename=""/>
+          script_id="validateCompletion"
+          type="External Method"
+  />
 
-  <script script_id="recordCompletionTime" type="External Method"
+  <script filename=""
+          function="record_completion_time"
           module="workflow_scripts"
-          function="record_completion_time" filename=""/>
+          script_id="recordCompletionTime"
+          type="External Method"
+  />
 
 </dc-workflow>

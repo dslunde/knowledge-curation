@@ -1,31 +1,32 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:five="http://namespaces.zope.org/five"
-    i18n_domain="knowledge.curator">
+    i18n_domain="knowledge.curator"
+    >
 
-    <!-- Event subscribers for automatic vector management -->
-    <subscriber
-        for="Products.CMFCore.interfaces.IContentish
-             zope.lifecycleevent.IObjectCreatedEvent"
-        handler=".events.content_created"
-        />
+  <!-- Event subscribers for automatic vector management -->
+  <subscriber
+      for="Products.CMFCore.interfaces.IContentish
+           zope.lifecycleevent.IObjectCreatedEvent"
+      handler=".events.content_created"
+      />
 
-    <subscriber
-        for="Products.CMFCore.interfaces.IContentish
-             zope.lifecycleevent.IObjectModifiedEvent"
-        handler=".events.content_modified"
-        />
+  <subscriber
+      for="Products.CMFCore.interfaces.IContentish
+           zope.lifecycleevent.IObjectModifiedEvent"
+      handler=".events.content_modified"
+      />
 
-    <subscriber
-        for="Products.CMFCore.interfaces.IContentish
-             zope.lifecycleevent.IObjectRemovedEvent"
-        handler=".events.content_removed"
-        />
+  <subscriber
+      for="Products.CMFCore.interfaces.IContentish
+           zope.lifecycleevent.IObjectRemovedEvent"
+      handler=".events.content_removed"
+      />
 
-    <subscriber
-        for="Products.CMFCore.interfaces.IContentish
-             Products.DCWorkflow.interfaces.IAfterTransitionEvent"
-        handler=".events.workflow_transition"
-        />
+  <subscriber
+      for="Products.CMFCore.interfaces.IContentish
+           Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+      handler=".events.workflow_transition"
+      />
 
 </configure>

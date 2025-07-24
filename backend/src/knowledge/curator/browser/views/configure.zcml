@@ -1,7 +1,8 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
-    i18n_domain="knowledge.curator">
+    i18n_domain="knowledge.curator"
+    >
 
   <!-- Research Note Views -->
   <browser:page

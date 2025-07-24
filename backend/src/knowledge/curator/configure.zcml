@@ -3,7 +3,8 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:plone="http://namespaces.plone.org/plone"
-    i18n_domain="knowledge.curator">
+    i18n_domain="knowledge.curator"
+    >
 
   <i18n:registerTranslations directory="locales" />
 
@@ -31,18 +32,18 @@
   <genericsetup:registerProfile
       name="default"
       title="Knowledge Curator"
-      directory="profiles/default"
       description="Installs the Knowledge Curator add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/default"
       post_handler=".setuphandlers.post_install"
       />
 
   <genericsetup:registerProfile
       name="uninstall"
       title="Knowledge Curator (uninstall)"
-      directory="profiles/uninstall"
       description="Uninstalls the Knowledge Curator add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
+      directory="profiles/uninstall"
       post_handler=".setuphandlers.uninstall"
       />
 

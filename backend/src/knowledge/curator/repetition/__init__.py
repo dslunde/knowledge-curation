@@ -5,9 +5,5 @@ from .forgetting_curve import ForgettingCurve
 from .scheduler import ReviewScheduler
 from .tracker import PerformanceTracker
 
-__all__ = [
-    'SM2Algorithm',
-    'ForgettingCurve',
-    'ReviewScheduler',
-    'PerformanceTracker'
-]
+
+__all__ = ["ForgettingCurve", "PerformanceTracker", "ReviewScheduler", "SM2Algorithm"]

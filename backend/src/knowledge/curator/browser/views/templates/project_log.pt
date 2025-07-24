@@ -1,81 +1,115 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
       i18n:domain="knowledge.curator"
-      metal:use-macro="context/main_template/macros/master">
-<body>
+>
+  <body>
 
-<metal:main fill-slot="main">
-    <h1 class="documentFirstHeading" tal:content="context/title">Title</h1>
-    
-    <div class="documentDescription" tal:content="context/description">
+    <metal:main fill-slot="main">
+      <h1 class="documentFirstHeading"
+          tal:content="context/title"
+      >Title</h1>
+
+      <div class="documentDescription"
+           tal:content="context/description"
+      >
         Description
-    </div>
+      </div>
 
-    <div id="project-metadata" class="metadata-section">
+      <div class="metadata-section"
+           id="project-metadata"
+      >
         <div class="field">
-            <label i18n:translate="">Status:</label>
-            <span tal:attributes="class string:status ${view/get_status_class}"
-                  tal:content="context/status">Status</span>
+          <label i18n:translate="">Status:</label>
+          <span tal:content="context/status"
+                tal:attributes="
+                  class string:status ${view/get_status_class};
+                "
+          >Status</span>
         </div>
-        
-        <div class="field">
-            <label i18n:translate="">Start Date:</label>
-            <span tal:content="python:context.start_date.strftime('%B %d, %Y')">Date</span>
-        </div>
-        
-        <div class="field">
-            <label i18n:translate="">Duration:</label>
-            <span tal:content="view/format_duration">Duration</span>
-        </div>
-    </div>
 
-    <div id="deliverables-section" tal:condition="context/deliverables">
+        <div class="field">
+          <label i18n:translate="">Start Date:</label>
+          <span tal:content="python:context.start_date.strftime('%B %d, %Y')">Date</span>
+        </div>
+
+        <div class="field">
+          <label i18n:translate="">Duration:</label>
+          <span tal:content="view/format_duration">Duration</span>
+        </div>
+      </div>
+
+      <div id="deliverables-section"
+           tal:condition="context/deliverables"
+      >
         <h2 i18n:translate="">Deliverables</h2>
         <ul>
-            <li tal:repeat="deliverable context/deliverables"
-                tal:content="deliverable">Deliverable</li>
+          <li tal:repeat="deliverable context/deliverables"
+              tal:content="deliverable"
+          >Deliverable</li>
         </ul>
-    </div>
+      </div>
 
-    <div id="learnings-section" tal:condition="context/learnings">
+      <div id="learnings-section"
+           tal:condition="context/learnings"
+      >
         <h2 i18n:translate="">Key Learnings</h2>
         <ul>
-            <li tal:repeat="learning context/learnings"
-                tal:content="learning">Learning</li>
+          <li tal:repeat="learning context/learnings"
+              tal:content="learning"
+          >Learning</li>
         </ul>
-    </div>
+      </div>
 
-    <div id="log-entries" tal:condition="view/get_all_entries">
+      <div id="log-entries"
+           tal:condition="view/get_all_entries"
+      >
         <h2 i18n:translate="">Project Log Entries</h2>
-        
-        <div class="log-filters" tal:condition="view/get_all_tags">
-            <label i18n:translate="">Filter by tag:</label>
-            <select id="tag-filter">
-                <option value="">All</option>
-                <option tal:repeat="tag view/get_all_tags"
-                        tal:attributes="value tag"
-                        tal:content="tag">Tag</option>
-            </select>
+
+        <div class="log-filters"
+             tal:condition="view/get_all_tags"
+        >
+          <label i18n:translate="">Filter by tag:</label>
+          <select id="tag-filter">
+            <option value="">All</option>
+            <option tal:repeat="tag view/get_all_tags"
+                    tal:content="tag"
+                    tal:attributes="
+                      value tag;
+                    "
+            >Tag</option>
+          </select>
         </div>
-        
+
         <div class="log-entries">
-            <div tal:repeat="entry view/get_recent_entries" 
-                 class="log-entry"
-                 tal:attributes="data-tags python:' '.join(entry.get('tags', []))">
-                <h3 tal:content="entry/title">Entry Title</h3>
-                <div class="entry-timestamp" 
-                     tal:content="python:entry.get('timestamp', '')">Timestamp</div>
-                <div class="entry-content" tal:content="entry/content">Content</div>
-                <div class="entry-tags" tal:condition="entry/tags">
-                    <span tal:repeat="tag entry/tags" class="tag" tal:content="tag">Tag</span>
-                </div>
+          <div class="log-entry"
+               tal:repeat="entry view/get_recent_entries"
+               tal:attributes="
+                 data-tags python:' '.join(entry.get('tags', []));
+               "
+          >
+            <h3 tal:content="entry/title">Entry Title</h3>
+            <div class="entry-timestamp"
+                 tal:content="python:entry.get('timestamp', '')"
+            >Timestamp</div>
+            <div class="entry-content"
+                 tal:content="entry/content"
+            >Content</div>
+            <div class="entry-tags"
+                 tal:condition="entry/tags"
+            >
+              <span class="tag"
+                    tal:repeat="tag entry/tags"
+                    tal:content="tag"
+              >Tag</span>
             </div>
+          </div>
         </div>
-    </div>
+      </div>
 
-</metal:main>
+    </metal:main>
 
-</body>
+  </body>
 </html>

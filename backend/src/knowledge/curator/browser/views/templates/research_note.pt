@@ -1,59 +1,84 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
       i18n:domain="knowledge.curator"
-      metal:use-macro="context/main_template/macros/master">
-<body>
+>
+  <body>
 
-<metal:main fill-slot="main">
-    <h1 class="documentFirstHeading" tal:content="context/title">Title</h1>
-    
-    <div class="documentDescription" tal:content="context/description">
+    <metal:main fill-slot="main">
+      <h1 class="documentFirstHeading"
+          tal:content="context/title"
+      >Title</h1>
+
+      <div class="documentDescription"
+           tal:content="context/description"
+      >
         Description
-    </div>
+      </div>
 
-    <div id="research-note-metadata" class="metadata-section">
-        <div class="field" tal:condition="context/source_url">
-            <label i18n:translate="">Source:</label>
-            <a tal:attributes="href context/source_url" 
-               tal:content="context/source_url"
-               target="_blank">Source URL</a>
+      <div class="metadata-section"
+           id="research-note-metadata"
+      >
+        <div class="field"
+             tal:condition="context/source_url"
+        >
+          <label i18n:translate="">Source:</label>
+          <a target="_blank"
+             tal:content="context/source_url"
+             tal:attributes="
+               href context/source_url;
+             "
+          >Source URL</a>
         </div>
-        
-        <div class="field" tal:condition="context/tags">
-            <label i18n:translate="">Tags:</label>
-            <span tal:repeat="tag context/tags">
-                <span class="tag" tal:content="tag">Tag</span>
-            </span>
-        </div>
-    </div>
 
-    <div id="research-note-content" 
-         tal:condition="context/content"
-         tal:content="structure context/content/output">
+        <div class="field"
+             tal:condition="context/tags"
+        >
+          <label i18n:translate="">Tags:</label>
+          <span tal:repeat="tag context/tags">
+            <span class="tag"
+                  tal:content="tag"
+            >Tag</span>
+          </span>
+        </div>
+      </div>
+
+      <div id="research-note-content"
+           tal:condition="context/content"
+           tal:content="structure context/content/output"
+      >
         Content
-    </div>
+      </div>
 
-    <div id="key-insights" tal:condition="view/get_key_insights_formatted">
+      <div id="key-insights"
+           tal:condition="view/get_key_insights_formatted"
+      >
         <h2 i18n:translate="">Key Insights</h2>
         <ul>
-            <li tal:repeat="insight view/get_key_insights_formatted"
-                tal:content="insight">Insight</li>
+          <li tal:repeat="insight view/get_key_insights_formatted"
+              tal:content="insight"
+          >Insight</li>
         </ul>
-    </div>
+      </div>
 
-    <div id="connections" tal:condition="view/get_connections">
+      <div id="connections"
+           tal:condition="view/get_connections"
+      >
         <h2 i18n:translate="">Related Content</h2>
         <ul>
-            <li tal:repeat="item view/get_connections">
-                <a tal:attributes="href item/getURL"
-                   tal:content="item/Title">Connected Item</a>
-            </li>
+          <li tal:repeat="item view/get_connections">
+            <a tal:content="item/Title"
+               tal:attributes="
+                 href item/getURL;
+               "
+            >Connected Item</a>
+          </li>
         </ul>
-    </div>
+      </div>
 
-</metal:main>
+    </metal:main>
 
-</body>
+  </body>
 </html>

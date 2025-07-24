@@ -1,163 +1,237 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
       i18n:domain="knowledge.curator"
-      metal:use-macro="context/main_template/macros/master">
+>
 
-<body>
+  <body>
 
-<metal:main fill-slot="main">
-    <tal:main-macro metal:define-macro="main">
+    <metal:main fill-slot="main">
+      <tal:main-macro metal:define-macro="main">
 
         <div class="documentDescription">
             Search knowledge content using semantic similarity
         </div>
 
         <div id="content-core">
-            
-            <!-- Search Form -->
-            <div class="box">
-                <form method="POST" tal:attributes="action string:${context/absolute_url}/@@vector-search">
-                    
-                    <div class="field">
-                        <label for="q">Search Query:</label>
-                        <input type="text" name="q" id="q" class="form-control"
-                               tal:attributes="value view/query|nothing"
-                               placeholder="Enter search terms..." />
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="field">
-                                <label for="limit">Results Limit:</label>
-                                <input type="number" name="limit" id="limit" value="10" 
-                                       min="1" max="100" class="form-control" />
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="field">
-                                <label for="threshold">Similarity Threshold:</label>
-                                <input type="number" name="threshold" id="threshold" value="0.5"
-                                       min="0" max="1" step="0.1" class="form-control" />
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="field">
-                                <label for="types">Content Types:</label>
-                                <select name="types" id="types" class="form-control" multiple>
-                                    <option value="BookmarkPlus">Bookmark Plus</option>
-                                    <option value="ResearchNote">Research Note</option>
-                                    <option value="LearningGoal">Learning Goal</option>
-                                    <option value="ProjectLog">Project Log</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="formControls">
-                        <button type="submit" class="btn btn-primary">Search</button>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="format" value="json" />
-                            Return as JSON
-                        </label>
-                    </div>
-                    
-                </form>
-            </div>
-            
-            <!-- Search Results -->
-            <div class="box" tal:condition="view/results|nothing">
-                <h2>Search Results</h2>
-                
-                <p class="discreet">
-                    Found <span tal:content="python:len(view.results)"></span> similar items
-                </p>
-                
-                <div class="search-results">
-                    <div class="result-item" tal:repeat="result view/results">
-                        <h3>
-                            <a tal:attributes="href result/url|nothing"
-                               tal:content="result/title">Title</a>
-                            <span class="score label label-default">
-                                Score: <span tal:content="python:'{:.2f}'.format(result['score'])"></span>
-                            </span>
-                        </h3>
-                        
-                        <p class="discreet">
-                            <span tal:content="result/content_type">Type</span>
-                            |
-                            <span tal:content="result/workflow_state">State</span>
-                            |
-                            <span tal:content="result/modified">Modified</span>
-                        </p>
-                        
-                        <p tal:condition="result/description"
-                           tal:content="result/description">Description</p>
-                           
-                        <div tal:condition="result/tags|nothing">
-                            <strong>Tags:</strong>
-                            <span tal:repeat="tag result/tags">
-                                <span class="label label-info" tal:content="tag">tag</span>
-                            </span>
-                        </div>
-                    </div>
+
+          <!-- Search Form -->
+          <div class="box">
+            <form method="POST"
+                  tal:attributes="
+                    action string:${context/absolute_url}/@@vector-search;
+                  "
+            >
+
+              <div class="field">
+                <label for="q">Search Query:</label>
+                <input class="form-control"
+                       id="q"
+                       name="q"
+                       placeholder="Enter search terms..."
+                       type="text"
+                       tal:attributes="
+                         value view/query|nothing;
+                       "
+                />
+              </div>
+
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="field">
+                    <label for="limit">Results Limit:</label>
+                    <input class="form-control"
+                           id="limit"
+                           max="100"
+                           min="1"
+                           name="limit"
+                           type="number"
+                           value="10"
+                    />
+                  </div>
                 </div>
+
+                <div class="col-md-4">
+                  <div class="field">
+                    <label for="threshold">Similarity Threshold:</label>
+                    <input class="form-control"
+                           id="threshold"
+                           max="1"
+                           min="0"
+                           name="threshold"
+                           step="0.1"
+                           type="number"
+                           value="0.5"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="field">
+                    <label for="types">Content Types:</label>
+                    <select class="form-control"
+                            id="types"
+                            multiple
+                            name="types"
+                    >
+                      <option value="BookmarkPlus">Bookmark Plus</option>
+                      <option value="ResearchNote">Research Note</option>
+                      <option value="LearningGoal">Learning Goal</option>
+                      <option value="ProjectLog">Project Log</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="formControls">
+                <button class="btn btn-primary"
+                        type="submit"
+                >Search</button>
+                <label class="checkbox-inline">
+                  <input name="format"
+                         type="checkbox"
+                         value="json"
+                  />
+                            Return as JSON
+                </label>
+              </div>
+
+            </form>
+          </div>
+
+          <!-- Search Results -->
+          <div class="box"
+               tal:condition="view/results|nothing"
+          >
+            <h2>Search Results</h2>
+
+            <p class="discreet">
+                    Found
+              <span tal:content="python:len(view.results)"></span>
+               similar items
+            </p>
+
+            <div class="search-results">
+              <div class="result-item"
+                   tal:repeat="result view/results"
+              >
+                <h3>
+                  <a tal:content="result/title"
+                     tal:attributes="
+                       href result/url|nothing;
+                     "
+                  >Title</a>
+                  <span class="score label label-default">
+                                Score:
+                    <span tal:content="python:'{:.2f}'.format(result['score'])"></span>
+                  </span>
+                </h3>
+
+                <p class="discreet">
+                  <span tal:content="result/content_type">Type</span>
+                            |
+                  <span tal:content="result/workflow_state">State</span>
+                            |
+                  <span tal:content="result/modified">Modified</span>
+                </p>
+
+                <p tal:condition="result/description"
+                   tal:content="result/description"
+                >Description</p>
+
+                <div tal:condition="result/tags|nothing">
+                  <strong>Tags:</strong>
+                  <span tal:repeat="tag result/tags">
+                    <span class="label label-info"
+                          tal:content="tag"
+                    >tag</span>
+                  </span>
+                </div>
+              </div>
             </div>
-            
-            <!-- Similar Content Finder -->
-            <div class="box">
-                <h2>Find Similar Content</h2>
-                <p class="discreet">Find content similar to a specific item by its UID</p>
-                
-                <form method="POST" tal:attributes="action string:${context/absolute_url}/@@vector-search/find_similar">
-                    
-                    <div class="field">
-                        <label for="uid">Content UID:</label>
-                        <input type="text" name="uid" id="uid" class="form-control"
-                               placeholder="Enter content UID..." />
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="field">
-                                <label for="similar_limit">Results Limit:</label>
-                                <input type="number" name="limit" id="similar_limit" value="5"
-                                       min="1" max="20" class="form-control" />
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="field">
-                                <label for="similar_threshold">Similarity Threshold:</label>
-                                <input type="number" name="threshold" id="similar_threshold" value="0.6"
-                                       min="0" max="1" step="0.1" class="form-control" />
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="field">
-                                <label class="checkbox-inline" style="margin-top: 25px;">
-                                    <input type="checkbox" name="same_type" value="true" />
+          </div>
+
+          <!-- Similar Content Finder -->
+          <div class="box">
+            <h2>Find Similar Content</h2>
+            <p class="discreet">Find content similar to a specific item by its UID</p>
+
+            <form method="POST"
+                  tal:attributes="
+                    action string:${context/absolute_url}/@@vector-search/find_similar;
+                  "
+            >
+
+              <div class="field">
+                <label for="uid">Content UID:</label>
+                <input class="form-control"
+                       id="uid"
+                       name="uid"
+                       placeholder="Enter content UID..."
+                       type="text"
+                />
+              </div>
+
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="field">
+                    <label for="similar_limit">Results Limit:</label>
+                    <input class="form-control"
+                           id="similar_limit"
+                           max="20"
+                           min="1"
+                           name="limit"
+                           type="number"
+                           value="5"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="field">
+                    <label for="similar_threshold">Similarity Threshold:</label>
+                    <input class="form-control"
+                           id="similar_threshold"
+                           max="1"
+                           min="0"
+                           name="threshold"
+                           step="0.1"
+                           type="number"
+                           value="0.6"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="field">
+                    <label class="checkbox-inline"
+                           style="margin-top: 25px;"
+                    >
+                      <input name="same_type"
+                             type="checkbox"
+                             value="true"
+                      />
                                     Same type only
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="formControls">
-                        <button type="submit" class="btn btn-primary">Find Similar</button>
-                    </div>
-                    
-                </form>
-            </div>
-            
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="formControls">
+                <button class="btn btn-primary"
+                        type="submit"
+                >Find Similar</button>
+              </div>
+
+            </form>
+          </div>
+
         </div>
 
-    </tal:main-macro>
-</metal:main>
+      </tal:main-macro>
+    </metal:main>
 
-</body>
+  </body>
 </html>

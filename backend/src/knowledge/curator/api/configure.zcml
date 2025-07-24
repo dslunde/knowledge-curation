@@ -2,66 +2,67 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:plone="http://namespaces.plone.org/plone"
     xmlns:zcml="http://namespaces.zope.org/zcml"
-    i18n_domain="knowledge.curator">
+    i18n_domain="knowledge.curator"
+    >
 
   <!-- Knowledge Graph API -->
   <plone:service
       method="GET"
-      for="*"
       accept="application/json"
-      name="@knowledge-graph"
-      permission="zope2.View"
       factory=".knowledge_graph.KnowledgeGraphService"
+      for="*"
+      permission="zope2.View"
+      name="@knowledge-graph"
       />
 
   <!-- Search API -->
   <plone:service
       method="GET,POST"
-      for="*"
       accept="application/json"
-      name="@knowledge-search"
-      permission="zope2.View"
       factory=".search.SearchService"
+      for="*"
+      permission="zope2.View"
+      name="@knowledge-search"
       />
 
   <!-- Analytics API -->
   <plone:service
       method="GET"
-      for="*"
       accept="application/json"
-      name="@knowledge-analytics"
-      permission="zope2.View"
       factory=".analytics.AnalyticsService"
+      for="*"
+      permission="zope2.View"
+      name="@knowledge-analytics"
       />
 
   <!-- Bulk Operations API -->
   <plone:service
       method="POST"
-      for="*"
       accept="application/json"
-      name="@knowledge-bulk"
-      permission="zope2.View"
       factory=".bulk_operations.BulkOperationsService"
+      for="*"
+      permission="zope2.View"
+      name="@knowledge-bulk"
       />
 
   <!-- Spaced Repetition API -->
   <plone:service
       method="GET,POST"
-      for="*"
       accept="application/json"
-      name="@spaced-repetition"
-      permission="zope2.View"
       factory=".spaced_repetition.SpacedRepetitionService"
+      for="*"
+      permission="zope2.View"
+      name="@spaced-repetition"
       />
 
   <!-- Import/Export API -->
   <plone:service
       method="GET,POST"
-      for="*"
       accept="application/json"
-      name="@knowledge-io"
-      permission="zope2.View"
       factory=".import_export.ImportExportService"
+      for="*"
+      permission="zope2.View"
+      name="@knowledge-io"
       />
 
   <!-- Custom Serializers -->
@@ -73,47 +74,47 @@
   <!-- Vector Database API -->
   <plone:service
       method="POST"
-      for="*"
       accept="application/json"
-      name="@vector-search"
-      permission="zope2.View"
       factory=".vector_api.VectorSearchService"
+      for="*"
+      permission="zope2.View"
+      name="@vector-search"
       />
 
   <plone:service
       method="GET,POST"
-      for="*"
       accept="application/json"
-      name="@similar-content"
-      permission="zope2.View"
       factory=".vector_api.SimilarContentService"
+      for="*"
+      permission="zope2.View"
+      name="@similar-content"
       />
 
   <plone:service
       method="GET,POST"
-      for="*"
       accept="application/json"
-      name="@vector-management"
-      permission="zope2.View"
       factory=".vector_api.VectorManagementService"
+      for="*"
+      permission="zope2.View"
+      name="@vector-management"
       />
 
   <plone:service
       method="GET,POST"
-      for="*"
       accept="application/json"
-      name="@vector-recommendations"
-      permission="zope2.View"
       factory=".vector_api.VectorRecommendationsService"
+      for="*"
+      permission="zope2.View"
+      name="@vector-recommendations"
       />
 
   <plone:service
       method="GET,POST"
-      for="*"
       accept="application/json"
-      name="@vector-clustering"
-      permission="zope2.View"
       factory=".vector_api.VectorClusteringService"
+      for="*"
+      permission="zope2.View"
+      name="@vector-clustering"
       />
 
 </configure>

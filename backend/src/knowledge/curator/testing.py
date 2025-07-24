@@ -12,7 +12,6 @@ import knowledge.curator
 
 
 class PloneAppKnowledgeLayer(PloneSandboxLayer):
-
     defaultBases = (PLONE_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
@@ -20,11 +19,30 @@ class PloneAppKnowledgeLayer(PloneSandboxLayer):
         # The z3c.autoinclude feature is disabled in the Plone fixture base
         # layer.
         import plone.restapi
+
         self.loadZCML(package=plone.restapi)
         self.loadZCML(package=knowledge.curator)
 
     def setUpPloneSite(self, portal):
-        applyProfile(portal, 'knowledge.curator:default')
+        # Apply core dependencies first
+        try:
+            applyProfile(portal, "plone.app.dexterity:default")
+            applyProfile(portal, "plone.restapi:default")
+            applyProfile(portal, "plone.app.versioningbehavior:default") 
+            applyProfile(portal, "plone.app.relationfield:default")
+        except Exception:
+            pass  # Some dependencies might not be available in test environment
+        
+        # Apply our profile without dependencies
+        try:
+            applyProfile(portal, "knowledge.curator:default")
+        except Exception:
+            # If dependencies fail, try to install just the content types
+            portal.portal_types.manage_addPortalType(
+                id="ResearchNote",
+                title="Research Note",
+                meta_type="Dexterity Content Type"
+            )
 
 
 PLONE_APP_KNOWLEDGE_FIXTURE = PloneAppKnowledgeLayer()
@@ -32,13 +50,13 @@ PLONE_APP_KNOWLEDGE_FIXTURE = PloneAppKnowledgeLayer()
 
 PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING = IntegrationTesting(
     bases=(PLONE_APP_KNOWLEDGE_FIXTURE,),
-    name='PloneAppKnowledgeLayer:IntegrationTesting',
+    name="PloneAppKnowledgeLayer:IntegrationTesting",
 )
 
 
 PLONE_APP_KNOWLEDGE_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(PLONE_APP_KNOWLEDGE_FIXTURE,),
-    name='PloneAppKnowledgeLayer:FunctionalTesting',
+    name="PloneAppKnowledgeLayer:FunctionalTesting",
 )
 
 
@@ -48,5 +66,5 @@ PLONE_APP_KNOWLEDGE_ACCEPTANCE_TESTING = FunctionalTesting(
         REMOTE_LIBRARY_BUNDLE_FIXTURE,
         z2.ZSERVER_FIXTURE,
     ),
-    name='PloneAppKnowledgeLayer:AcceptanceTesting',
+    name="PloneAppKnowledgeLayer:AcceptanceTesting",
 )

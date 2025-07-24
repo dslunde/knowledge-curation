@@ -1,33 +1,34 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    i18n_domain="knowledge.curator">
+    i18n_domain="knowledge.curator"
+    >
 
   <!-- Priority vocabulary -->
   <utility
-      component=".PriorityVocabularyFactory"
-      name="knowledge.curator.priority_vocabulary"
       provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.priority_vocabulary"
+      component=".PriorityVocabularyFactory"
       />
 
   <!-- Project status vocabulary -->
   <utility
-      component=".ProjectStatusVocabularyFactory"
-      name="knowledge.curator.project_status_vocabulary"
       provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.project_status_vocabulary"
+      component=".ProjectStatusVocabularyFactory"
       />
 
   <!-- Read status vocabulary -->
   <utility
-      component=".ReadStatusVocabularyFactory"
-      name="knowledge.curator.read_status_vocabulary"
       provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.read_status_vocabulary"
+      component=".ReadStatusVocabularyFactory"
       />
 
   <!-- Importance vocabulary -->
   <utility
-      component=".ImportanceVocabularyFactory"
-      name="knowledge.curator.importance_vocabulary"
       provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.importance_vocabulary"
+      component=".ImportanceVocabularyFactory"
       />
 
 </configure>
