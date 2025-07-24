@@ -1,7 +1,6 @@
 """Review Scheduling Engine for Spaced Repetition."""
 
 from datetime import datetime
->>>>>>> fixing_linting_and_tests
 import random
 
 
@@ -9,13 +8,6 @@ class ReviewScheduler:
     """Manages review scheduling and session planning."""
 
     # Review order strategies
-<<<<<<< HEAD
-    ORDER_URGENCY = "urgency"
-    ORDER_RANDOM = "random"
-    ORDER_OLDEST = "oldest"
-    ORDER_DIFFICULTY = "difficulty"
-    ORDER_INTERLEAVED = "interleaved"
-=======
     ORDER_URGENCY = 'urgency'
     ORDER_RANDOM = 'random'
     ORDER_OLDEST = 'oldest'

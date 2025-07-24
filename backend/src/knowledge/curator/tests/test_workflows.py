@@ -7,7 +7,6 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from Products.CMFCore.WorkflowCore import WorkflowException
 from zope.annotation.interfaces import IAnnotations
->>>>>>> fixing_linting_and_tests
 
 
 class TestKnowledgeWorkflow(unittest.TestCase):
@@ -17,12 +16,6 @@ class TestKnowledgeWorkflow(unittest.TestCase):
 
     def setUp(self):
         """Set up test environment."""
-<<<<<<< HEAD
-        self.portal = self.layer["portal"]
-        self.request = self.layer["request"]
-
-        setRoles(self.portal, TEST_USER_ID, ["Manager"])
-=======
         self.portal = self.layer['portal']
         self.request = self.layer['request']
 

@@ -1,7 +1,6 @@
 """Views for Learning Goal content type."""
 
 from plone import api
->>>>>>> fixing_linting_and_tests
 
 
 class LearningGoalView(BrowserView):
@@ -26,13 +25,6 @@ class LearningGoalView(BrowserView):
 
     def get_completed_milestones(self):
         """Get only completed milestones."""
-<<<<<<< HEAD
-        return [m for m in self.get_milestones() if m.get("completed", False)]
-
-    def get_pending_milestones(self):
-        """Get only pending milestones."""
-        return [m for m in self.get_milestones() if not m.get("completed", False)]
-=======
         return [m for m in self.get_milestones() if m.get('completed', False)]
 
     def get_pending_milestones(self):
