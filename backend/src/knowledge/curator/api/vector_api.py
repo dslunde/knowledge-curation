@@ -170,11 +170,19 @@ class VectorManagementService(Service):
             return {"error": "Insufficient privileges"}
 
         if not self.params:
-            return {"available_operations": ["health", "stats", "initialize", "rebuild", "update"]}
+            return {
+                "available_operations": [
+                    "health",
+                    "stats",
+                    "initialize",
+                    "rebuild",
+                    "update",
+                ]
+            }
 
         operation = self.params[0]
         manager = VectorCollectionManager()
-        
+
         handlers = {
             "health": self._handle_health_check,
             "stats": self._handle_stats,
@@ -182,7 +190,7 @@ class VectorManagementService(Service):
             "rebuild": self._handle_rebuild,
             "update": self._handle_update,
         }
-        
+
         handler = handlers.get(operation)
         if handler:
             return handler(manager)

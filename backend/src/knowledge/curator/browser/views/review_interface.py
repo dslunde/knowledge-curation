@@ -14,7 +14,6 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope.interface import alsoProvides
 
 
-
 class ReviewQueueView(BrowserView):
     """Review queue interface."""
 

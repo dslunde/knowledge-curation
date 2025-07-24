@@ -4,7 +4,6 @@ from enum import Enum
 from typing import ClassVar
 
 
-
 class RelationshipType(Enum):
     """Standard relationship types in the knowledge graph."""
 

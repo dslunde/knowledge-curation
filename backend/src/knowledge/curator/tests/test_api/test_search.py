@@ -9,7 +9,6 @@ from plone.restapi.testing import RelativeSession
 from knowledge.curator.testing import PLONE_APP_KNOWLEDGE_FUNCTIONAL_TESTING
 
 
-
 class TestSearchAPI(unittest.TestCase):
     """Test Search API endpoints."""
 

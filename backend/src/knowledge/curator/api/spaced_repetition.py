@@ -294,7 +294,7 @@ class SpacedRepetitionService(Service):
                 "successful": 0,
                 "time_spent": 0,
             }
-        
+
         stats["daily_stats"][date_key]["reviews"] += 1
         if quality >= 3:
             stats["daily_stats"][date_key]["successful"] += 1
@@ -311,14 +311,16 @@ class SpacedRepetitionService(Service):
             )
         else:
             stats["success_rate"] = 0
-        
+
         daily_list = []
         for date, data in sorted(stats["daily_stats"].items()):
             daily_list.append({
                 "date": date,
                 "reviews": data["reviews"],
                 "successful": data["successful"],
-                "success_rate": round(data["successful"] / data["reviews"] * 100, 1) if data["reviews"] > 0 else 0,
+                "success_rate": round(data["successful"] / data["reviews"] * 100, 1)
+                if data["reviews"] > 0
+                else 0,
                 "time_spent": data["time_spent"],
             })
         stats["daily_stats"] = daily_list
@@ -331,16 +333,23 @@ class SpacedRepetitionService(Service):
 
         days = int(self.request.get("days", 30))
         start_date = datetime.now() - timedelta(days=days)
-        
+
         catalog = api.portal.get_tool("portal_catalog")
         user = api.user.get_current()
-        brains = catalog(Creator=user.getId(), portal_type=["ResearchNote", "BookmarkPlus"])
+        brains = catalog(
+            Creator=user.getId(), portal_type=["ResearchNote", "BookmarkPlus"]
+        )
 
         stats = {
-            "total_reviews": 0, "successful_reviews": 0, "failed_reviews": 0,
-            "average_quality": 0, "average_time_spent": 0, "items_in_system": 0,
-            "mature_items": 0, "daily_stats": {},
-            "quality_distribution": {i: 0 for i in range(6)},
+            "total_reviews": 0,
+            "successful_reviews": 0,
+            "failed_reviews": 0,
+            "average_quality": 0,
+            "average_time_spent": 0,
+            "items_in_system": 0,
+            "mature_items": 0,
+            "daily_stats": {},
+            "quality_distribution": dict.fromkeys(range(6), 0),
         }
         total_quality = 0
         total_time = 0
@@ -365,7 +374,7 @@ class SpacedRepetitionService(Service):
                     total_quality += quality
                     total_time += entry.get("time_spent", 0)
                     self._aggregate_daily_stats(entry, stats)
-        
+
         self._calculate_average_stats(stats, total_quality, total_time)
         return {"period_days": days, "statistics": stats}
 
@@ -465,9 +474,8 @@ class SpacedRepetitionService(Service):
             obj = brain.getObject()
             sr_data = self._get_sr_data(obj)
 
-            if (
-                sr_data.get("next_review")
-                and (next_date is None or sr_data["next_review"] < next_date)
+            if sr_data.get("next_review") and (
+                next_date is None or sr_data["next_review"] < next_date
             ):
                 next_date = sr_data["next_review"]
 

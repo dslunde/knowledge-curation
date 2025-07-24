@@ -4,7 +4,6 @@ import secrets
 from datetime import datetime
 
 
-
 class ReviewScheduler:
     """Manages review scheduling and session planning."""
 
@@ -101,8 +100,13 @@ class ReviewScheduler:
             sr_data = item.get("sr_data", {})
             last_review = sr_data.get("last_review")
             if last_review:
-                return datetime.fromisoformat(last_review) if isinstance(last_review, str) else last_review
+                return (
+                    datetime.fromisoformat(last_review)
+                    if isinstance(last_review, str)
+                    else last_review
+                )
             return datetime.min
+
         return sorted(items, key=get_last_review)
 
     @classmethod
@@ -112,7 +116,9 @@ class ReviewScheduler:
     @classmethod
     def _order_interleaved(cls, items):
         new_items = [i for i in items if i.get("sr_data", {}).get("repetitions", 0) < 3]
-        mature_items = [i for i in items if i.get("sr_data", {}).get("repetitions", 0) >= 3]
+        mature_items = [
+            i for i in items if i.get("sr_data", {}).get("repetitions", 0) >= 3
+        ]
         secrets.shuffle(new_items)
         secrets.shuffle(mature_items)
         result = []
@@ -408,7 +414,11 @@ class ReviewScheduler:
                 else:
                     optimal_lengths.append(len(session) * 2)
 
-        return min(60, max(10, sum(optimal_lengths) // len(optimal_lengths))) if optimal_lengths else cls.DEFAULT_SESSION_DURATION
+        return (
+            min(60, max(10, sum(optimal_lengths) // len(optimal_lengths)))
+            if optimal_lengths
+            else cls.DEFAULT_SESSION_DURATION
+        )
 
     @classmethod
     def _create_weekly_schedule(

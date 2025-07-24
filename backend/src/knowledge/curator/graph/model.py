@@ -309,8 +309,7 @@ class Graph:
         neighbors = []
         for edge in self.edges:
             if edge.target_uid == uid and (
-                relationship_type is None
-                or edge.relationship_type == relationship_type
+                relationship_type is None or edge.relationship_type == relationship_type
             ):
                 neighbors.append(edge.source_uid)
 
@@ -331,8 +330,7 @@ class Graph:
         edges = []
         for edge in self.edges:
             if edge.source_uid == uid and (
-                relationship_type is None
-                or edge.relationship_type == relationship_type
+                relationship_type is None or edge.relationship_type == relationship_type
             ):
                 edges.append(edge)
         return edges
@@ -352,8 +350,7 @@ class Graph:
         edges = []
         for edge in self.edges:
             if edge.target_uid == uid and (
-                relationship_type is None
-                or edge.relationship_type == relationship_type
+                relationship_type is None or edge.relationship_type == relationship_type
             ):
                 edges.append(edge)
         return edges

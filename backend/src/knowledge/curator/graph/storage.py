@@ -235,7 +235,13 @@ class GraphStorage:
                 if hasattr(rel, "to_object"):
                     target = rel.to_object
                     if target:
-                        graph.add_edge(Edge(uid, api.content.get_uuid(target), RelationshipType.RELATED_TO.value))
+                        graph.add_edge(
+                            Edge(
+                                uid,
+                                api.content.get_uuid(target),
+                                RelationshipType.RELATED_TO.value,
+                            )
+                        )
 
     def _sync_content_relationships(self, graph: Graph, obj, uid: str):
         """Sync relationships from content object to graph."""

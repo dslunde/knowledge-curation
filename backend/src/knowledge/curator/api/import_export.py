@@ -309,14 +309,14 @@ class ImportExportService(Service):
 
         if brain.Subject:
             item_output.write(f"- **Tags:** {', '.join(brain.Subject)}\n")
-        
+
         item_output.write("\n")
 
         if brain.portal_type == "ResearchNote":
             self._format_research_note(item_output, obj)
         elif brain.portal_type == "BookmarkPlus":
             self._format_bookmark_plus(item_output, obj)
-        
+
         item_output.write("---\n\n")
         return item_output.getvalue()
 
@@ -384,9 +384,18 @@ class ImportExportService(Service):
             "string": "Metadata",
             "uid": f"{brain.UID[:9]}-meta",
             "children": [
-                {"string": f"Type:: {brain.portal_type}", "uid": f"{brain.UID[:9]}-type"},
-                {"string": f"Created:: {brain.created.strftime('%B %d, %Y')}", "uid": f"{brain.UID[:9]}-created"},
-                {"string": f"Tags:: {', '.join(brain.Subject)}", "uid": f"{brain.UID[:9]}-tags"},
+                {
+                    "string": f"Type:: {brain.portal_type}",
+                    "uid": f"{brain.UID[:9]}-type",
+                },
+                {
+                    "string": f"Created:: {brain.created.strftime('%B %d, %Y')}",
+                    "uid": f"{brain.UID[:9]}-created",
+                },
+                {
+                    "string": f"Tags:: {', '.join(brain.Subject)}",
+                    "uid": f"{brain.UID[:9]}-tags",
+                },
             ],
         }
         page["children"].append(metadata)
@@ -396,25 +405,45 @@ class ImportExportService(Service):
         if hasattr(obj, "content") and obj.content:
             for i, line in enumerate(obj.content.raw.split("\n")):
                 if line.strip():
-                    page["children"].append({"string": line, "uid": f"{brain.UID[:9]}-c{i}"})
+                    page["children"].append({
+                        "string": line,
+                        "uid": f"{brain.UID[:9]}-c{i}",
+                    })
         if getattr(obj, "key_insights", []):
-            insights_block = {"string": "Key Insights", "uid": f"{brain.UID[:9]}-insights", "children": []}
+            insights_block = {
+                "string": "Key Insights",
+                "uid": f"{brain.UID[:9]}-insights",
+                "children": [],
+            }
             for i, insight in enumerate(obj.key_insights):
-                insights_block["children"].append({"string": insight, "uid": f"{brain.UID[:9]}-i{i}"})
+                insights_block["children"].append({
+                    "string": insight,
+                    "uid": f"{brain.UID[:9]}-i{i}",
+                })
             page["children"].append(insights_block)
         if getattr(obj, "connections", []):
-            connections_block = {"string": "Connections", "uid": f"{brain.UID[:9]}-conn", "children": []}
+            connections_block = {
+                "string": "Connections",
+                "uid": f"{brain.UID[:9]}-conn",
+                "children": [],
+            }
             for i, conn_uid in enumerate(obj.connections):
                 conn_brains = api.content.find(UID=conn_uid)
                 if conn_brains:
-                    connections_block["children"].append({"string": f"[[{conn_brains[0].Title}]]", "uid": f"{brain.UID[:9]}-conn{i}"})
+                    connections_block["children"].append({
+                        "string": f"[[{conn_brains[0].Title}]]",
+                        "uid": f"{brain.UID[:9]}-conn{i}",
+                    })
             if connections_block["children"]:
                 page["children"].append(connections_block)
 
     def _add_roam_content(self, page, brain, obj):
         """Add content-specific fields to a Roam page."""
         if brain.Description:
-            page["children"].append({"string": brain.Description, "uid": f"{brain.UID[:9]}-desc"})
+            page["children"].append({
+                "string": brain.Description,
+                "uid": f"{brain.UID[:9]}-desc",
+            })
 
         if brain.portal_type == "ResearchNote":
             self._add_research_note_content(page, brain, obj)
@@ -429,9 +458,13 @@ class ImportExportService(Service):
             self._add_roam_content(page, brain, obj)
             pages.append(page)
 
-        filename = f"knowledge_roam_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        filename = (
+            f"knowledge_roam_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        )
         self.request.response.setHeader("Content-Type", "application/json")
-        self.request.response.setHeader("Content-Disposition", f'attachment; filename="{filename}"')
+        self.request.response.setHeader(
+            "Content-Disposition", f'attachment; filename="{filename}"'
+        )
         return pages
 
     def import_content(self):
@@ -590,14 +623,14 @@ class ImportExportService(Service):
             obj.setSubject(data["tags"])
 
         portal_type = data.get("portal_type")
-        
+
         update_handlers = {
             "ResearchNote": self._update_research_note,
             "LearningGoal": self._update_learning_goal,
             "ProjectLog": self._update_project_log,
             "BookmarkPlus": self._update_bookmark_plus,
         }
-        
+
         handler = update_handlers.get(portal_type)
         if handler:
             handler(obj, data)
@@ -780,17 +813,21 @@ class ImportExportService(Service):
         if not isinstance(item, dict):
             validation["errors"].append(f"Item {i} must be an object")
             return
-        
+
         portal_type = item.get("portal_type", "ResearchNote")
         if not item.get("portal_type"):
-            validation["warnings"].append(f"Item {i} missing portal_type, will default to ResearchNote")
-        
+            validation["warnings"].append(
+                f"Item {i} missing portal_type, will default to ResearchNote"
+            )
+
         type_counts[portal_type] = type_counts.get(portal_type, 0) + 1
 
         if portal_type in required_fields:
             for field in required_fields[portal_type]:
                 if field not in item or not item[field]:
-                    validation["warnings"].append(f"Item {i} ({portal_type}) missing required field: {field}")
+                    validation["warnings"].append(
+                        f"Item {i} ({portal_type}) missing required field: {field}"
+                    )
 
     def _validate_json(self, content, validation):
         """Validate JSON import file."""

@@ -7,6 +7,7 @@ import knowledge.curator
 
 logger = logging.getLogger(__name__)
 
+
 # Create minimal stubs first (available globally)
 class StubPloneSandboxLayer:
     """Stub Plone sandbox layer for when testing infrastructure is not available."""
@@ -32,6 +33,7 @@ class StubTestingFixture:
 
 class StubZ2:
     """Stub z2 module."""
+
     ZSERVER_FIXTURE = None
 
 
@@ -81,6 +83,7 @@ class PloneAppKnowledgeLayer(PloneSandboxLayer):  # type: ignore[misc]
         # layer.
         try:
             import plone.restapi  # type: ignore[import-untyped]
+
             self.loadZCML(package=plone.restapi)  # type: ignore[attr-defined]
         except ImportError:
             logger.warning("plone.restapi not available for testing")
@@ -109,7 +112,7 @@ class PloneAppKnowledgeLayer(PloneSandboxLayer):  # type: ignore[misc]
         except Exception:
             logger.warning("Could not apply knowledge.curator profile for testing.")
             # If dependencies fail, try to install just the content types
-            if hasattr(portal, 'portal_types'):
+            if hasattr(portal, "portal_types"):
                 portal.portal_types.manage_addPortalType(
                     id="ResearchNote",
                     title="Research Note",

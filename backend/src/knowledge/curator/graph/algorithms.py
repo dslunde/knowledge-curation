@@ -50,12 +50,17 @@ class GraphAlgorithms:
                 return self._reconstruct_path(start_uid, end_uid, previous)
 
             for edge in self.graph.get_edges_from_node(current_uid):
-                if relationship_types and edge.relationship_type not in relationship_types:
+                if (
+                    relationship_types
+                    and edge.relationship_type not in relationship_types
+                ):
                     continue
 
                 neighbor_uid = edge.target_uid
                 if neighbor_uid not in visited:
-                    distance = current_dist + (1.0 / edge.weight if edge.weight > 0 else float("inf"))
+                    distance = current_dist + (
+                        1.0 / edge.weight if edge.weight > 0 else float("inf")
+                    )
                     if distance < distances[neighbor_uid]:
                         distances[neighbor_uid] = distance
                         previous[neighbor_uid] = current_uid
@@ -308,7 +313,9 @@ class GraphAlgorithms:
         edge_count = 0
         for node1 in cluster:
             for node2 in cluster:
-                if node1 != node2 and any(e.target_uid == node2 for e in self.graph.get_edges_from_node(node1)):
+                if node1 != node2 and any(
+                    e.target_uid == node2 for e in self.graph.get_edges_from_node(node1)
+                ):
                     edge_count += 1
         max_edges = len(cluster) * (len(cluster) - 1)
         return edge_count / max_edges if max_edges > 0 else 0

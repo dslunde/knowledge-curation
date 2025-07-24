@@ -183,7 +183,9 @@ class KnowledgeGraphService(Service):
             if hasattr(obj, "embedding_vector"):
                 other_vector = getattr(obj, "embedding_vector", [])
                 if other_vector:
-                    similarity = self._calculate_similarity(current_vector, other_vector)
+                    similarity = self._calculate_similarity(
+                        current_vector, other_vector
+                    )
                     if similarity > 0.7:
                         similarities.append({"brain": brain, "similarity": similarity})
 

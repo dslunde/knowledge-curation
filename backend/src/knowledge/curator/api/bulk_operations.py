@@ -122,7 +122,7 @@ class BulkOperationsService(Service):
             new_tags.update(add_tags)
             new_tags.difference_update(remove_tags)
             new_tags = list(new_tags)
-        
+
         obj.setSubject(tuple(new_tags))
         obj.reindexObject(idxs=["Subject"])
         return new_tags
@@ -254,9 +254,13 @@ class BulkOperationsService(Service):
             validated_objs[uid] = obj
 
             if not api.user.has_permission("Copy or Move", obj=obj):
-                unauthorized.append({"uid": uid, "title": obj.Title(), "error": "Missing 'Copy or Move' permission"})
+                unauthorized.append({
+                    "uid": uid,
+                    "title": obj.Title(),
+                    "error": "Missing 'Copy or Move' permission",
+                })
                 continue
-            
+
             if not api.user.has_permission("Add portal content", obj=target):
                 unauthorized.append({
                     "uid": uid,
@@ -264,13 +268,17 @@ class BulkOperationsService(Service):
                     "error": "Cannot add to target container",
                 })
                 continue
-        
+
         return validated_objs, unauthorized
 
     def _execute_move(self, obj, target):
         """Execute the move operation for a single object."""
         api.content.move(source=obj, target=target)
-        return {"uid": obj.UID(), "title": obj.Title(), "new_path": api.content.get_path(obj)}
+        return {
+            "uid": obj.UID(),
+            "title": obj.Title(),
+            "new_path": api.content.get_path(obj),
+        }
 
     def bulk_move(self):
         """Move multiple items to a new location."""
@@ -298,26 +306,34 @@ class BulkOperationsService(Service):
         catalog = api.portal.get_tool("portal_catalog")
         results = {"successful": [], "failed": []}
 
-        validated_objs, unauthorized = self._validate_move_permissions(uids, target, catalog)
+        validated_objs, unauthorized = self._validate_move_permissions(
+            uids, target, catalog
+        )
         results["unauthorized"] = unauthorized
 
         if unauthorized:
-            uids = [uid for uid in uids if uid not in [item['uid'] for item in unauthorized]]
-        
+            uids = [
+                uid for uid in uids if uid not in [item["uid"] for item in unauthorized]
+            ]
+
         for uid in uids:
             if uid not in validated_objs:
                 results["failed"].append({"uid": uid, "error": "Item not found"})
                 continue
-            
+
             obj = validated_objs[uid]
             try:
                 result = self._execute_move(obj, target)
                 results["successful"].append(result)
             except Exception as e:
-                results["failed"].append({"uid": uid, "title": obj.Title(), "error": str(e)})
+                results["failed"].append({
+                    "uid": uid,
+                    "title": obj.Title(),
+                    "error": str(e),
+                })
 
         transaction.commit()
-        
+
         return {
             "operation": "bulk_move",
             "target_path": target_path,

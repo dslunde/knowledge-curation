@@ -11,7 +11,6 @@ from knowledge.curator.interfaces import IProjectLog
 from knowledge.curator.testing import PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
 
 
-
 class ProjectLogIntegrationTest(unittest.TestCase):
     """Test Project Log content type."""
 

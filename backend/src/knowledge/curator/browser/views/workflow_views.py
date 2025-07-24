@@ -166,7 +166,9 @@ class BulkWorkflowView(BrowserView):
                 else:
                     common_transitions &= transitions
             except Exception:
-                logger.exception("Error getting transitions for object with UID: %s", uid)
+                logger.exception(
+                    "Error getting transitions for object with UID: %s", uid
+                )
                 continue
         return common_transitions
 

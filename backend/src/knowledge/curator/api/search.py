@@ -119,7 +119,9 @@ class SearchService(Service):
             if hasattr(obj, "embedding_vector"):
                 content_vector = getattr(obj, "embedding_vector", [])
                 if content_vector:
-                    similarity = self._calculate_similarity(query_vector, content_vector)
+                    similarity = self._calculate_similarity(
+                        query_vector, content_vector
+                    )
                     if similarity > 0.5:
                         results.append({"brain": brain, "similarity": similarity})
 

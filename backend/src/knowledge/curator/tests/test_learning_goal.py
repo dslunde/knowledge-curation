@@ -11,7 +11,6 @@ from knowledge.curator.interfaces import ILearningGoal
 from knowledge.curator.testing import PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
 
 
-
 class LearningGoalIntegrationTest(unittest.TestCase):
     """Test Learning Goal content type."""
 

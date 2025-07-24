@@ -112,17 +112,19 @@ class EmbeddingGenerator:
         """Prepare text for BookmarkPlus content type."""
         if url := getattr(content_object, "url", ""):
             parts.append(f"URL: {url}")
-        if notes := getattr(content_object, "notes", None):
-            if hasattr(notes, "output"):
-                parts.append(f"Notes: {notes.output}")
+        if (notes := getattr(content_object, "notes", None)) and hasattr(
+            notes, "output"
+        ):
+            parts.append(f"Notes: {notes.output}")
         if tags := getattr(content_object, "tags", []):
             parts.append(f"Tags: {', '.join(tags)}")
 
     def _prepare_research_note_text(self, content_object, parts):
         """Prepare text for ResearchNote content type."""
-        if content := getattr(content_object, "content", None):
-            if hasattr(content, "output"):
-                parts.append(f"Content: {content.output[:2000]}")
+        if (content := getattr(content_object, "content", None)) and hasattr(
+            content, "output"
+        ):
+            parts.append(f"Content: {content.output[:2000]}")
         if key_findings := getattr(content_object, "key_findings", []):
             parts.append(f"Key Findings: {'; '.join(key_findings)}")
         if tags := getattr(content_object, "tags", []):
@@ -130,9 +132,10 @@ class EmbeddingGenerator:
 
     def _prepare_learning_goal_text(self, content_object, parts):
         """Prepare text for LearningGoal content type."""
-        if goal_description := getattr(content_object, "goal_description", None):
-            if hasattr(goal_description, "output"):
-                parts.append(f"Goal: {goal_description.output}")
+        if (
+            goal_description := getattr(content_object, "goal_description", None)
+        ) and hasattr(goal_description, "output"):
+            parts.append(f"Goal: {goal_description.output}")
         if target_date := getattr(content_object, "target_date", None):
             parts.append(f"Target Date: {target_date}")
         if success_criteria := getattr(content_object, "success_criteria", []):
@@ -142,9 +145,10 @@ class EmbeddingGenerator:
         """Prepare text for ProjectLog content type."""
         if project_status := getattr(content_object, "project_status", ""):
             parts.append(f"Status: {project_status}")
-        if latest_update := getattr(content_object, "latest_update", None):
-            if hasattr(latest_update, "output"):
-                parts.append(f"Latest Update: {latest_update.output[:1000]}")
+        if (
+            latest_update := getattr(content_object, "latest_update", None)
+        ) and hasattr(latest_update, "output"):
+            parts.append(f"Latest Update: {latest_update.output[:1000]}")
         if next_steps := getattr(content_object, "next_steps", []):
             parts.append(f"Next Steps: {'; '.join(next_steps[:5])}")
 
@@ -166,7 +170,7 @@ class EmbeddingGenerator:
             handler = content_type_handlers.get(content_object.portal_type)
             if handler:
                 handler(content_object, parts)
-            
+
             return "\n\n".join(parts)
         except Exception as e:
             logger.error(f"Failed to prepare content text: {e}")

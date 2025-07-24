@@ -271,7 +271,9 @@ class TestBulkOperationsAPI(unittest.TestCase):
         """Test bulk operations with insufficient permissions."""
         # Create a new user with limited permissions
         api.user.create(
-            email="limited@example.com", username="limited", password="secret"  # noqa: S106
+            email="limited@example.com",
+            username="limited",
+            password="secret",  # noqa: S106
         )
 
         # Create new session with limited user
