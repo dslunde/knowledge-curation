@@ -3,6 +3,7 @@
 import os
 
 from plone import api
+from plone.api.exc import CannotGetPortalError, InvalidParameterError
 from zope.component import ComponentLookupError
 
 
@@ -67,10 +68,10 @@ def get_vector_config():
                     value = registry(registry_key)
                     if value is not None:
                         config[config_key] = value
-                except (AttributeError, KeyError):
+                except (AttributeError, KeyError, InvalidParameterError):
                     # Registry key doesn't exist, use default
                     pass
-    except (AttributeError, ComponentLookupError):
+    except (AttributeError, ComponentLookupError, CannotGetPortalError):
         # Portal not available or registry not accessible
         pass
 
