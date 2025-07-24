@@ -42,6 +42,8 @@ dependencies = [
 test = [
     "horse-with-no-namespace",
     "plone.app.testing",
+    "plone.testing",
+    "plone.app.robotframework.testing",
     "plone.restapi[test]",
     "pytest",
     "pytest-cov",

@@ -3,6 +3,7 @@
 from typing import Any
 from collections.abc import Callable
 from collections import deque
+from .algorithms import GraphAlgorithms
 from .model import Graph, Node
 from .relationships import RelationshipType
 
@@ -409,8 +410,6 @@ class GraphTraversal:
                 return [target_uid]
 
         # Find shortest path from root to target
-        from ..algorithms import GraphAlgorithms
-
         algo = GraphAlgorithms(self.graph)
         path = algo.shortest_path(root_uid, target_uid)
 
