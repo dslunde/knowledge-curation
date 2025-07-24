@@ -447,7 +447,8 @@ class PerformanceTracker:
             insights.append("Excellent performance! Your success rate is above 90%.")
         elif summary["success_rate"] < 70:
             insights.append(
-                "Your success rate is below 70%. Consider reviewing items more frequently."
+                "Your success rate is below 70%. Consider reviewing "
+                "items more frequently."
             )
 
         # Streak insights
@@ -472,7 +473,8 @@ class PerformanceTracker:
             insights.append("Your performance is improving over time!")
         elif progress.get("trend") == "declining":
             insights.append(
-                "Your performance has been declining. Consider adjusting your review schedule."
+                "Your performance has been declining. Consider adjusting "
+                "your review schedule."
             )
 
         return insights
@@ -495,8 +497,9 @@ class PerformanceTracker:
         difficulty = metrics.get("difficulty_analysis", {})
         if difficulty.get("struggling_items"):
             recommendations.append(
-                f"You have {len(difficulty['struggling_items'])} items you're struggling with. "
-                "Consider creating additional notes or examples for these."
+                f"You have {len(difficulty['struggling_items'])} items "
+                "you're struggling with. Consider creating additional "
+                "notes or examples for these."
             )
 
         # Consistency recommendations

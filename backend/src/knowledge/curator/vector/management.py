@@ -332,7 +332,8 @@ class VectorCollectionManager:
             # Verify compatibility
             if backup_data["vector_dimension"] != self.embeddings.embedding_dimension:
                 logger.error(
-                    f"Dimension mismatch: backup has {backup_data['vector_dimension']}, "
+                    f"Dimension mismatch: backup has "
+                    f"{backup_data['vector_dimension']}, "
                     f"current model has {self.embeddings.embedding_dimension}"
                 )
                 return False

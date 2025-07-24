@@ -484,7 +484,10 @@ class SpacedRepetitionService(Service):
             obj = brain.getObject()
             sr_data = self._get_sr_data(obj)
 
-            if sr_data.get("next_review") and (next_date is None or sr_data["next_review"] < next_date):
+            if (
+                sr_data.get("next_review")
+                and (next_date is None or sr_data["next_review"] < next_date)
+            ):
                 next_date = sr_data["next_review"]
 
         return next_date.isoformat() if next_date else None

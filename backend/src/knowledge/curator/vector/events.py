@@ -131,7 +131,8 @@ def workflow_transition(obj, event):
             success = manager.update_content_vector(obj)
             if success:
                 logger.info(
-                    f"Created vector after transition to {new_state}: {obj.absolute_url()}"
+                    f"Created vector after transition to {new_state}: "
+                    f"{obj.absolute_url()}"
                 )
 
         elif was_indexed and not should_index_now:
@@ -139,7 +140,8 @@ def workflow_transition(obj, event):
             success = manager.delete_content_vector(obj.UID())
             if success:
                 logger.info(
-                    f"Deleted vector after transition to {new_state}: {obj.absolute_url()}"
+                    f"Deleted vector after transition to {new_state}: "
+                    f"{obj.absolute_url()}"
                 )
 
         elif should_index_now and was_indexed:
@@ -147,7 +149,8 @@ def workflow_transition(obj, event):
             success = manager.update_content_vector(obj)
             if success:
                 logger.info(
-                    f"Updated vector after transition to {new_state}: {obj.absolute_url()}"
+                    f"Updated vector after transition to {new_state}: "
+                    f"{obj.absolute_url()}"
                 )
 
     except Exception as e:

@@ -69,7 +69,8 @@ class GraphAlgorithms:
 
                 neighbor_uid = edge.target_uid
                 if neighbor_uid not in visited:
-                    # Use inverse of weight as distance (higher weight = shorter distance)
+                    # Use inverse of weight as distance
+                    # (higher weight = shorter distance)
                     distance = current_dist + (
                         1.0 / edge.weight if edge.weight > 0 else float("inf")
                     )

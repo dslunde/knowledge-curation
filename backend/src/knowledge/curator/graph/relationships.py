@@ -438,7 +438,12 @@ class RelationshipManager:
             visited = set()
             reachable = set()
 
-            def dfs(current_uid: str, path_start: str, visited_set: set, reachable_set: set):
+            def dfs(
+                current_uid: str,
+                path_start: str,
+                visited_set: set,
+                reachable_set: set,
+            ):
                 if current_uid in visited_set:
                     return
                 visited_set.add(current_uid)

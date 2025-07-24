@@ -63,7 +63,11 @@ class ReviewQueueView(BrowserView):
         for brain in brains:
             try:
                 obj = brain.getObject()
-                if hasattr(obj, "last_review") and obj.last_review and obj.last_review.date() == today:
+                if (
+                    hasattr(obj, "last_review")
+                    and obj.last_review
+                    and obj.last_review.date() == today
+                ):
                     count += 1
             except (AttributeError, TypeError):
                 continue
@@ -161,7 +165,11 @@ class ReviewCardView(BrowserView):
                     "full_content": obj.body.output if hasattr(obj, "body") else "",
                 }
 
-        elif obj.portal_type == "BookmarkPlus" and hasattr(obj, "key_concepts") and obj.key_concepts:
+        elif (
+            obj.portal_type == "BookmarkPlus"
+            and hasattr(obj, "key_concepts")
+            and obj.key_concepts
+        ):
             # For bookmarks, test on key concepts
             return {
                 "question": "What are the key concepts?",
@@ -325,7 +333,10 @@ class ReviewPerformanceView(BrowserView):
         if not review_history:
             return {
                 "has_data": False,
-                "message": "No review data available yet. Start reviewing to see your performance!",
+                "message": (
+                    "No review data available yet. Start reviewing to see "
+                    "your performance!"
+                ),
             }
 
         # Recent performance (last 7 days)
@@ -405,11 +416,12 @@ class ReviewStatisticsView(BrowserView):
     def export_statistics(self):
         """Export statistics as JSON."""
         stats = self.get_statistics()
+        date_str = datetime.now().strftime("%Y%m%d")
 
         self.request.response.setHeader("Content-Type", "application/json")
         self.request.response.setHeader(
             "Content-Disposition",
-            f'attachment; filename="sr_statistics_{datetime.now().strftime("%Y%m%d")}.json"',
+            f'attachment; filename="sr_statistics_{date_str}.json"',
         )
 
         return json.dumps(stats, indent=2, default=str)

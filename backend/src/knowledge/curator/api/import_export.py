@@ -911,7 +911,9 @@ class ImportExportService(Service):
                 {
                     "format": "json",
                     "name": "JSON",
-                    "description": "Complete export with all metadata and relationships",
+                    "description": (
+                        "Complete export with all metadata and relationships"
+                    ),
                     "mime_type": "application/json",
                     "extension": ".json",
                 },

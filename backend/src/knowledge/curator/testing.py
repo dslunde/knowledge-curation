@@ -1,5 +1,6 @@
-"""Base module for unittesting."""
+"""Testing Setup Module for Knowledge Curator."""
 
+import logging
 from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
 from plone.app.testing import applyProfile
 from plone.app.testing import FunctionalTesting
@@ -9,6 +10,8 @@ from plone.app.testing import PloneSandboxLayer
 from plone.testing import z2
 
 import knowledge.curator
+
+logger = logging.getLogger(__name__)
 
 
 class PloneAppKnowledgeLayer(PloneSandboxLayer):
@@ -31,12 +34,14 @@ class PloneAppKnowledgeLayer(PloneSandboxLayer):
             applyProfile(portal, "plone.app.versioningbehavior:default")
             applyProfile(portal, "plone.app.relationfield:default")
         except Exception:
-            pass  # Some dependencies might not be available in test environment
+            logger.warning("Could not apply core dependencies for testing.")
+            # Some dependencies might not be available in test environment
 
         # Apply our profile without dependencies
         try:
             applyProfile(portal, "knowledge.curator:default")
         except Exception:
+            logger.warning("Could not apply knowledge.curator profile for testing.")
             # If dependencies fail, try to install just the content types
             portal.portal_types.manage_addPortalType(
                 id="ResearchNote",

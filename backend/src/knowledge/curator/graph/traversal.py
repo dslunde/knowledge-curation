@@ -253,7 +253,8 @@ class GraphTraversal:
         return paths
 
     def get_learning_path(self, start_uid: str, goal_uid: str) -> list[str] | None:
-        """Find optimal learning path from start to goal using prerequisite relationships.
+        """Find optimal learning path from start to goal using prerequisite
+        relationships.
 
         Args:
             start_uid: Starting knowledge node

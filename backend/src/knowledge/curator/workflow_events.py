@@ -156,5 +156,6 @@ def log_abandonment(obj):
     }
 
     logger.info(
-        f"Learning goal '{obj.title}' abandoned at {getattr(obj, 'progress', 0)}% progress"
+        f"Learning goal '{obj.title}' abandoned at "
+        f"{getattr(obj, 'progress', 0)}% progress"
     )

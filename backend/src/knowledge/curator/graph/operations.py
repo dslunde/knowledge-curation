@@ -338,7 +338,8 @@ class GraphOperations:
         """Add multiple relationships in batch.
 
         Args:
-            relationships: List of (source_uid, target_uid, relationship_type, weight) tuples
+            relationships: List of (source_uid, target_uid, relationship_type,
+                                   weight) tuples
 
         Returns:
             Number of relationships successfully added

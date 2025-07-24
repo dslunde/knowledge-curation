@@ -242,7 +242,9 @@ class SimilaritySearch:
             # Calculate cluster centers and find representative items
             for cluster_name in clusters:
                 cluster_indices = [
-                    i for i, label in enumerate(labels) if f"cluster_{label}" == cluster_name
+                    i
+                    for i, label in enumerate(labels)
+                    if f"cluster_{label}" == cluster_name
                 ]
                 cluster_embeddings = X[cluster_indices]
                 center = np.mean(cluster_embeddings, axis=0)

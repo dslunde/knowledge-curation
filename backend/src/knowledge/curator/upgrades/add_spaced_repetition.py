@@ -52,4 +52,7 @@ def add_spaced_repetition_to_content(context):
     )
     logger.info(f"Updated content types: {', '.join(updated_types)}")
 
-    return f"Successfully added spaced repetition to {len(updated_types)} content types and {updated_count} items"
+    return (
+        f"Successfully added spaced repetition to {len(updated_types)} "
+        f"content types and {updated_count} items"
+    )
