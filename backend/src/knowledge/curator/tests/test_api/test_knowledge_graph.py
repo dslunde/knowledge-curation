@@ -1,6 +1,7 @@
 """Tests for Knowledge Graph API."""
 
 import unittest
+import transaction
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.restapi.testing import RelativeSession
@@ -110,8 +111,6 @@ class TestKnowledgeGraphAPI(unittest.TestCase):
             title="Unrelated Topic",
             embedding_vector=[0.9, 0.8, 0.7, 0.6, 0.5],  # Very different
         )
-
-        import transaction
 
         transaction.commit()
 

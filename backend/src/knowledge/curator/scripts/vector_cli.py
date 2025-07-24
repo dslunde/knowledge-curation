@@ -162,7 +162,7 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     # Initialize command
-    parser_init = subparsers.add_parser("init", help="Initialize vector database")
+    _parser_init = subparsers.add_parser("init", help="Initialize vector database")
 
     # Rebuild command
     parser_rebuild = subparsers.add_parser("rebuild", help="Rebuild vector index")
@@ -177,10 +177,10 @@ def main():
     )
 
     # Stats command
-    parser_stats = subparsers.add_parser("stats", help="Show database statistics")
+    _parser_stats = subparsers.add_parser("stats", help="Show database statistics")
 
     # Health command
-    parser_health = subparsers.add_parser("health", help="Check system health")
+    _parser_health = subparsers.add_parser("health", help="Check system health")
 
     # Search command
     parser_search = subparsers.add_parser("search", help="Search for similar content")
@@ -218,7 +218,7 @@ def main():
     app = zope_app()
 
     try:
-        site = initialize_plone(app, args.site_id)
+        _site = initialize_plone(app, args.site_id)
 
         # Create manager/search instance
         if args.command == "search":

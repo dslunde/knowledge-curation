@@ -435,15 +435,14 @@ class BulkOperationsService(Service):
                             source_obj.reindexObject()
 
                     # Add reverse connection if bidirectional
-                    if connection_type == "bidirectional":
-                        if hasattr(target_obj, "connections"):
-                            target_connections = list(
-                                getattr(target_obj, "connections", [])
-                            )
-                            if source_uid not in target_connections:
-                                target_connections.append(source_uid)
-                                target_obj.connections = target_connections
-                                target_obj.reindexObject()
+                    if connection_type == "bidirectional" and hasattr(target_obj, "connections"):
+                        target_connections = list(
+                            getattr(target_obj, "connections", [])
+                        )
+                        if source_uid not in target_connections:
+                            target_connections.append(source_uid)
+                            target_obj.connections = target_connections
+                            target_obj.reindexObject()
 
                     results["successful"].append({
                         "source_uid": source_uid,

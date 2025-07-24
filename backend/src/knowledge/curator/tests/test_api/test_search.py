@@ -1,6 +1,7 @@
 """Tests for Search API."""
 
 import unittest
+import transaction
 from datetime import datetime, timedelta
 from plone import api
 from plone.app.testing import setRoles, TEST_USER_ID
@@ -74,8 +75,6 @@ class TestSearchAPI(unittest.TestCase):
         self.note1.embedding_vector = [0.1, 0.2, 0.3, 0.4, 0.5]
         self.note2.embedding_vector = [0.1, 0.2, 0.3, 0.5, 0.6]  # Similar to note1
         self.note3.embedding_vector = [0.9, 0.8, 0.7, 0.6, 0.5]  # Different
-
-        import transaction
 
         transaction.commit()
 

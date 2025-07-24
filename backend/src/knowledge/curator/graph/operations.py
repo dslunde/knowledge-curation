@@ -4,7 +4,7 @@ from typing import Any
 from datetime import datetime
 
 from .model import Graph, Node, Edge, NodeType
-from .relationships import RelationshipType, RelationshipMetadata
+from .relationships import RelationshipType, RelationshipMetadata, RelationshipManager
 
 
 class GraphOperations:

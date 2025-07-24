@@ -308,7 +308,10 @@ class Graph:
         # Filter by relationship type
         neighbors = []
         for edge in self.edges:
-            if edge.target_uid == uid and edge.relationship_type == relationship_type:
+            if edge.target_uid == uid and (
+                relationship_type is None
+                or edge.relationship_type == relationship_type
+            ):
                 neighbors.append(edge.source_uid)
 
         return neighbors
@@ -327,12 +330,11 @@ class Graph:
         """
         edges = []
         for edge in self.edges:
-            if edge.source_uid == uid:
-                if (
-                    relationship_type is None
-                    or edge.relationship_type == relationship_type
-                ):
-                    edges.append(edge)
+            if edge.source_uid == uid and (
+                relationship_type is None
+                or edge.relationship_type == relationship_type
+            ):
+                edges.append(edge)
         return edges
 
     def get_edges_to_node(
@@ -349,12 +351,11 @@ class Graph:
         """
         edges = []
         for edge in self.edges:
-            if edge.target_uid == uid:
-                if (
-                    relationship_type is None
-                    or edge.relationship_type == relationship_type
-                ):
-                    edges.append(edge)
+            if edge.target_uid == uid and (
+                relationship_type is None
+                or edge.relationship_type == relationship_type
+            ):
+                edges.append(edge)
         return edges
 
     def get_subgraph(self, node_uids: list[str]) -> "Graph":

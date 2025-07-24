@@ -186,3 +186,27 @@ parallel = true
 omit = [
   "src/knowledge/curator/locales/*.py",
 ]
+
+[tool.pyright]
+# Configuration for Plone development environment
+venvPath = "."
+venv = "venv"
+pythonPlatform = "All"
+
+# Suppress warnings only for specific external packages that may not be available during development
+reportMissingTypeStubs = "none"
+
+# Specific packages to ignore import warnings for
+extraPaths = [
+    "src"
+]
+
+# Allow undefined variables as warnings rather than errors in test files
+reportUndefinedVariable = "warning"
+
+# Suppress specific warnings for external packages
+reportOptionalCall = "none"
+reportOptionalMemberAccess = "none"
+
+# Ignore specific external package patterns
+reportMissingModuleSource = "none"

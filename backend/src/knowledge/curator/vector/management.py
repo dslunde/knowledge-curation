@@ -10,7 +10,7 @@ from typing import Any
 import logging
 import json
 
-logger = logging.getLogger("knowledge.curator.vector")
+logger = logging.getLogger(__name__)
 
 
 class VectorCollectionManager:
@@ -259,6 +259,7 @@ class VectorCollectionManager:
                 info = self.adapter.get_collection_info()
                 collection_exists = info.get("status") is not None
             except Exception:
+                logger.exception("Error checking collection info")
                 pass
 
         return {

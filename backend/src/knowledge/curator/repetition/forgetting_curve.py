@@ -54,7 +54,7 @@ class ForgettingCurve:
         interval: int = 1,
         ease_factor: float = 2.5,
         repetitions: int = 0,
-        days_ahead: int = None,
+        days_ahead: int | None = None,
     ) -> list[dict[str, float]]:
         """
         Generate forgetting curve data points for visualization.

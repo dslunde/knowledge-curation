@@ -1,12 +1,13 @@
-"""Analytics API endpoints for learning statistics and progress tracking."""
+"""Analytics API endpoints for learning statistics."""
 
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
+
 from plone import api
 from plone.restapi.services import Service
 from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse
 import math
+from zope.security import Unauthorized
 
 
 @implementer(IPublishTraverse)
@@ -206,6 +207,14 @@ class AnalyticsService(Service):
 
         # Get spaced repetition stats
         sr_stats = self.get_spaced_repetition_stats()
+
+        return {
+            "period_days": days,
+            "goals": goal_stats,
+            "content": content_stats,
+            "spaced_repetition": sr_stats,
+            "generated_at": datetime.now().isoformat(),
+        }
 
     def get_forgetting_curve(self):
         """Get forgetting curve data for spaced repetition."""
@@ -491,7 +500,10 @@ class AnalyticsService(Service):
                 "type": "tag_correlation",
                 "tags": list(pair),
                 "strength": count,
-                "message": f"Tags '{pair[0]}' and '{pair[1]}' frequently appear together ({count} times)",
+                "message": (
+                    f"Tags '{pair[0]}' and '{pair[1]}' frequently appear together "
+                    f"({count} times)"
+                ),
             })
 
         # Analyze learning goal completion
@@ -512,7 +524,10 @@ class AnalyticsService(Service):
                     "type": "goal_completion",
                     "priority": priority,
                     "average_completion": round(avg_completion, 1),
-                    "message": f"{priority.capitalize()} priority goals have {avg_completion:.1f}% average completion",
+                    "message": (
+                        f"{priority.capitalize()} priority goals have "
+                        f"{avg_completion:.1f}% average completion"
+                    ),
                 })
 
         # Find isolated content
@@ -528,11 +543,13 @@ class AnalyticsService(Service):
                 })
 
         if isolated_items:
-            insights["connections"].append({
+            insights["patterns"].append({
                 "type": "isolated_content",
                 "count": len(isolated_items),
                 "items": isolated_items[:5],
-                "message": f"Found {len(isolated_items)} research notes without connections",
+                "message": (
+                    f"Found {len(isolated_items)} research notes without connections"
+                ),
             })
 
         return insights

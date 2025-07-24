@@ -50,7 +50,7 @@ class ImportExportService(Service):
             return {"error": "Unauthorized"}
 
         # Get parameters
-        format = self.request.get("format", "json")
+        file_format = self.request.get("format", "json")
         portal_types = (
             self.request.get("types", "").split(",")
             if self.request.get("types")
@@ -81,19 +81,19 @@ class ImportExportService(Service):
             path={"query": "/".join(self.context.getPhysicalPath()), "depth": -1},
         )
 
-        if format == "json":
+        if file_format == "json":
             return self._export_json(brains, include_embeddings, include_connections)
-        elif format == "csv":
+        elif file_format == "csv":
             return self._export_csv(brains)
-        elif format == "opml":
+        elif file_format == "opml":
             return self._export_opml(brains)
-        elif format == "markdown":
+        elif file_format == "markdown":
             return self._export_markdown(brains)
-        elif format == "roam":
+        elif file_format == "roam":
             return self._export_roam_json(brains)
         else:
             self.request.response.setStatus(400)
-            return {"error": f"Unsupported format: {format}"}
+            return {"error": f"Unsupported format: {file_format}"}
 
     def _export_json(self, brains, include_embeddings, include_connections):
         """Export as JSON format."""
@@ -473,7 +473,7 @@ class ImportExportService(Service):
 
         # Get file from request
         file_data = self.request.get("file")
-        format = self.request.get("format", "json")
+        file_format = self.request.get("format", "json")
         merge_strategy = self.request.get(
             "merge_strategy", "skip"
         )  # skip, update, duplicate
@@ -483,15 +483,15 @@ class ImportExportService(Service):
             return {"error": "No file provided"}
 
         try:
-            if format == "json":
+            if file_format == "json":
                 return self._import_json(file_data, merge_strategy)
-            elif format == "csv":
+            elif file_format == "csv":
                 return self._import_csv(file_data, merge_strategy)
-            elif format == "opml":
+            elif file_format == "opml":
                 return self._import_opml(file_data, merge_strategy)
             else:
                 self.request.response.setStatus(400)
-                return {"error": f"Unsupported format: {format}"}
+                return {"error": f"Unsupported format: {file_format}"}
         except Exception as e:
             self.request.response.setStatus(400)
             return {"error": f"Import failed: {e!s}"}
@@ -499,10 +499,7 @@ class ImportExportService(Service):
     def _import_json(self, file_data, merge_strategy):
         """Import from JSON format."""
         # Parse JSON
-        if hasattr(file_data, "read"):
-            content = file_data.read()
-        else:
-            content = file_data
+        content = file_data.read() if hasattr(file_data, "read") else file_data
 
         if isinstance(content, bytes):
             content = content.decode("utf-8")
@@ -628,10 +625,7 @@ class ImportExportService(Service):
 
     def _import_csv(self, file_data, merge_strategy):
         """Import from CSV format."""
-        if hasattr(file_data, "read"):
-            content = file_data.read()
-        else:
-            content = file_data
+        content = file_data.read() if hasattr(file_data, "read") else file_data
 
         if isinstance(content, bytes):
             content = content.decode("utf-8")
@@ -686,10 +680,7 @@ class ImportExportService(Service):
 
     def _import_opml(self, file_data, merge_strategy):
         """Import from OPML format."""
-        if hasattr(file_data, "read"):
-            content = file_data.read()
-        else:
-            content = file_data
+        content = file_data.read() if hasattr(file_data, "read") else file_data
 
         if isinstance(content, bytes):
             content = content.decode("utf-8")
@@ -748,7 +739,7 @@ class ImportExportService(Service):
             return {"error": "Method not allowed"}
 
         file_data = self.request.get("file")
-        format = self.request.get("format", "json")
+        file_format = self.request.get("format", "json")
 
         if not file_data:
             self.request.response.setStatus(400)
@@ -766,15 +757,15 @@ class ImportExportService(Service):
 
             validation = {"valid": True, "errors": [], "warnings": [], "summary": {}}
 
-            if format == "json":
+            if file_format == "json":
                 self._validate_json(content, validation)
-            elif format == "csv":
+            elif file_format == "csv":
                 self._validate_csv(content, validation)
-            elif format == "opml":
+            elif file_format == "opml":
                 self._validate_opml(content, validation)
             else:
                 validation["valid"] = False
-                validation["errors"].append(f"Unsupported format: {format}")
+                validation["errors"].append(f"Unsupported format: {file_format}")
 
             return validation
 

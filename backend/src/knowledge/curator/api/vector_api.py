@@ -1,12 +1,14 @@
-"""REST API endpoints for vector database operations."""
+"""REST API Views for Vector Database Operations."""
 
-from knowledge.curator.vector.management import VectorCollectionManager
-from knowledge.curator.vector.search import SimilaritySearch
+import json
+
+from plone import api
 from plone.restapi.services import Service
 from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse
 
-import json
+from knowledge.curator.vector.management import VectorCollectionManager
+from knowledge.curator.vector.search import SimilaritySearch
 
 
 @implementer(IPublishTraverse)

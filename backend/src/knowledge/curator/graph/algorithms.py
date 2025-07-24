@@ -156,7 +156,7 @@ class GraphAlgorithms:
         centrality = dict.fromkeys(self.graph.nodes, 0.0)
         nodes = list(self.graph.nodes.keys())
 
-        for i, start_uid in enumerate(nodes):
+        for _i, start_uid in enumerate(nodes):
             # Single source shortest paths
             S = []  # Stack of nodes in order of distance
             P = {uid: [] for uid in nodes}  # Predecessors
@@ -248,7 +248,7 @@ class GraphAlgorithms:
         # Initialize scores
         scores = dict.fromkeys(self.graph.nodes, 1.0 / n)
 
-        for iteration in range(max_iterations):
+        for _iteration in range(max_iterations):
             new_scores = {}
             diff = 0.0
 
@@ -436,10 +436,7 @@ class GraphAlgorithms:
         Returns:
             Density score between 0 and 1
         """
-        if subgraph_nodes:
-            nodes = subgraph_nodes
-        else:
-            nodes = set(self.graph.nodes.keys())
+        nodes = subgraph_nodes or set(self.graph.nodes.keys())
 
         if len(nodes) <= 1:
             return 0.0

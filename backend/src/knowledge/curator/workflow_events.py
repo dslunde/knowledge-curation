@@ -21,7 +21,7 @@ def knowledge_item_workflow_changed(obj, event):
         return
 
     transition_id = event.transition.id
-    new_state = event.new_state.id
+    _new_state = event.new_state.id
 
     # Handle specific transitions
     if transition_id == "start_processing":

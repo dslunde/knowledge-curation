@@ -67,7 +67,7 @@ class QdrantAdapter:
         """Add multiple vectors to the collection in batches."""
         try:
             points = []
-            for i, (doc, embedding) in enumerate(
+            for _i, (doc, embedding) in enumerate(
                 zip(documents, embeddings, strict=False)
             ):
                 point_id = str(uuid.uuid4())

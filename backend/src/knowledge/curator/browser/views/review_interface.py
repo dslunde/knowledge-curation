@@ -1,12 +1,15 @@
-"""Review Interface Views for Spaced Repetition."""
+"""Review Interface Views."""
 
+import json
 from datetime import datetime
+
+from plone import api
+from Products.Five.browser import BrowserView
+
 from knowledge.curator.repetition import ForgettingCurve
 from knowledge.curator.repetition import PerformanceTracker
 from knowledge.curator.repetition.utilities import ReviewUtilities
-from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
-from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope.interface import alsoProvides
 
@@ -60,9 +63,8 @@ class ReviewQueueView(BrowserView):
         for brain in brains:
             try:
                 obj = brain.getObject()
-                if hasattr(obj, "last_review") and obj.last_review:
-                    if obj.last_review.date() == today:
-                        count += 1
+                if hasattr(obj, "last_review") and obj.last_review and obj.last_review.date() == today:
+                    count += 1
             except (AttributeError, TypeError):
                 continue
 
@@ -159,14 +161,13 @@ class ReviewCardView(BrowserView):
                     "full_content": obj.body.output if hasattr(obj, "body") else "",
                 }
 
-        elif obj.portal_type == "BookmarkPlus":
+        elif obj.portal_type == "BookmarkPlus" and hasattr(obj, "key_concepts") and obj.key_concepts:
             # For bookmarks, test on key concepts
-            if hasattr(obj, "key_concepts") and obj.key_concepts:
-                return {
-                    "question": "What are the key concepts?",
-                    "answer": ", ".join(obj.key_concepts),
-                    "full_content": obj.notes if hasattr(obj, "notes") else "",
-                }
+            return {
+                "question": "What are the key concepts?",
+                "answer": ", ".join(obj.key_concepts),
+                "full_content": obj.notes if hasattr(obj, "notes") else "",
+            }
 
         # Default: use title and description
         return {
@@ -283,7 +284,7 @@ class ReviewPerformanceView(BrowserView):
                         review_copy["item_id"] = brain.UID
                         review_copy["item_title"] = brain.Title
                         review_history.append(review_copy)
-            except:
+            except (AttributeError, KeyError, TypeError):
                 continue
 
         return review_history
@@ -312,7 +313,7 @@ class ReviewPerformanceView(BrowserView):
                             "next_review": obj.next_review,
                         },
                     })
-            except:
+            except (AttributeError, KeyError, TypeError):
                 continue
 
         return items
@@ -396,7 +397,7 @@ class ReviewStatisticsView(BrowserView):
                         review_copy = dict(review)
                         review_copy["item_id"] = brain.UID
                         review_history.append(review_copy)
-            except:
+            except (AttributeError, KeyError, TypeError):
                 continue
 
         return review_history

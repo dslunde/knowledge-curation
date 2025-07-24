@@ -1,7 +1,8 @@
-"""Review Scheduling Engine for Spaced Repetition."""
+"""Spaced Repetition Scheduling and Session Management."""
 
+import secrets
 from datetime import datetime
-import random
+
 
 
 class ReviewScheduler:
@@ -94,7 +95,7 @@ class ReviewScheduler:
         elif strategy == cls.ORDER_RANDOM:
             # Random shuffle
             shuffled = items.copy()
-            random.shuffle(shuffled)
+            secrets.shuffle(shuffled)
             return shuffled
 
         elif strategy == cls.ORDER_OLDEST:
@@ -126,8 +127,8 @@ class ReviewScheduler:
             ]
 
             # Shuffle both groups
-            random.shuffle(new_items)
-            random.shuffle(mature_items)
+            secrets.shuffle(new_items)
+            secrets.shuffle(mature_items)
 
             # Interleave
             result = []
@@ -258,7 +259,6 @@ class ReviewScheduler:
     def _plan_breaks(cls, items: list[dict], settings: dict) -> list[dict]:
         """Plan break points in the session."""
         breaks = []
-        break_interval = settings.get("break_interval", cls.DEFAULT_BREAK_INTERVAL)
         break_duration = settings.get("break_duration", cls.DEFAULT_BREAK_DURATION)
 
         for i, item in enumerate(items):
@@ -282,7 +282,7 @@ class ReviewScheduler:
             "Practice deep breathing",
             "Look at something 20 feet away for 20 seconds",
         ]
-        return random.choice(activities)
+        return secrets.choice(activities)
 
     @classmethod
     def _calculate_difficulty_distribution(cls, items: list[dict]) -> dict[str, int]:

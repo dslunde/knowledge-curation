@@ -14,8 +14,7 @@ from zope.interface import Interface
 import json
 import logging
 
-
-logger = logging.getLogger("knowledge.curator.workflow_views")
+logger = logging.getLogger(__name__)
 
 
 class IWorkflowTransitionForm(Interface):
@@ -170,7 +169,7 @@ class BulkWorkflowView(BrowserView):
                     continue
 
                 transitions = workflow_tool.getTransitionsFor(obj)
-                transition_ids = set(t["id"] for t in transitions)
+                transition_ids = {t["id"] for t in transitions}
 
                 if common_transitions is None:
                     common_transitions = transition_ids
@@ -178,6 +177,7 @@ class BulkWorkflowView(BrowserView):
                     common_transitions &= transition_ids
 
             except Exception:
+                logger.exception("Error getting transitions for object with UID: %s", uid)
                 continue
 
         if not common_transitions:

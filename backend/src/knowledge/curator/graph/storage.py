@@ -392,21 +392,21 @@ class GraphStorage:
 
         return []
 
-    def export_graph(self, format: str = "json") -> str:
+    def export_graph(self, file_format: str = "json") -> str:
         """Export graph to various formats.
 
         Args:
-            format: Export format ('json', 'gexf', 'graphml')
+            file_format: Output file_format ('json', 'gexf', 'graphml')
 
         Returns:
-            Exported graph data as string
+            Serialized graph data
         """
         graph = self.load_graph()
 
-        if format == "json":
+        if file_format == "json":
             return json.dumps(graph.to_dict(), indent=2)
 
-        elif format == "gexf":
+        elif file_format == "gexf":
             # GEXF format for Gephi
             gexf = ['<?xml version="1.0" encoding="UTF-8"?>']
             gexf.append('<gexf xmlns="http://www.gexf.net/1.2draft" version="1.2">')
@@ -432,7 +432,7 @@ class GraphStorage:
 
             return "\n".join(gexf)
 
-        elif format == "graphml":
+        elif file_format == "graphml":
             # GraphML format
             graphml = ['<?xml version="1.0" encoding="UTF-8"?>']
             graphml.append('<graphml xmlns="http://graphml.graphdrawing.org/xmlns">')
@@ -462,23 +462,21 @@ class GraphStorage:
             return "\n".join(graphml)
 
         else:
-            raise ValueError(f"Unsupported format: {format}")
+            raise ValueError(f"Unsupported format: {file_format}")
 
-    def import_graph(self, data: str, format: str = "json", merge: bool = True):
+    def import_graph(self, data: str, file_format: str = "json", merge: bool = True):
         """Import graph from various formats.
 
         Args:
-            data: Graph data as string
-            format: Import format ('json')
+            data: Graph data to import
+            file_format: Input file_format ('json')
             merge: Whether to merge with existing graph
+
         """
-        if format == "json":
+        if file_format == "json":
             import_data = json.loads(data)
 
-            if merge:
-                graph = self.load_graph()
-            else:
-                graph = Graph()
+            graph = self.load_graph() if merge else Graph()
 
             # Import nodes
             for node_data in import_data.get("nodes", []):
@@ -514,7 +512,7 @@ class GraphStorage:
             self.save_graph(graph)
 
         else:
-            raise ValueError(f"Unsupported format: {format}")
+            raise ValueError(f"Unsupported format: {file_format}")
 
     def get_statistics(self) -> dict[str, Any]:
         """Get graph statistics.

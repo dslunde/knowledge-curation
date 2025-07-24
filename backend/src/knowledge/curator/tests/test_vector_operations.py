@@ -223,7 +223,7 @@ class TestSimilaritySearch(unittest.TestCase):
             UID="source-uid",
         )
 
-        bookmark2 = api.content.create(
+        _bookmark2 = api.content.create(
             container=self.portal,
             type="BookmarkPlus",
             title="Similar Bookmark",

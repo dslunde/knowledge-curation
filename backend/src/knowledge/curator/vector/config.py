@@ -1,8 +1,9 @@
-"""Vector database configuration utilities."""
-
-from plone import api
+"""Vector Database Configuration Management."""
 
 import os
+
+from plone import api
+from zope.component.interfaces import ComponentLookupError
 
 
 def get_vector_config():

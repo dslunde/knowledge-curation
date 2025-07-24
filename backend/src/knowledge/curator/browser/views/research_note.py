@@ -1,7 +1,11 @@
 """Views for Research Note content type."""
 
+import logging
+
 from plone import api
 from Products.Five.browser import BrowserView
+
+logger = logging.getLogger(__name__)
 
 
 class ResearchNoteView(BrowserView):
@@ -21,7 +25,7 @@ class ResearchNoteView(BrowserView):
                     if brain:
                         connections.append(brain[0])
                 except Exception:
-                    pass
+                    logger.exception("Error finding connection with UID: %s", uid)
         return connections
 
     def get_key_insights_formatted(self):

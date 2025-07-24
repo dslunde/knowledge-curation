@@ -47,7 +47,7 @@ class TestSpacedRepetitionSystem(unittest.TestCase):
 
         # Perform a review on first item
         first_item = self.items[0]
-        result = first_item.update_review(quality=4, time_spent=60)
+        _result = first_item.update_review(quality=4, time_spent=60)
 
         # Check review was recorded
         self.assertEqual(first_item.repetitions, 1)

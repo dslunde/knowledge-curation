@@ -1,6 +1,7 @@
 """Tests for Bulk Operations API."""
 
 import unittest
+import transaction
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.restapi.testing import RelativeSession
@@ -138,8 +139,6 @@ class TestBulkOperationsAPI(unittest.TestCase):
             )
             to_delete.append(note.UID())
 
-        import transaction
-
         transaction.commit()
 
         response = self.api_session.post(
@@ -190,8 +189,6 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 progress=0,
             )
             goals.append(goal.UID())
-
-        import transaction
 
         transaction.commit()
 
@@ -274,7 +271,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
         """Test bulk operations with insufficient permissions."""
         # Create a new user with limited permissions
         api.user.create(
-            email="limited@example.com", username="limited", password="test_password"
+            email="limited@example.com", username="limited", password="secret"  # noqa: S106
         )
 
         # Create new session with limited user

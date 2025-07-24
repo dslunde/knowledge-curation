@@ -1,14 +1,17 @@
-"""Spaced Repetition Behavior for Content Types."""
+"""Spaced Repetition Behavior."""
 
 from datetime import datetime
-from knowledge.curator.repetition import ForgettingCurve
-from knowledge.curator.repetition import SM2Algorithm
-from persistent.list import PersistentList
 from plone.autoform import directives
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
 from zope import schema
 from zope.component import adapter
+from zope.interface import implementer
+from zope.interface import provider
+
+from knowledge.curator.repetition import ForgettingCurve
+from knowledge.curator.repetition import SM2Algorithm
+from persistent.list import PersistentList
 
 
 @provider(IFormFieldProvider)

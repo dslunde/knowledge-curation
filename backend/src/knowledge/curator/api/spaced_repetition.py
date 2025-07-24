@@ -422,19 +422,22 @@ class SpacedRepetitionService(Service):
 
         data = json.loads(self.request.get("BODY", "{}"))
 
-        if "daily_review_limit" in settings:
+        # Get current settings
+        settings = self.get_settings()
+
+        if "daily_review_limit" in data:
             settings["daily_review_limit"] = max(
-                1, min(100, int(settings["daily_review_limit"]))
+                1, min(100, int(data["daily_review_limit"]))
             )
 
-        if "new_items_per_day" in settings:
+        if "new_items_per_day" in data:
             settings["new_items_per_day"] = max(
-                0, min(50, int(settings["new_items_per_day"]))
+                0, min(50, int(data["new_items_per_day"]))
             )
 
-        if "minimum_ease_factor" in settings:
+        if "minimum_ease_factor" in data:
             settings["minimum_ease_factor"] = max(
-                1.0, min(3.0, float(settings["minimum_ease_factor"]))
+                1.0, min(3.0, float(data["minimum_ease_factor"]))
             )
 
         # Save settings
@@ -481,8 +484,7 @@ class SpacedRepetitionService(Service):
             obj = brain.getObject()
             sr_data = self._get_sr_data(obj)
 
-            if sr_data.get("next_review"):
-                if next_date is None or sr_data["next_review"] < next_date:
-                    next_date = sr_data["next_review"]
+            if sr_data.get("next_review") and (next_date is None or sr_data["next_review"] < next_date):
+                next_date = sr_data["next_review"]
 
         return next_date.isoformat() if next_date else None

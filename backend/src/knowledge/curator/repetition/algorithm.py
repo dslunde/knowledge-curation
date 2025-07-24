@@ -1,10 +1,7 @@
-"""SM-2 Algorithm Implementation.
-
-The SuperMemo 2 (SM-2) algorithm is a spaced repetition algorithm that determines
-optimal intervals between repetitions based on the quality of recall.
-"""
+"""SM2 Spaced Repetition Algorithm Implementation."""
 
 from datetime import datetime, timedelta
+from typing import ClassVar
 import math
 
 
@@ -25,7 +22,7 @@ class SM2Algorithm:
     QUALITY_PERFECT = 5  # Perfect response
 
     # Initial intervals (in days)
-    INITIAL_INTERVALS = [1, 6]
+    INITIAL_INTERVALS: ClassVar[list[int]] = [1, 6]
 
     @classmethod
     def calculate_next_review(

@@ -1,6 +1,8 @@
-"""Relationship types and management for knowledge graph."""
+"""Relationship handling for knowledge graph."""
 
 from enum import Enum
+from typing import ClassVar
+
 
 
 class RelationshipType(Enum):
@@ -59,7 +61,7 @@ class RelationshipType(Enum):
 class RelationshipMetadata:
     """Metadata for relationship types."""
 
-    RELATIONSHIP_METADATA = {
+    RELATIONSHIP_METADATA: ClassVar[dict[RelationshipType, dict]] = {
         RelationshipType.RELATED_TO: {
             "bidirectional": True,
             "transitive": False,
@@ -436,20 +438,20 @@ class RelationshipManager:
             visited = set()
             reachable = set()
 
-            def dfs(current_uid: str, path_start: str):
-                if current_uid in visited:
+            def dfs(current_uid: str, path_start: str, visited_set: set, reachable_set: set):
+                if current_uid in visited_set:
                     return
-                visited.add(current_uid)
+                visited_set.add(current_uid)
 
                 # Get neighbors through this relationship type
                 edges = graph.get_edges_from_node(current_uid, rel_type_value)
                 for edge in edges:
                     if edge.target_uid != path_start:
-                        reachable.add(edge.target_uid)
-                        dfs(edge.target_uid, path_start)
+                        reachable_set.add(edge.target_uid)
+                        dfs(edge.target_uid, path_start, visited_set, reachable_set)
 
             # Start DFS from this node
-            dfs(node_uid, node_uid)
+            dfs(node_uid, node_uid, visited, reachable)
 
             # Check which relationships are missing
             for target_uid in reachable:

@@ -152,7 +152,7 @@ class PerformanceTracker:
         total_items = len(items_data)
         interval_growths = []
 
-        for item_id, reviews in items_data.items():
+        for _item_id, reviews in items_data.items():
             if reviews:
                 # Check if mastered
                 latest_interval = reviews[-1].get("interval", 0)

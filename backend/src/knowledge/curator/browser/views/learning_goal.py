@@ -1,7 +1,11 @@
 """Views for Learning Goal content type."""
 
+import logging
+
 from plone import api
 from Products.Five.browser import BrowserView
+
+logger = logging.getLogger(__name__)
 
 
 class LearningGoalView(BrowserView):
@@ -46,7 +50,7 @@ class LearningGoalView(BrowserView):
                     if brain:
                         notes.append(brain[0])
                 except Exception:
-                    pass
+                    logger.exception("Error finding related note with UID: %s", uid)
         return notes
 
     def get_priority_class(self):
