@@ -7,6 +7,8 @@ import {
   ProjectLogEdit,
   BookmarkPlusView,
   BookmarkPlusEdit,
+  KnowledgeItemView,
+  KnowledgeItemEdit,
 } from './components';
 
 const applyConfig = (config) => {
@@ -23,6 +25,7 @@ const applyConfig = (config) => {
       LearningGoal: LearningGoalView,
       ProjectLog: ProjectLogView,
       BookmarkPlus: BookmarkPlusView,
+      KnowledgeItem: KnowledgeItemView,
     },
     layoutViews: {
       ...config.views.layoutViews,
@@ -30,18 +33,7 @@ const applyConfig = (config) => {
       LearningGoal: LearningGoalView,
       ProjectLog: ProjectLogView,
       BookmarkPlus: BookmarkPlusView,
-    },
-  };
-
-  // Register edit forms
-  config.widgets = {
-    ...config.widgets,
-    views: {
-      ...config.widgets.views,
-      ResearchNote: ResearchNoteEdit,
-      LearningGoal: LearningGoalEdit,
-      ProjectLog: ProjectLogEdit,
-      BookmarkPlus: BookmarkPlusEdit,
+      KnowledgeItem: KnowledgeItemView,
     },
   };
 

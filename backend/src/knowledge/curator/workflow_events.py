@@ -1,6 +1,6 @@
 """Workflow event handlers and subscribers."""
 
-from knowledge.curator.content.knowledge_item import IKnowledgeItem
+from knowledge.curator.interfaces import IKnowledgeItem
 from knowledge.curator.interfaces import ILearningGoal
 from plone import api
 from Products.CMFCore.interfaces import IActionSucceededEvent

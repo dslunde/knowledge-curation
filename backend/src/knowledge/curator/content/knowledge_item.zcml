@@ -4,13 +4,11 @@
     i18n_domain="knowledge.curator"
     >
 
-  <plone:behavior
-      name="knowledge.curator.knowledge_item"
-      title="Knowledge Item"
-      description="Knowledge Item content type"
-      factory=".knowledge_item.KnowledgeItem"
-      provides=".knowledge_item.IKnowledgeItem"
-      marker=".knowledge_item.IKnowledgeItem"
-      />
+  <class class=".knowledge_item.KnowledgeItem">
+    <require
+        permission="zope2.View"
+        attributes="get_embedding update_embedding"
+        />
+  </class>
 
 </configure>

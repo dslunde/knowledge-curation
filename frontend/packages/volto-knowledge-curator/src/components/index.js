@@ -7,6 +7,8 @@ export { default as ProjectLogView } from './ProjectLog/View';
 export { default as ProjectLogEdit } from './ProjectLog/Edit';
 export { default as BookmarkPlusView } from './BookmarkPlus/View';
 export { default as BookmarkPlusEdit } from './BookmarkPlus/Edit';
+export { default as KnowledgeItemView } from './KnowledgeItem/View';
+export { default as KnowledgeItemEdit } from './KnowledgeItem/Edit';
 
 // Widgets
 export { default as AIFeaturesWidget } from './Widgets/AIFeaturesWidget';
