@@ -10,24 +10,20 @@ from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope.interface import alsoProvides
 
-from knowledge.curator.repetition import (
-    ForgettingCurve, PerformanceTracker
-)
-from knowledge.curator.repetition.utilities import ReviewUtilities
 
 
 class ReviewQueueView(BrowserView):
     """Review queue interface."""
 
-    template = ViewPageTemplateFile('templates/review_queue.pt')
+    template = ViewPageTemplateFile("templates/review_queue.pt")
 
     def __call__(self):
         return self.template()
 
     def get_review_items(self):
         """Get items due for review."""
-        limit = int(self.request.get('limit', 20))
-        portal_types = self.request.get('types', 'ResearchNote,BookmarkPlus').split(',')
+        limit = int(self.request.get("limit", 20))
+        portal_types = self.request.get("types", "ResearchNote,BookmarkPlus").split(",")
 
         items = ReviewUtilities.get_items_due_for_review(
             portal_types=portal_types, limit=limit
@@ -36,14 +32,13 @@ class ReviewQueueView(BrowserView):
         # Add session metadata
         user = api.user.get_current()
         member = api.user.get(user.getId())
-        settings = member.getProperty('sr_settings', {
-            'daily_review_limit': 20,
-            'review_order': 'urgency'
-        })
+        settings = member.getProperty(
+            "sr_settings", {"daily_review_limit": 20, "review_order": "urgency"}
+        )
 
         # Get today's review count
         today_count = self._get_today_review_count()
-        remaining = settings.get('daily_review_limit', 20) - today_count
+        remaining = settings.get("daily_review_limit", 20) - today_count
 
         return {
             "items": items[:remaining] if remaining > 0 else [],
@@ -95,13 +90,13 @@ class ReviewQueueView(BrowserView):
 class ReviewCardView(BrowserView):
     """Individual review card interface."""
 
-    template = ViewPageTemplateFile('templates/review_card.pt')
+    template = ViewPageTemplateFile("templates/review_card.pt")
 
     def __call__(self):
         # Disable CSRF for AJAX calls
         alsoProvides(self.request, IDisableCSRFProtection)
 
-        uid = self.request.get('uid')
+        uid = self.request.get("uid")
         if not uid:
             return self.request.response.redirect(self.context.absolute_url())
 
@@ -113,7 +108,7 @@ class ReviewCardView(BrowserView):
         if not uid:
             return None
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
         brains = catalog(UID=uid)
 
         if not brains:
@@ -164,7 +159,7 @@ class ReviewCardView(BrowserView):
                     "full_content": obj.body.output if hasattr(obj, "body") else "",
                 }
 
-        elif obj.portal_type == 'BookmarkPlus':
+        elif obj.portal_type == "BookmarkPlus":
             # For bookmarks, test on key concepts
             if hasattr(obj, "key_concepts") and obj.key_concepts:
                 return {
@@ -193,18 +188,18 @@ class ReviewCardView(BrowserView):
         elif interval < 90:
             return "Mature"
         else:
-            return 'Mastered'
+            return "Mastered"
 
     def submit_review(self):
         """Handle review submission."""
-        uid = self.request.form.get('uid')
-        quality = int(self.request.form.get('quality', 0))
-        time_spent = int(self.request.form.get('time_spent', 60))
+        uid = self.request.form.get("uid")
+        quality = int(self.request.form.get("quality", 0))
+        time_spent = int(self.request.form.get("time_spent", 60))
 
         try:
             result = ReviewUtilities.handle_review_response(uid, quality, time_spent)
 
-            self.request.response.setHeader('Content-Type', 'application/json')
+            self.request.response.setHeader("Content-Type", "application/json")
             return json.dumps({
                 "success": True,
                 "result": result,
@@ -213,24 +208,18 @@ class ReviewCardView(BrowserView):
 
         except Exception as e:
             self.request.response.setStatus(400)
-            self.request.response.setHeader('Content-Type', 'application/json')
-            return json.dumps({
-                'success': False,
-                'error': str(e)
-            })
+            self.request.response.setHeader("Content-Type", "application/json")
+            return json.dumps({"success": False, "error": str(e)})
 
     def _get_next_item(self, current_uid):
         """Get next item in queue."""
         items = ReviewUtilities.get_items_due_for_review(limit=10)
 
         # Filter out current item
-        items = [i for i in items if i['uid'] != current_uid]
+        items = [i for i in items if i["uid"] != current_uid]
 
         if items:
-            return {
-                'uid': items[0]['uid'],
-                'title': items[0]['title']
-            }
+            return {"uid": items[0]["uid"], "title": items[0]["title"]}
 
         return None
 
@@ -238,22 +227,20 @@ class ReviewCardView(BrowserView):
 class ReviewPerformanceView(BrowserView):
     """Performance visualization dashboard."""
 
-    template = ViewPageTemplateFile('templates/review_performance.pt')
+    template = ViewPageTemplateFile("templates/review_performance.pt")
 
     def __call__(self):
         return self.template()
 
     def get_performance_data(self):
         """Get performance metrics and visualizations."""
-        days = int(self.request.get('days', 30))
+        days = int(self.request.get("days", 30))
 
         # Get user's review history
         review_history = self._get_user_review_history()
 
         # Calculate metrics
-        metrics = PerformanceTracker.calculate_performance_metrics(
-            review_history, days
-        )
+        metrics = PerformanceTracker.calculate_performance_metrics(review_history, days)
 
         # Get forgetting curves for current items
         items = ReviewUtilities.get_items_due_for_review(limit=10)
@@ -266,10 +253,7 @@ class ReviewPerformanceView(BrowserView):
                 ease_factor=sr_data["ease_factor"],
                 repetitions=sr_data["repetitions"],
             )
-            forgetting_curves.append({
-                'title': item['title'],
-                'data': curve_data
-            })
+            forgetting_curves.append({"title": item["title"], "data": curve_data})
 
         # Get workload forecast
         all_items = self._get_all_user_items()
@@ -350,9 +334,11 @@ class ReviewPerformanceView(BrowserView):
             if (datetime.now() - datetime.fromisoformat(r["date"])).days <= 7
         ]
 
-        recent_metrics = PerformanceTracker.calculate_performance_metrics(
-            recent_history, 7
-        ) if recent_history else None
+        recent_metrics = (
+            PerformanceTracker.calculate_performance_metrics(recent_history, 7)
+            if recent_history
+            else None
+        )
 
         # All-time performance
         all_time_metrics = PerformanceTracker.calculate_performance_metrics(
@@ -369,7 +355,7 @@ class ReviewPerformanceView(BrowserView):
 class ReviewStatisticsView(BrowserView):
     """Detailed statistics dashboard."""
 
-    template = ViewPageTemplateFile('templates/review_statistics.pt')
+    template = ViewPageTemplateFile("templates/review_statistics.pt")
 
     def __call__(self):
         return self.template()
@@ -419,7 +405,7 @@ class ReviewStatisticsView(BrowserView):
         """Export statistics as JSON."""
         stats = self.get_statistics()
 
-        self.request.response.setHeader('Content-Type', 'application/json')
+        self.request.response.setHeader("Content-Type", "application/json")
         self.request.response.setHeader(
             "Content-Disposition",
             f'attachment; filename="sr_statistics_{datetime.now().strftime("%Y%m%d")}.json"',

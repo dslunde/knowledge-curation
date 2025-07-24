@@ -48,7 +48,7 @@ class LearningGoal(Container):
         if not self.milestones:
             return 0
 
-        completed = sum(1 for m in self.milestones if m.get('completed', False))
+        completed = sum(1 for m in self.milestones if m.get("completed", False))
         total = len(self.milestones)
 
         if total == 0:

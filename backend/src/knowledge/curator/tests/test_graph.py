@@ -35,13 +35,13 @@ class TestGraphModel(unittest.TestCase):
 
     def test_add_edge(self):
         """Test adding edges to graph."""
-        node1 = Node('test1', 'Node 1', NodeType.RESEARCH_NOTE)
-        node2 = Node('test2', 'Node 2', NodeType.LEARNING_GOAL)
+        node1 = Node("test1", "Node 1", NodeType.RESEARCH_NOTE)
+        node2 = Node("test2", "Node 2", NodeType.LEARNING_GOAL)
 
         self.graph.add_node(node1)
         self.graph.add_node(node2)
 
-        edge = Edge('test1', 'test2', RelationshipType.RELATED_TO.value)
+        edge = Edge("test1", "test2", RelationshipType.RELATED_TO.value)
         self.assertTrue(self.graph.add_edge(edge))
         self.assertEqual(len(self.graph.edges), 1)
 
@@ -51,13 +51,13 @@ class TestGraphModel(unittest.TestCase):
 
     def test_remove_node(self):
         """Test removing nodes from graph."""
-        node1 = Node('test1', 'Node 1', NodeType.RESEARCH_NOTE)
-        node2 = Node('test2', 'Node 2', NodeType.LEARNING_GOAL)
+        node1 = Node("test1", "Node 1", NodeType.RESEARCH_NOTE)
+        node2 = Node("test2", "Node 2", NodeType.LEARNING_GOAL)
 
         self.graph.add_node(node1)
         self.graph.add_node(node2)
 
-        edge = Edge('test1', 'test2', RelationshipType.RELATED_TO.value)
+        edge = Edge("test1", "test2", RelationshipType.RELATED_TO.value)
         self.graph.add_edge(edge)
 
         # Remove node should also remove connected edges
@@ -73,17 +73,17 @@ class TestGraphModel(unittest.TestCase):
             self.graph.add_node(node)
 
         # Add edges: 0->1, 0->2, 1->3
-        self.graph.add_edge(Edge('test0', 'test1', RelationshipType.RELATED_TO.value))
-        self.graph.add_edge(Edge('test0', 'test2', RelationshipType.RELATED_TO.value))
-        self.graph.add_edge(Edge('test1', 'test3', RelationshipType.RELATED_TO.value))
+        self.graph.add_edge(Edge("test0", "test1", RelationshipType.RELATED_TO.value))
+        self.graph.add_edge(Edge("test0", "test2", RelationshipType.RELATED_TO.value))
+        self.graph.add_edge(Edge("test1", "test3", RelationshipType.RELATED_TO.value))
 
         # Test neighbors
-        neighbors = self.graph.get_neighbors('test0')
-        self.assertEqual(set(neighbors), {'test1', 'test2'})
+        neighbors = self.graph.get_neighbors("test0")
+        self.assertEqual(set(neighbors), {"test1", "test2"})
 
         # Test incoming neighbors
-        incoming = self.graph.get_incoming_neighbors('test1')
-        self.assertEqual(set(incoming), {'test0'})
+        incoming = self.graph.get_incoming_neighbors("test1")
+        self.assertEqual(set(incoming), {"test0"})
 
     def test_get_subgraph(self):
         """Test getting subgraph."""
@@ -105,7 +105,7 @@ class TestGraphModel(unittest.TestCase):
             self.graph.add_edge(Edge(source, target, RelationshipType.RELATED_TO.value))
 
         # Get subgraph with nodes 0, 1, 2
-        subgraph = self.graph.get_subgraph(['test0', 'test1', 'test2'])
+        subgraph = self.graph.get_subgraph(["test0", "test1", "test2"])
 
         self.assertEqual(len(subgraph.nodes), 3)
         self.assertEqual(len(subgraph.edges), 2)  # Only edges between included nodes
@@ -122,8 +122,7 @@ class TestRelationships(unittest.TestCase):
         # Test valid relationships
         self.assertTrue(
             self.manager.validate_relationship(
-                'ResearchNote', 'ResearchNote',
-                RelationshipType.RELATED_TO.value
+                "ResearchNote", "ResearchNote", RelationshipType.RELATED_TO.value
             )
         )
 
@@ -166,7 +165,7 @@ class TestRelationships(unittest.TestCase):
             },
         )
 
-        self.assertIn('mentions', self.manager.custom_relationships)
+        self.assertIn("mentions", self.manager.custom_relationships)
 
 
 class TestGraphOperations(unittest.TestCase):
@@ -184,15 +183,15 @@ class TestGraphOperations(unittest.TestCase):
             )
         )
 
-        node = self.graph.get_node('uid1')
+        node = self.graph.get_node("uid1")
         self.assertIsNotNone(node)
-        self.assertEqual(node.title, 'Research Note 1')
-        self.assertEqual(node.get_property('tags'), ['python', 'testing'])
+        self.assertEqual(node.title, "Research Note 1")
+        self.assertEqual(node.get_property("tags"), ["python", "testing"])
 
     def test_create_relationship(self):
         """Test creating relationships."""
-        self.ops.add_content_node('uid1', 'Note 1', 'ResearchNote')
-        self.ops.add_content_node('uid2', 'Note 2', 'ResearchNote')
+        self.ops.add_content_node("uid1", "Note 1", "ResearchNote")
+        self.ops.add_content_node("uid2", "Note 2", "ResearchNote")
 
         self.assertTrue(
             self.ops.create_relationship(
@@ -200,22 +199,22 @@ class TestGraphOperations(unittest.TestCase):
             )
         )
 
-        edge = self.graph.get_edge('uid1', 'uid2', RelationshipType.RELATED_TO.value)
+        edge = self.graph.get_edge("uid1", "uid2", RelationshipType.RELATED_TO.value)
         self.assertIsNotNone(edge)
         self.assertEqual(edge.weight, 0.8)
 
     def test_merge_nodes(self):
         """Test merging nodes."""
         # Create nodes with edges
-        self.ops.add_content_node('uid1', 'Note 1', 'ResearchNote')
-        self.ops.add_content_node('uid2', 'Note 2', 'ResearchNote')
-        self.ops.add_content_node('uid3', 'Note 3', 'ResearchNote')
+        self.ops.add_content_node("uid1", "Note 1", "ResearchNote")
+        self.ops.add_content_node("uid2", "Note 2", "ResearchNote")
+        self.ops.add_content_node("uid3", "Note 3", "ResearchNote")
 
-        self.ops.create_relationship('uid1', 'uid3', RelationshipType.RELATED_TO)
-        self.ops.create_relationship('uid2', 'uid3', RelationshipType.RELATED_TO)
+        self.ops.create_relationship("uid1", "uid3", RelationshipType.RELATED_TO)
+        self.ops.create_relationship("uid2", "uid3", RelationshipType.RELATED_TO)
 
         # Merge uid2 into uid1
-        self.assertTrue(self.ops.merge_nodes('uid1', 'uid2'))
+        self.assertTrue(self.ops.merge_nodes("uid1", "uid2"))
 
         # Check results
         self.assertIsNone(self.graph.get_node("uid2"))
@@ -224,23 +223,23 @@ class TestGraphOperations(unittest.TestCase):
         # Check edges were redirected
         edges_from_uid1 = self.graph.get_edges_from_node("uid1")
         self.assertEqual(len(edges_from_uid1), 1)
-        self.assertEqual(edges_from_uid1[0].target_uid, 'uid3')
+        self.assertEqual(edges_from_uid1[0].target_uid, "uid3")
 
     def test_suggest_connections(self):
         """Test connection suggestions."""
         # Create a small graph
-        self.ops.add_content_node('uid1', 'Note 1', 'ResearchNote')
-        self.ops.add_content_node('uid2', 'Note 2', 'ResearchNote')
-        self.ops.add_content_node('uid3', 'Note 3', 'ResearchNote')
-        self.ops.add_content_node('uid4', 'Note 4', 'ResearchNote')
+        self.ops.add_content_node("uid1", "Note 1", "ResearchNote")
+        self.ops.add_content_node("uid2", "Note 2", "ResearchNote")
+        self.ops.add_content_node("uid3", "Note 3", "ResearchNote")
+        self.ops.add_content_node("uid4", "Note 4", "ResearchNote")
 
         # Create connections
-        self.ops.create_relationship('uid1', 'uid2', RelationshipType.RELATED_TO)
-        self.ops.create_relationship('uid2', 'uid3', RelationshipType.RELATED_TO)
-        self.ops.create_relationship('uid3', 'uid4', RelationshipType.RELATED_TO)
+        self.ops.create_relationship("uid1", "uid2", RelationshipType.RELATED_TO)
+        self.ops.create_relationship("uid2", "uid3", RelationshipType.RELATED_TO)
+        self.ops.create_relationship("uid3", "uid4", RelationshipType.RELATED_TO)
 
         # Get suggestions for uid1
-        suggestions = self.ops.suggest_connections('uid1', limit=5)
+        suggestions = self.ops.suggest_connections("uid1", limit=5)
 
         # Should suggest uid3 (connected through uid2)
         suggested_uids = [s[0] for s in suggestions]
@@ -291,23 +290,23 @@ class TestGraphAlgorithms(unittest.TestCase):
 
         # node0 should have highest centrality
         max_centrality_node = max(degree_centrality.items(), key=lambda x: x[1])[0]
-        self.assertEqual(max_centrality_node, 'node0')
+        self.assertEqual(max_centrality_node, "node0")
 
         # Test PageRank
         pagerank = self.algo.pagerank()
         max_pagerank_node = max(pagerank.items(), key=lambda x: x[1])[0]
-        self.assertEqual(max_pagerank_node, 'node0')
+        self.assertEqual(max_pagerank_node, "node0")
 
     def test_find_communities(self):
         """Test community detection."""
         # Create two connected components
         # Component 1: node0, node1, node2
-        self.graph.add_edge(Edge('node0', 'node1', RelationshipType.RELATED_TO.value))
-        self.graph.add_edge(Edge('node1', 'node2', RelationshipType.RELATED_TO.value))
+        self.graph.add_edge(Edge("node0", "node1", RelationshipType.RELATED_TO.value))
+        self.graph.add_edge(Edge("node1", "node2", RelationshipType.RELATED_TO.value))
 
         # Component 2: node3, node4, node5
-        self.graph.add_edge(Edge('node3', 'node4', RelationshipType.RELATED_TO.value))
-        self.graph.add_edge(Edge('node4', 'node5', RelationshipType.RELATED_TO.value))
+        self.graph.add_edge(Edge("node3", "node4", RelationshipType.RELATED_TO.value))
+        self.graph.add_edge(Edge("node4", "node5", RelationshipType.RELATED_TO.value))
 
         communities = self.algo.find_communities()
 
@@ -327,8 +326,8 @@ class TestGraphStorage(unittest.TestCase):
     layer = PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
 
     def setUp(self):
-        self.portal = self.layer['portal']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.portal = self.layer["portal"]
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
         self.storage = GraphStorage(self.portal)
 
@@ -337,12 +336,12 @@ class TestGraphStorage(unittest.TestCase):
         # Create a graph
         graph = Graph()
 
-        node1 = Node('test1', 'Test Node 1', NodeType.RESEARCH_NOTE)
-        node2 = Node('test2', 'Test Node 2', NodeType.LEARNING_GOAL)
+        node1 = Node("test1", "Test Node 1", NodeType.RESEARCH_NOTE)
+        node2 = Node("test2", "Test Node 2", NodeType.LEARNING_GOAL)
         graph.add_node(node1)
         graph.add_node(node2)
 
-        edge = Edge('test1', 'test2', RelationshipType.RELATED_TO.value, 0.8)
+        edge = Edge("test1", "test2", RelationshipType.RELATED_TO.value, 0.8)
         graph.add_edge(edge)
 
         # Save graph
@@ -355,8 +354,8 @@ class TestGraphStorage(unittest.TestCase):
         self.assertEqual(len(loaded_graph.edges), 1)
 
         # Check node properties
-        loaded_node = loaded_graph.get_node('test1')
-        self.assertEqual(loaded_node.title, 'Test Node 1')
+        loaded_node = loaded_graph.get_node("test1")
+        self.assertEqual(loaded_node.title, "Test Node 1")
 
         # Check edge properties
         loaded_edge = loaded_graph.get_edge(
@@ -390,8 +389,12 @@ class TestGraphStorage(unittest.TestCase):
         graph = self.storage.load_graph()
 
         # Should have nodes for both notes
-        self.assertEqual(len([n for n in graph.nodes.values()
-                            if n.node_type == NodeType.RESEARCH_NOTE]), 2)
+        self.assertEqual(
+            len([
+                n for n in graph.nodes.values() if n.node_type == NodeType.RESEARCH_NOTE
+            ]),
+            2,
+        )
 
         # Should have tag nodes
         tag_nodes = [n for n in graph.nodes.values() if n.node_type == NodeType.TAG]
@@ -437,15 +440,15 @@ class TestGraphStorage(unittest.TestCase):
         self.storage.save_graph(graph)
 
         # Export to JSON
-        json_data = self.storage.export_graph(format='json')
-        self.assertIn('nodes', json_data)
-        self.assertIn('edges', json_data)
+        json_data = self.storage.export_graph(format="json")
+        self.assertIn("nodes", json_data)
+        self.assertIn("edges", json_data)
 
         # Clear and import
         empty_graph = Graph()
         self.storage.save_graph(empty_graph)
 
-        self.storage.import_graph(json_data, format='json', merge=False)
+        self.storage.import_graph(json_data, format="json", merge=False)
 
         # Check imported graph
         imported_graph = self.storage.load_graph()
@@ -482,13 +485,13 @@ class TestGraphTraversal(unittest.TestCase):
             self.graph.add_edge(edge)
 
         # Perform BFS
-        result = self.traversal.breadth_first_search('node0', max_depth=2)
+        result = self.traversal.breadth_first_search("node0", max_depth=2)
 
         # Check order and depth
         visited_nodes = [item[0].uid for item in result]
         depths = [item[1] for item in result]
 
-        self.assertEqual(visited_nodes[0], 'node0')  # Start node
+        self.assertEqual(visited_nodes[0], "node0")  # Start node
         self.assertEqual(depths[0], 0)
 
         # All nodes should be visited within depth 2
@@ -498,17 +501,17 @@ class TestGraphTraversal(unittest.TestCase):
     def test_find_connected_component(self):
         """Test finding connected components."""
         # Create two separate components
-        self.graph.add_edge(Edge('node0', 'node1', RelationshipType.RELATED_TO.value))
-        self.graph.add_edge(Edge('node1', 'node2', RelationshipType.RELATED_TO.value))
+        self.graph.add_edge(Edge("node0", "node1", RelationshipType.RELATED_TO.value))
+        self.graph.add_edge(Edge("node1", "node2", RelationshipType.RELATED_TO.value))
 
-        self.graph.add_edge(Edge('node3', 'node4', RelationshipType.RELATED_TO.value))
+        self.graph.add_edge(Edge("node3", "node4", RelationshipType.RELATED_TO.value))
 
         # Find components
-        component1 = self.traversal.find_connected_component('node0')
-        component2 = self.traversal.find_connected_component('node3')
+        component1 = self.traversal.find_connected_component("node0")
+        component2 = self.traversal.find_connected_component("node3")
 
-        self.assertEqual(component1, {'node0', 'node1', 'node2'})
-        self.assertEqual(component2, {'node3', 'node4'})
+        self.assertEqual(component1, {"node0", "node1", "node2"})
+        self.assertEqual(component2, {"node3", "node4"})
 
     def test_get_learning_path(self):
         """Test finding learning paths."""
@@ -525,11 +528,11 @@ class TestGraphTraversal(unittest.TestCase):
             self.graph.add_edge(edge)
 
         # Find learning path
-        path = self.traversal.get_learning_path('node0', 'node2')
+        path = self.traversal.get_learning_path("node0", "node2")
 
         self.assertIsNotNone(path)
-        self.assertEqual(path[0], 'node0')
-        self.assertEqual(path[-1], 'node2')
+        self.assertEqual(path[0], "node0")
+        self.assertEqual(path[-1], "node2")
 
     def test_suggest_next_nodes(self):
         """Test next node suggestions."""
@@ -545,7 +548,7 @@ class TestGraphTraversal(unittest.TestCase):
         )
 
         # Get suggestions
-        suggestions = self.traversal.suggest_next_nodes('node0', set())
+        suggestions = self.traversal.suggest_next_nodes("node0", set())
 
         self.assertEqual(len(suggestions), 3)
 
@@ -571,5 +574,5 @@ def test_suite():
     return suite
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

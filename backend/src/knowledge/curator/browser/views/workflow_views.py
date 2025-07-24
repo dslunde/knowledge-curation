@@ -52,9 +52,9 @@ class WorkflowTransitionForm(form.Form):
 
     def __init__(self, context, request):
         super().__init__(context, request)
-        self.transition_id = request.get('transition', '')
+        self.transition_id = request.get("transition", "")
 
-    @button.buttonAndHandler(_('Confirm Transition'), name='transition')
+    @button.buttonAndHandler(_("Confirm Transition"), name="transition")
     def handle_transition(self, action):
         data, errors = self.extractData()
         if errors:
@@ -69,23 +69,21 @@ class WorkflowTransitionForm(form.Form):
             )
 
             IStatusMessage(self.request).addStatusMessage(
-                _("Workflow transition completed successfully."),
-                type='info'
+                _("Workflow transition completed successfully."), type="info"
             )
 
             self.request.response.redirect(self.context.absolute_url())
 
         except Exception as e:
             IStatusMessage(self.request).addStatusMessage(
-                _("Transition failed: ${error}", mapping={'error': str(e)}),
-                type='error'
+                _("Transition failed: ${error}", mapping={"error": str(e)}),
+                type="error",
             )
 
-    @button.buttonAndHandler(_('Cancel'), name='cancel')
+    @button.buttonAndHandler(_("Cancel"), name="cancel")
     def handle_cancel(self, action):
         IStatusMessage(self.request).addStatusMessage(
-            _("Transition cancelled."),
-            type='info'
+            _("Transition cancelled."), type="info"
         )
         self.request.response.redirect(self.context.absolute_url())
 
@@ -95,17 +93,16 @@ class PublishTransitionForm(WorkflowTransitionForm):
 
     fields = field.Fields(IPublishForm)
 
-    @button.buttonAndHandler(_('Publish Content'), name='publish')
+    @button.buttonAndHandler(_("Publish Content"), name="publish")
     def handle_publish(self, action):
         data, errors = self.extractData()
         if errors:
             self.status = self.formErrorsMessage
             return
 
-        if not (data.get('confirm_quality') and data.get('confirm_connections')):
+        if not (data.get("confirm_quality") and data.get("confirm_connections")):
             IStatusMessage(self.request).addStatusMessage(
-                _("Please confirm all requirements before publishing."),
-                type='error'
+                _("Please confirm all requirements before publishing."), type="error"
             )
             return
 
@@ -126,8 +123,8 @@ class WorkflowHistoryView(BrowserView):
 
         try:
             # Get workflow history
-            workflow_tool = api.portal.get_tool('portal_workflow')
-            history = workflow_tool.getInfoFor(self.context, 'review_history', [])
+            workflow_tool = api.portal.get_tool("portal_workflow")
+            history = workflow_tool.getInfoFor(self.context, "review_history", [])
 
             for item in reversed(history):
                 self.history.append({
@@ -164,7 +161,7 @@ class BulkWorkflowView(BrowserView):
 
         # Find common transitions
         common_transitions = None
-        workflow_tool = api.portal.get_tool('portal_workflow')
+        workflow_tool = api.portal.get_tool("portal_workflow")
 
         for uid in uids:
             try:
@@ -173,7 +170,7 @@ class BulkWorkflowView(BrowserView):
                     continue
 
                 transitions = workflow_tool.getTransitionsFor(obj)
-                transition_ids = set(t['id'] for t in transitions)
+                transition_ids = set(t["id"] for t in transitions)
 
                 if common_transitions is None:
                     common_transitions = transition_ids
@@ -200,9 +197,9 @@ class BulkWorkflowView(BrowserView):
 
     def handle_bulk_transition(self):
         """Handle bulk workflow transition."""
-        uids = self.request.get('uids', [])
-        transition = self.request.get('transition', '')
-        comment = self.request.get('comment', '')
+        uids = self.request.get("uids", [])
+        transition = self.request.get("transition", "")
+        comment = self.request.get("comment", "")
 
         if not (uids and transition):
             return json.dumps({
@@ -230,17 +227,15 @@ class BulkWorkflowView(BrowserView):
             "errors": errors,
         }
 
-        self.request.response.setHeader('Content-Type', 'application/json')
+        self.request.response.setHeader("Content-Type", "application/json")
         return json.dumps(response)
 
 
 # Form wrappers
 WorkflowTransitionFormView = layout.wrap_form(
-    WorkflowTransitionForm,
-    label=_("Workflow Transition")
+    WorkflowTransitionForm, label=_("Workflow Transition")
 )
 
 PublishTransitionFormView = layout.wrap_form(
-    PublishTransitionForm,
-    label=_("Publish Content")
+    PublishTransitionForm, label=_("Publish Content")
 )

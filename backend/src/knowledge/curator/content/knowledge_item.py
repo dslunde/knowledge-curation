@@ -13,62 +13,62 @@ class IKnowledgeItem(model.Schema):
     """Schema for Knowledge Item content type."""
 
     title = schema.TextLine(
-        title=_('Title'),
+        title=_("Title"),
         required=True,
     )
 
     description = schema.Text(
-        title=_('Summary'),
-        description=_('A short summary of the knowledge item'),
+        title=_("Summary"),
+        description=_("A short summary of the knowledge item"),
         required=False,
     )
 
     text = RichText(
-        title=_('Body Text'),
-        description=_('Main content of the knowledge item'),
+        title=_("Body Text"),
+        description=_("Main content of the knowledge item"),
         required=False,
     )
 
     tags = schema.List(
-        title=_('Tags'),
-        description=_('Tags for categorization'),
+        title=_("Tags"),
+        description=_("Tags for categorization"),
         value_type=schema.TextLine(),
         required=False,
         default=[],
     )
 
     source_url = schema.URI(
-        title=_('Source URL'),
-        description=_('Original source of the information'),
+        title=_("Source URL"),
+        description=_("Original source of the information"),
         required=False,
     )
 
     embedding_vector = schema.List(
-        title=_('Embedding Vector'),
-        description=_('AI-generated embedding vector for similarity search'),
+        title=_("Embedding Vector"),
+        description=_("AI-generated embedding vector for similarity search"),
         value_type=schema.Float(),
         required=False,
         readonly=True,
     )
 
     ai_summary = schema.Text(
-        title=_('AI Summary'),
-        description=_('AI-generated summary of the content'),
+        title=_("AI Summary"),
+        description=_("AI-generated summary of the content"),
         required=False,
         readonly=True,
     )
 
     relevance_score = schema.Float(
-        title=_('Relevance Score'),
-        description=_('AI-calculated relevance score'),
+        title=_("Relevance Score"),
+        description=_("AI-calculated relevance score"),
         required=False,
         readonly=True,
         default=0.0,
     )
 
     attachment = NamedBlobFile(
-        title=_('Attachment'),
-        description=_('Upload a file attachment'),
+        title=_("Attachment"),
+        description=_("Upload a file attachment"),
         required=False,
     )
 

@@ -24,23 +24,25 @@ class ResearchNoteSerializer(SerializeFolderToJson):
         obj = self.context
 
         # Include embedding vector if requested
-        include_embeddings = self.request.get('include_embeddings', 'false').lower() == 'true'
+        include_embeddings = (
+            self.request.get("include_embeddings", "false").lower() == "true"
+        )
 
-        result['content'] = obj.content.raw if hasattr(obj, 'content') else ''
-        result['source_url'] = getattr(obj, 'source_url', '')
-        result['key_insights'] = getattr(obj, 'key_insights', [])
-        result['connections'] = getattr(obj, 'connections', [])
-        result['ai_summary'] = getattr(obj, 'ai_summary', '')
+        result["content"] = obj.content.raw if hasattr(obj, "content") else ""
+        result["source_url"] = getattr(obj, "source_url", "")
+        result["key_insights"] = getattr(obj, "key_insights", [])
+        result["connections"] = getattr(obj, "connections", [])
+        result["ai_summary"] = getattr(obj, "ai_summary", "")
 
-        if include_embeddings and hasattr(obj, 'embedding_vector'):
-            result['embedding_vector'] = getattr(obj, 'embedding_vector', [])
+        if include_embeddings and hasattr(obj, "embedding_vector"):
+            result["embedding_vector"] = getattr(obj, "embedding_vector", [])
 
         # Add connection details
         if result["connections"]:
             catalog = api.portal.get_tool("portal_catalog")
             connection_details = []
 
-            for uid in result['connections']:
+            for uid in result["connections"]:
                 brains = catalog(UID=uid)
                 if brains:
                     brain = brains[0]
@@ -51,7 +53,7 @@ class ResearchNoteSerializer(SerializeFolderToJson):
                         "url": brain.getURL(),
                     })
 
-            result['connection_details'] = connection_details
+            result["connection_details"] = connection_details
 
         # Add spaced repetition data if available
         if hasattr(obj, "_sr_data"):
@@ -81,22 +83,22 @@ class LearningGoalSerializer(SerializeFolderToJson):
 
         obj = self.context
 
-        result['target_date'] = getattr(obj, 'target_date', None)
-        if result['target_date']:
-            result['target_date'] = result['target_date'].isoformat()
+        result["target_date"] = getattr(obj, "target_date", None)
+        if result["target_date"]:
+            result["target_date"] = result["target_date"].isoformat()
 
-        result['milestones'] = getattr(obj, 'milestones', [])
-        result['progress'] = getattr(obj, 'progress', 0)
-        result['priority'] = getattr(obj, 'priority', 'medium')
-        result['reflection'] = getattr(obj, 'reflection', '')
-        result['related_notes'] = getattr(obj, 'related_notes', [])
+        result["milestones"] = getattr(obj, "milestones", [])
+        result["progress"] = getattr(obj, "progress", 0)
+        result["priority"] = getattr(obj, "priority", "medium")
+        result["reflection"] = getattr(obj, "reflection", "")
+        result["related_notes"] = getattr(obj, "related_notes", [])
 
         # Add related note details
         if result["related_notes"]:
             catalog = api.portal.get_tool("portal_catalog")
             note_details = []
 
-            for uid in result['related_notes']:
+            for uid in result["related_notes"]:
                 brains = catalog(UID=uid)
                 if brains:
                     brain = brains[0]
@@ -107,7 +109,7 @@ class LearningGoalSerializer(SerializeFolderToJson):
                         "url": brain.getURL(),
                     })
 
-            result['related_note_details'] = note_details
+            result["related_note_details"] = note_details
 
         # Calculate time to target
         if result["target_date"]:
@@ -117,8 +119,8 @@ class LearningGoalSerializer(SerializeFolderToJson):
             target = datetime.fromisoformat(result["target_date"]).date()
             today = date.today()
             days_remaining = (target - today).days
-            result['days_remaining'] = days_remaining
-            result['is_overdue'] = days_remaining < 0
+            result["days_remaining"] = days_remaining
+            result["is_overdue"] = days_remaining < 0
 
         return result
 
@@ -133,14 +135,14 @@ class ProjectLogSerializer(SerializeFolderToJson):
 
         obj = self.context
 
-        result['start_date'] = getattr(obj, 'start_date', None)
-        if result['start_date']:
-            result['start_date'] = result['start_date'].isoformat()
+        result["start_date"] = getattr(obj, "start_date", None)
+        if result["start_date"]:
+            result["start_date"] = result["start_date"].isoformat()
 
-        result['entries'] = getattr(obj, 'entries', [])
-        result['deliverables'] = getattr(obj, 'deliverables', [])
-        result['learnings'] = getattr(obj, 'learnings', [])
-        result['status'] = getattr(obj, 'status', 'planning')
+        result["entries"] = getattr(obj, "entries", [])
+        result["deliverables"] = getattr(obj, "deliverables", [])
+        result["learnings"] = getattr(obj, "learnings", [])
+        result["status"] = getattr(obj, "status", "planning")
 
         # Calculate project duration
         if result["start_date"]:
@@ -149,7 +151,7 @@ class ProjectLogSerializer(SerializeFolderToJson):
 
             start = datetime.fromisoformat(result["start_date"]).date()
             today = date.today()
-            result['duration_days'] = (today - start).days
+            result["duration_days"] = (today - start).days
 
         # Add entry count and latest entry
         result["entry_count"] = len(result["entries"])
@@ -158,7 +160,7 @@ class ProjectLogSerializer(SerializeFolderToJson):
             sorted_entries = sorted(
                 result["entries"], key=lambda x: x.get("date", ""), reverse=True
             )
-            result['latest_entry'] = sorted_entries[0]
+            result["latest_entry"] = sorted_entries[0]
 
         return result
 
@@ -174,16 +176,18 @@ class BookmarkPlusSerializer(SerializeFolderToJson):
         obj = self.context
 
         # Include embedding vector if requested
-        include_embeddings = self.request.get('include_embeddings', 'false').lower() == 'true'
+        include_embeddings = (
+            self.request.get("include_embeddings", "false").lower() == "true"
+        )
 
-        result['url'] = getattr(obj, 'url', '')
-        result['notes'] = obj.notes.raw if hasattr(obj, 'notes') else ''
-        result['read_status'] = getattr(obj, 'read_status', 'unread')
-        result['importance'] = getattr(obj, 'importance', 'medium')
-        result['ai_summary'] = getattr(obj, 'ai_summary', '')
+        result["url"] = getattr(obj, "url", "")
+        result["notes"] = obj.notes.raw if hasattr(obj, "notes") else ""
+        result["read_status"] = getattr(obj, "read_status", "unread")
+        result["importance"] = getattr(obj, "importance", "medium")
+        result["ai_summary"] = getattr(obj, "ai_summary", "")
 
-        if include_embeddings and hasattr(obj, 'embedding_vector'):
-            result['embedding_vector'] = getattr(obj, 'embedding_vector', [])
+        if include_embeddings and hasattr(obj, "embedding_vector"):
+            result["embedding_vector"] = getattr(obj, "embedding_vector", [])
 
         # Add spaced repetition data if available
         if hasattr(obj, "_sr_data"):
@@ -203,7 +207,8 @@ class BookmarkPlusSerializer(SerializeFolderToJson):
         # Add domain info from URL
         if result["url"]:
             from urllib.parse import urlparse
-            parsed = urlparse(result['url'])
-            result['domain'] = parsed.netloc
+
+            parsed = urlparse(result["url"])
+            result["domain"] = parsed.netloc
 
         return result

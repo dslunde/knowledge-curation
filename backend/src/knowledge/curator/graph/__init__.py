@@ -12,13 +12,13 @@ from .traversal import GraphTraversal
 
 
 __all__ = [
-    'Edge',
-    'Graph',
-    'GraphAlgorithms',
-    'GraphOperations',
-    'GraphStorage',
-    'GraphTraversal',
-    'Node',
-    'RelationshipManager',
-    'RelationshipType',
+    "Edge",
+    "Graph",
+    "GraphAlgorithms",
+    "GraphOperations",
+    "GraphStorage",
+    "GraphTraversal",
+    "Node",
+    "RelationshipManager",
+    "RelationshipType",
 ]

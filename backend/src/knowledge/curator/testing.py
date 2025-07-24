@@ -28,11 +28,11 @@ class PloneAppKnowledgeLayer(PloneSandboxLayer):
         try:
             applyProfile(portal, "plone.app.dexterity:default")
             applyProfile(portal, "plone.restapi:default")
-            applyProfile(portal, "plone.app.versioningbehavior:default") 
+            applyProfile(portal, "plone.app.versioningbehavior:default")
             applyProfile(portal, "plone.app.relationfield:default")
         except Exception:
             pass  # Some dependencies might not be available in test environment
-        
+
         # Apply our profile without dependencies
         try:
             applyProfile(portal, "knowledge.curator:default")
@@ -41,7 +41,7 @@ class PloneAppKnowledgeLayer(PloneSandboxLayer):
             portal.portal_types.manage_addPortalType(
                 id="ResearchNote",
                 title="Research Note",
-                meta_type="Dexterity Content Type"
+                meta_type="Dexterity Content Type",
             )
 
 
@@ -66,5 +66,5 @@ PLONE_APP_KNOWLEDGE_ACCEPTANCE_TESTING = FunctionalTesting(
         REMOTE_LIBRARY_BUNDLE_FIXTURE,
         z2.ZSERVER_FIXTURE,
     ),
-    name='PloneAppKnowledgeLayer:AcceptanceTesting',
+    name="PloneAppKnowledgeLayer:AcceptanceTesting",
 )

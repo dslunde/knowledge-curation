@@ -25,11 +25,15 @@ class SimilaritySearch:
         )
         self.embeddings = EmbeddingGenerator(config["embedding_model"])
 
-    def search_by_text(self, query: str, limit: int = 10,
-                      score_threshold: float = 0.5,
-                      content_types: list[str] | None = None,
-                      workflow_states: list[str] | None = None,
-                      tags: list[str] | None = None) -> list[dict[str, Any]]:
+    def search_by_text(
+        self,
+        query: str,
+        limit: int = 10,
+        score_threshold: float = 0.5,
+        content_types: list[str] | None = None,
+        workflow_states: list[str] | None = None,
+        tags: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
         """Search for similar content by text query."""
         try:
             # Generate embedding for query
@@ -77,9 +81,13 @@ class SimilaritySearch:
             logger.error(f"Search by text failed: {e}")
             return []
 
-    def find_similar_content(self, content_uid: str, limit: int = 5,
-                           score_threshold: float = 0.6,
-                           same_type_only: bool = False) -> list[dict[str, Any]]:
+    def find_similar_content(
+        self,
+        content_uid: str,
+        limit: int = 5,
+        score_threshold: float = 0.6,
+        same_type_only: bool = False,
+    ) -> list[dict[str, Any]]:
         """Find content similar to a given item."""
         try:
             # Get the content object
@@ -125,8 +133,9 @@ class SimilaritySearch:
             logger.error(f"Find similar content failed: {e}")
             return []
 
-    def find_duplicates(self, score_threshold: float = 0.9,
-                       content_types: list[str] | None = None) -> list[list[dict[str, Any]]]:
+    def find_duplicates(
+        self, score_threshold: float = 0.9, content_types: list[str] | None = None
+    ) -> list[list[dict[str, Any]]]:
         """Find potential duplicate content based on similarity."""
         try:
             # Get all content
@@ -152,13 +161,15 @@ class SimilaritySearch:
 
                 if similar:
                     # Create group including the source
-                    group = [{
-                        "uid": uid,
-                        "title": brain.Title,
-                        "path": brain.getPath(),
-                        "url": brain.getURL(),
-                        "score": 1.0  # Self-similarity
-                    }]
+                    group = [
+                        {
+                            "uid": uid,
+                            "title": brain.Title,
+                            "path": brain.getPath(),
+                            "url": brain.getURL(),
+                            "score": 1.0,  # Self-similarity
+                        }
+                    ]
 
                     for item in similar:
                         group.append(item)
@@ -173,8 +184,9 @@ class SimilaritySearch:
             logger.error(f"Find duplicates failed: {e}")
             return []
 
-    def semantic_clustering(self, content_types: list[str] | None = None,
-                          n_clusters: int = 5) -> dict[str, list[dict[str, Any]]]:
+    def semantic_clustering(
+        self, content_types: list[str] | None = None, n_clusters: int = 5
+    ) -> dict[str, list[dict[str, Any]]]:
         """Perform semantic clustering on content."""
         try:
             from sklearn.cluster import KMeans
@@ -229,8 +241,9 @@ class SimilaritySearch:
 
             # Calculate cluster centers and find representative items
             for cluster_name in clusters:
-                cluster_indices = [i for i, l in enumerate(labels)
-                                 if f"cluster_{l}" == cluster_name]
+                cluster_indices = [
+                    i for i, l in enumerate(labels) if f"cluster_{l}" == cluster_name
+                ]
                 cluster_embeddings = X[cluster_indices]
                 center = np.mean(cluster_embeddings, axis=0)
 
@@ -250,13 +263,18 @@ class SimilaritySearch:
             logger.error(f"Semantic clustering failed: {e}")
             return {}
 
-    def get_recommendation_candidates(self, user_id: str, limit: int = 20,
-                                    min_score: float = 0.5) -> list[dict[str, Any]]:
+    def get_recommendation_candidates(
+        self, user_id: str, limit: int = 20, min_score: float = 0.5
+    ) -> list[dict[str, Any]]:
         """Get content recommendations based on user's recent interactions."""
         try:
             # Get user's recent content (viewed, created, or modified)
-            user_content = api.content.find(Creator=user_id, sort_on="modified",
-                                          sort_order="descending", sort_limit=10)
+            user_content = api.content.find(
+                Creator=user_id,
+                sort_on="modified",
+                sort_order="descending",
+                sort_limit=10,
+            )
 
             if not user_content:
                 # Fallback to popular content

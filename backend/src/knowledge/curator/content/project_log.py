@@ -45,8 +45,7 @@ class ProjectLog(Container):
         if not self.entries:
             return []
 
-        return [entry for entry in self.entries
-                if tag in entry.get('tags', [])]
+        return [entry for entry in self.entries if tag in entry.get("tags", [])]
 
     def get_recent_entries(self, limit=10):
         """Get the most recent log entries."""

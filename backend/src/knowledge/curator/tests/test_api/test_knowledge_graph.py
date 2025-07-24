@@ -1,23 +1,72 @@
 """Tests for Knowledge Graph API."""
 
-        response = self.api_session.get('/@knowledge-graph')
+import unittest
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
+from plone.restapi.testing import RelativeSession
+from plone import api
+
+from knowledge.curator.testing import PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
+
+
+class TestKnowledgeGraphAPI(unittest.TestCase):
+    """Test knowledge graph API endpoints."""
+
+    layer = PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
+
+    def setUp(self):
+        """Set up test environment."""
+        self.app = self.layer["app"]
+        self.portal = self.layer["portal"]
+        self.request = self.layer["request"]
+
+        # Set up REST API session
+        self.api_session = RelativeSession(self.portal.absolute_url())
+        self.api_session.headers.update({"Accept": "application/json"})
+        self.api_session.auth = (SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+
+        # Create interconnected test content
+        self.note1 = api.content.create(
+            container=self.portal,
+            type="ResearchNote",
+            title="Machine Learning Basics",
+            tags=["ml", "basics"],
+        )
+
+        self.note2 = api.content.create(
+            container=self.portal,
+            type="ResearchNote",
+            title="Deep Learning Fundamentals",
+            tags=["ml", "deep-learning"],
+        )
+
+        self.goal = api.content.create(
+            container=self.portal,
+            type="LearningGoal",
+            title="Master Machine Learning",
+            tags=["ml", "goal"],
+        )
+
+    def test_get_graph(self):
+        """Test getting the complete knowledge graph."""
+        response = self.api_session.get("/@knowledge-graph")
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        self.assertIn('nodes', data)
-        self.assertIn('edges', data)
-        self.assertIn('count', data)
+        self.assertIn("nodes", data)
+        self.assertIn("edges", data)
+        self.assertIn("count", data)
 
         # Check nodes
-        self.assertEqual(len(data['nodes']), 3)
-        node_titles = [node['title'] for node in data['nodes']]
-        self.assertIn('Machine Learning Basics', node_titles)
-        self.assertIn('Deep Learning Fundamentals', node_titles)
-        self.assertIn('Master Machine Learning', node_titles)
+        self.assertEqual(len(data["nodes"]), 3)
+        node_titles = [node["title"] for node in data["nodes"]]
+        self.assertIn("Machine Learning Basics", node_titles)
+        self.assertIn("Deep Learning Fundamentals", node_titles)
+        self.assertIn("Master Machine Learning", node_titles)
 
         # Check edges
-        self.assertGreater(len(data['edges']), 0)
+        self.assertGreater(len(data["edges"]), 0)
 
         # Verify node structure
         node = data["nodes"][0]
@@ -36,8 +85,8 @@
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        self.assertIn('connections', data)
-        self.assertIn('count', data)
+        self.assertIn("connections", data)
+        self.assertIn("count", data)
 
         # Check connections
         connections = data["connections"]
@@ -73,8 +122,8 @@
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        self.assertIn('suggestions', data)
-        self.assertIn('count', data)
+        self.assertIn("suggestions", data)
+        self.assertIn("count", data)
 
         # Suggestions should be ordered by similarity
         if data["suggestions"]:
@@ -82,19 +131,19 @@
 
     def test_visualize_graph(self):
         """Test graph visualization endpoint."""
-        response = self.api_session.get('/@knowledge-graph/visualize')
+        response = self.api_session.get("/@knowledge-graph/visualize")
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        self.assertIn('graph', data)
-        self.assertIn('visualization', data)
+        self.assertIn("graph", data)
+        self.assertIn("visualization", data)
 
         # Check visualization config
-        viz = data['visualization']
-        self.assertIn('width', viz)
-        self.assertIn('height', viz)
-        self.assertIn('force', viz)
+        viz = data["visualization"]
+        self.assertIn("width", viz)
+        self.assertIn("height", viz)
+        self.assertIn("force", viz)
 
         # Check node colors
         nodes = data["graph"]["nodes"]
@@ -107,7 +156,7 @@
         # Logout
         self.api_session.auth = None
 
-        response = self.api_session.get('/@knowledge-graph')
+        response = self.api_session.get("/@knowledge-graph")
         self.assertEqual(response.status_code, 401)
 
     def test_invalid_endpoint(self):
@@ -132,6 +181,6 @@
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        self.assertEqual(len(data['nodes']), 0)
-        self.assertEqual(len(data['edges']), 0)
-        self.assertEqual(data['count'], 0)
+        self.assertEqual(len(data["nodes"]), 0)
+        self.assertEqual(len(data["edges"]), 0)
+        self.assertEqual(data["count"], 0)

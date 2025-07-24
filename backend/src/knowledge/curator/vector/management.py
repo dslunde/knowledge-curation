@@ -41,8 +41,12 @@ class VectorCollectionManager:
             logger.error(f"Failed to initialize database: {e}")
             return False
 
-    def rebuild_index(self, content_types: list[str] | None = None,
-                     batch_size: int = 100, clear_first: bool = True) -> dict[str, Any]:
+    def rebuild_index(
+        self,
+        content_types: list[str] | None = None,
+        batch_size: int = 100,
+        clear_first: bool = True,
+    ) -> dict[str, Any]:
         """Rebuild the entire vector index."""
         try:
             start_time = datetime.now()
@@ -53,7 +57,12 @@ class VectorCollectionManager:
 
             # Get all relevant content
             if content_types is None:
-                content_types = ["BookmarkPlus", "ResearchNote", "LearningGoal", "ProjectLog"]
+                content_types = [
+                    "BookmarkPlus",
+                    "ResearchNote",
+                    "LearningGoal",
+                    "ProjectLog",
+                ]
 
             query = {
                 "portal_type": content_types,
@@ -98,10 +107,11 @@ class VectorCollectionManager:
                     # Process batch when full
                     if len(batch_documents) >= batch_size:
                         embeddings = self.embeddings.generate_embeddings(
-                            batch_texts,
-                            batch_size=32
+                            batch_texts, batch_size=32
                         )
-                        self.adapter.add_vectors(batch_documents, embeddings, batch_size)
+                        self.adapter.add_vectors(
+                            batch_documents, embeddings, batch_size
+                        )
 
                         processed += len(batch_documents)
                         logger.info(f"Processed {processed}/{total_items} items")
@@ -138,10 +148,7 @@ class VectorCollectionManager:
 
         except Exception as e:
             logger.error(f"Index rebuild failed: {e}")
-            return {
-                "success": False,
-                "error": str(e)
-            }
+            return {"success": False, "error": str(e)}
 
     def update_content_vector(self, content_object) -> bool:
         """Update vector for a single content object."""
@@ -164,11 +171,7 @@ class VectorCollectionManager:
             embedding = self.embeddings.generate_embedding(text)
 
             # Update vector
-            return self.adapter.update_vector(
-                content_object.UID(),
-                embedding,
-                doc
-            )
+            return self.adapter.update_vector(content_object.UID(), embedding, doc)
 
         except Exception as e:
             logger.error(f"Failed to update content vector: {e}")
@@ -308,7 +311,7 @@ class VectorCollectionManager:
                 "points": all_points,
             }
 
-            with open(backup_path, 'w') as f:
+            with open(backup_path, "w") as f:
                 json.dump(backup_data, f)
 
             logger.info(f"Backed up {len(all_points)} vectors to {backup_path}")
@@ -341,7 +344,7 @@ class VectorCollectionManager:
             batch_size = 100
 
             for i in range(0, len(points), batch_size):
-                batch = points[i:i + batch_size]
+                batch = points[i : i + batch_size]
 
                 documents = []
                 embeddings = []

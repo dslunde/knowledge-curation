@@ -1,6 +1,7 @@
 """Views for Learning Goal content type."""
 
 from plone import api
+from Products.Five.browser import BrowserView
 
 
 class LearningGoalView(BrowserView):
@@ -25,11 +26,11 @@ class LearningGoalView(BrowserView):
 
     def get_completed_milestones(self):
         """Get only completed milestones."""
-        return [m for m in self.get_milestones() if m.get('completed', False)]
+        return [m for m in self.get_milestones() if m.get("completed", False)]
 
     def get_pending_milestones(self):
         """Get only pending milestones."""
-        return [m for m in self.get_milestones() if not m.get('completed', False)]
+        return [m for m in self.get_milestones() if not m.get("completed", False)]
 
     def is_overdue(self):
         """Check if the goal is overdue."""
@@ -55,4 +56,4 @@ class LearningGoalView(BrowserView):
             "medium": "priority-medium",
             "high": "priority-high",
         }
-        return priority_map.get(self.context.priority, 'priority-medium')
+        return priority_map.get(self.context.priority, "priority-medium")

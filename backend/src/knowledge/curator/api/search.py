@@ -36,10 +36,10 @@ class SearchService(Service):
 
     def search(self):
         """Perform search based on request data."""
-        data = json.loads(self.request.get('BODY', '{}'))
-        search_type = data.get('type', 'semantic')
+        data = json.loads(self.request.get("BODY", "{}"))
+        search_type = data.get("type", "semantic")
 
-        if search_type == 'semantic':
+        if search_type == "semantic":
             return self._semantic_search(data)
         elif search_type == "similarity":
             return self._similarity_search(data)
@@ -51,14 +51,17 @@ class SearchService(Service):
 
     def _semantic_search(self, data):
         """Perform semantic search using embeddings."""
-        query = data.get('query', '')
-        limit = data.get('limit', 20)
-        portal_types = data.get('portal_types', ['ResearchNote', 'LearningGoal', 'ProjectLog', 'BookmarkPlus'])
-        filters = data.get('filters', {})
+        query = data.get("query", "")
+        limit = data.get("limit", 20)
+        portal_types = data.get(
+            "portal_types",
+            ["ResearchNote", "LearningGoal", "ProjectLog", "BookmarkPlus"],
+        )
+        filters = data.get("filters", {})
 
         if not query:
             self.request.response.setStatus(400)
-            return {'error': 'Query is required'}
+            return {"error": "Query is required"}
 
         # Get AI service
         ai_service = queryUtility(IAIService)
@@ -72,23 +75,27 @@ class SearchService(Service):
             # Fallback to fulltext search
             return self._fulltext_search(data)
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
 
         # Build query
-        catalog_query = {
-            'portal_type': portal_types
-        }
+        catalog_query = {"portal_type": portal_types}
 
         # Add filters
-        if filters.get('review_state'):
-            catalog_query['review_state'] = filters['review_state']
-        if filters.get('tags'):
-            catalog_query['Subject'] = {'query': filters['tags'], 'operator': 'and'}
-        if filters.get('date_range'):
-            if filters['date_range'].get('start'):
-                catalog_query['created'] = {'query': filters['date_range']['start'], 'range': 'min'}
-            if filters['date_range'].get('end'):
-                catalog_query['created'] = {'query': filters['date_range']['end'], 'range': 'max'}
+        if filters.get("review_state"):
+            catalog_query["review_state"] = filters["review_state"]
+        if filters.get("tags"):
+            catalog_query["Subject"] = {"query": filters["tags"], "operator": "and"}
+        if filters.get("date_range"):
+            if filters["date_range"].get("start"):
+                catalog_query["created"] = {
+                    "query": filters["date_range"]["start"],
+                    "range": "min",
+                }
+            if filters["date_range"].get("end"):
+                catalog_query["created"] = {
+                    "query": filters["date_range"]["end"],
+                    "range": "max",
+                }
 
         brains = catalog(**catalog_query)
 
@@ -103,10 +110,7 @@ class SearchService(Service):
                         query_vector, content_vector
                     )
                     if similarity > 0.5:  # Threshold
-                        results.append({
-                            'brain': brain,
-                            'similarity': similarity
-                        })
+                        results.append({"brain": brain, "similarity": similarity})
 
         # Sort by similarity
         results.sort(key=lambda x: x["similarity"], reverse=True)
@@ -138,30 +142,30 @@ class SearchService(Service):
 
     def _similarity_search(self, data):
         """Find similar items to a given item."""
-        uid = data.get('uid')
-        limit = data.get('limit', 10)
-        threshold = data.get('threshold', 0.7)
+        uid = data.get("uid")
+        limit = data.get("limit", 10)
+        threshold = data.get("threshold", 0.7)
 
         if not uid:
             self.request.response.setStatus(400)
-            return {'error': 'UID is required'}
+            return {"error": "UID is required"}
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
         brains = catalog(UID=uid)
 
         if not brains:
             self.request.response.setStatus(404)
-            return {'error': 'Item not found'}
+            return {"error": "Item not found"}
 
         source_obj = brains[0].getObject()
 
-        if not hasattr(source_obj, 'embedding_vector'):
-            return {'items': [], 'message': 'No embedding vector available'}
+        if not hasattr(source_obj, "embedding_vector"):
+            return {"items": [], "message": "No embedding vector available"}
 
-        source_vector = getattr(source_obj, 'embedding_vector', [])
+        source_vector = getattr(source_obj, "embedding_vector", [])
 
         if not source_vector:
-            return {'items': [], 'message': 'No embedding vector available'}
+            return {"items": [], "message": "No embedding vector available"}
 
         # Search for similar items
         all_brains = catalog(
@@ -180,10 +184,7 @@ class SearchService(Service):
                 if other_vector:
                     similarity = self._calculate_similarity(source_vector, other_vector)
                     if similarity >= threshold:
-                        results.append({
-                            'brain': brain,
-                            'similarity': similarity
-                        })
+                        results.append({"brain": brain, "similarity": similarity})
 
         # Sort by similarity
         results.sort(key=lambda x: x["similarity"], reverse=True)
@@ -213,16 +214,19 @@ class SearchService(Service):
 
     def _fulltext_search(self, data):
         """Perform traditional fulltext search."""
-        query = data.get('query', '')
-        limit = data.get('limit', 20)
-        portal_types = data.get('portal_types', ['ResearchNote', 'LearningGoal', 'ProjectLog', 'BookmarkPlus'])
-        filters = data.get('filters', {})
+        query = data.get("query", "")
+        limit = data.get("limit", 20)
+        portal_types = data.get(
+            "portal_types",
+            ["ResearchNote", "LearningGoal", "ProjectLog", "BookmarkPlus"],
+        )
+        filters = data.get("filters", {})
 
         if not query:
             self.request.response.setStatus(400)
-            return {'error': 'Query is required'}
+            return {"error": "Query is required"}
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
 
         # Build query
         catalog_query = {
@@ -234,15 +238,21 @@ class SearchService(Service):
         }
 
         # Add filters
-        if filters.get('review_state'):
-            catalog_query['review_state'] = filters['review_state']
-        if filters.get('tags'):
-            catalog_query['Subject'] = {'query': filters['tags'], 'operator': 'and'}
-        if filters.get('date_range'):
-            if filters['date_range'].get('start'):
-                catalog_query['created'] = {'query': filters['date_range']['start'], 'range': 'min'}
-            if filters['date_range'].get('end'):
-                catalog_query['created'] = {'query': filters['date_range']['end'], 'range': 'max'}
+        if filters.get("review_state"):
+            catalog_query["review_state"] = filters["review_state"]
+        if filters.get("tags"):
+            catalog_query["Subject"] = {"query": filters["tags"], "operator": "and"}
+        if filters.get("date_range"):
+            if filters["date_range"].get("start"):
+                catalog_query["created"] = {
+                    "query": filters["date_range"]["start"],
+                    "range": "min",
+                }
+            if filters["date_range"].get("end"):
+                catalog_query["created"] = {
+                    "query": filters["date_range"]["end"],
+                    "range": "max",
+                }
 
         brains = catalog(**catalog_query)
 
@@ -272,10 +282,10 @@ class SearchService(Service):
         """Find similar items to the current context."""
         if not api.user.has_permission("View", obj=self.context):
             self.request.response.setStatus(403)
-            return {'error': 'Unauthorized'}
+            return {"error": "Unauthorized"}
 
-        limit = int(self.request.get('limit', 10))
-        threshold = float(self.request.get('threshold', 0.7))
+        limit = int(self.request.get("limit", 10))
+        threshold = float(self.request.get("threshold", 0.7))
 
         return self._similarity_search({
             "uid": api.content.get_uuid(self.context),
@@ -285,17 +295,18 @@ class SearchService(Service):
 
     def semantic_search(self):
         """Perform semantic search from GET parameters."""
-        query = self.request.get('q', '')
-        limit = int(self.request.get('limit', 20))
-        portal_types = self.request.get('types', '').split(',') if self.request.get('types') else None
+        query = self.request.get("q", "")
+        limit = int(self.request.get("limit", 20))
+        portal_types = (
+            self.request.get("types", "").split(",")
+            if self.request.get("types")
+            else None
+        )
 
-        data = {
-            'query': query,
-            'limit': limit
-        }
+        data = {"query": query, "limit": limit}
 
         if portal_types:
-            data['portal_types'] = [pt.strip() for pt in portal_types if pt.strip()]
+            data["portal_types"] = [pt.strip() for pt in portal_types if pt.strip()]
 
         return self._semantic_search(data)
 

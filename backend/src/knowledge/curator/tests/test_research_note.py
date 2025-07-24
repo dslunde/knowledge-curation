@@ -39,8 +39,7 @@ class ResearchNoteIntegrationTest(unittest.TestCase):
         factory = fti.factory
         obj = createObject(factory)
         self.assertTrue(
-            IResearchNote.providedBy(obj),
-            f'IResearchNote not provided by {obj}'
+            IResearchNote.providedBy(obj), f"IResearchNote not provided by {obj}"
         )
 
     def test_ct_research_note_adding(self):
@@ -54,8 +53,7 @@ class ResearchNoteIntegrationTest(unittest.TestCase):
             description="A test research note",
         )
         self.assertTrue(
-            IResearchNote.providedBy(obj),
-            f'IResearchNote not provided by {obj.id}'
+            IResearchNote.providedBy(obj), f"IResearchNote not provided by {obj.id}"
         )
         # Check that all fields are accessible
         self.assertEqual(obj.title, "Test Research Note")
@@ -87,9 +85,9 @@ class ResearchNoteIntegrationTest(unittest.TestCase):
         self.assertIn("uid-1", obj.get_connections())
         obj.add_connection("uid-2")
         self.assertEqual(len(obj.get_connections()), 2)
-        obj.remove_connection('uid-1')
-        self.assertNotIn('uid-1', obj.get_connections())
+        obj.remove_connection("uid-1")
+        self.assertNotIn("uid-1", obj.get_connections())
 
         # Test insight methods
-        obj.add_insight('Important insight')
-        self.assertIn('Important insight', obj.key_insights)
+        obj.add_insight("Important insight")
+        self.assertIn("Important insight", obj.key_insights)

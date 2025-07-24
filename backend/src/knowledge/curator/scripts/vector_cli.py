@@ -156,9 +156,7 @@ def main():
         description="Vector database management for Plone Knowledge System"
     )
     parser.add_argument(
-        "--site-id",
-        default="Plone",
-        help="Plone site ID (default: Plone)"
+        "--site-id", default="Plone", help="Plone site ID (default: Plone)"
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Commands")

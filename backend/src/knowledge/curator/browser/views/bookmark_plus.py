@@ -18,7 +18,7 @@ class BookmarkPlusView(BrowserView):
             "reading": "bookmark-reading",
             "read": "bookmark-read",
         }
-        return status_map.get(self.context.read_status, 'bookmark-unread')
+        return status_map.get(self.context.read_status, "bookmark-unread")
 
     def get_importance_class(self):
         """Get CSS class based on importance."""
@@ -28,7 +28,7 @@ class BookmarkPlusView(BrowserView):
             "high": "importance-high",
             "critical": "importance-critical",
         }
-        return importance_map.get(self.context.importance, 'importance-medium')
+        return importance_map.get(self.context.importance, "importance-medium")
 
     def is_high_priority(self):
         """Check if this is a high priority bookmark."""

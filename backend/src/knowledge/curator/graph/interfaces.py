@@ -21,8 +21,8 @@ class IGraphStorage(Interface):
     def query_relationships(relationship_type=None, source_uid=None, target_uid=None):
         """Query relationships by type and endpoints."""
 
-    def export_graph(format='json'):
+    def export_graph(format="json"):
         """Export graph to various formats."""
 
-    def import_graph(data, format='json', merge=True):
+    def import_graph(data, format="json", merge=True):
         """Import graph from various formats."""

@@ -1,7 +1,23 @@
 """Graph algorithms for analysis and traversal."""
 
-    def shortest_path(self, start_uid: str, end_uid: str,
-                     relationship_types: list[str] | None = None) -> list[str] | None:
+import heapq
+from collections import deque
+from typing import Any
+
+from .model import Graph
+from .relationships import RelationshipType
+
+
+class GraphAlgorithms:
+    """Graph algorithms for knowledge network analysis."""
+
+    def __init__(self, graph: Graph):
+        """Initialize with a graph instance."""
+        self.graph = graph
+
+    def shortest_path(
+        self, start_uid: str, end_uid: str, relationship_types: list[str] | None = None
+    ) -> list[str] | None:
         """Find shortest path between two nodes using Dijkstra's algorithm.
 
         Args:
@@ -54,7 +70,9 @@
                 neighbor_uid = edge.target_uid
                 if neighbor_uid not in visited:
                     # Use inverse of weight as distance (higher weight = shorter distance)
-                    distance = current_dist + (1.0 / edge.weight if edge.weight > 0 else float('inf'))
+                    distance = current_dist + (
+                        1.0 / edge.weight if edge.weight > 0 else float("inf")
+                    )
 
                     if distance < distances[neighbor_uid]:
                         distances[neighbor_uid] = distance
@@ -63,7 +81,9 @@
 
         return None
 
-    def all_paths(self, start_uid: str, end_uid: str, max_length: int = 5) -> list[list[str]]:
+    def all_paths(
+        self, start_uid: str, end_uid: str, max_length: int = 5
+    ) -> list[list[str]]:
         """Find all paths between two nodes up to a maximum length.
 
         Args:
@@ -205,8 +225,12 @@
 
         return centrality
 
-    def pagerank(self, damping_factor: float = 0.85, max_iterations: int = 100,
-                tolerance: float = 1e-6) -> dict[str, float]:
+    def pagerank(
+        self,
+        damping_factor: float = 0.85,
+        max_iterations: int = 100,
+        tolerance: float = 1e-6,
+    ) -> dict[str, float]:
         """Calculate PageRank scores for all nodes.
 
         Args:
@@ -342,7 +366,9 @@
 
         return clusters
 
-    def find_knowledge_gaps(self, min_importance: float = 0.5) -> list[tuple[str, str, float]]:
+    def find_knowledge_gaps(
+        self, min_importance: float = 0.5
+    ) -> list[tuple[str, str, float]]:
         """Find potential missing connections (knowledge gaps).
 
         Args:
@@ -385,9 +411,10 @@
                 # Calculate gap score
                 if common_neighbors > 0 and path_distance > 2:
                     gap_score = (
-                        (node1_importance + node2_importance) / 2 *
-                        (common_neighbors / 10) *
-                        (1 / path_distance)
+                        (node1_importance + node2_importance)
+                        / 2
+                        * (common_neighbors / 10)
+                        * (1 / path_distance)
                     )
 
                     if gap_score >= min_importance:
@@ -398,7 +425,9 @@
 
         return gaps
 
-    def calculate_knowledge_density(self, subgraph_nodes: set[str] | None = None) -> float:
+    def calculate_knowledge_density(
+        self, subgraph_nodes: set[str] | None = None
+    ) -> float:
         """Calculate knowledge density of the graph or subgraph.
 
         Args:
@@ -455,9 +484,7 @@
 
         # Sort and return top N
         sorted_concepts = sorted(
-            combined_scores.items(),
-            key=lambda x: x[1],
-            reverse=True
+            combined_scores.items(), key=lambda x: x[1], reverse=True
         )
 
         return sorted_concepts[:top_n]
@@ -500,6 +527,6 @@
                 "incoming": incoming,
                 "total": outgoing + incoming,
             },
-            'community': communities.get(uid, -1),
-            'node_info': self.graph.get_node(uid).to_dict()
+            "community": communities.get(uid, -1),
+            "node_info": self.graph.get_node(uid).to_dict(),
         }

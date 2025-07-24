@@ -11,9 +11,6 @@ from zope.publisher.interfaces import IPublishTraverse
 
 import json
 import math
-from persistent.mapping import PersistentMapping
-from persistent.list import PersistentList
-
 
 
 @implementer(IPublishTraverse)
@@ -99,7 +96,7 @@ class SpacedRepetitionService(Service):
                 })
 
         # Sort by urgency (retention score)
-        review_items.sort(key=lambda x: x['sr_data']['retention_score'])
+        review_items.sort(key=lambda x: x["sr_data"]["retention_score"])
 
         # Limit to reasonable number per session
         limit = int(self.request.get("limit", 20))
@@ -122,25 +119,25 @@ class SpacedRepetitionService(Service):
         quality = data.get("quality")  # 0-5 scale (SM-2 algorithm)
         time_spent = data.get("time_spent", 0)  # seconds
 
-        data = json.loads(self.request.get('BODY', '{}'))
-        uid = data.get('uid')
-        quality = data.get('quality')  # 0-5 scale (SM-2 algorithm)
-        time_spent = data.get('time_spent', 0)  # seconds
+        data = json.loads(self.request.get("BODY", "{}"))
+        uid = data.get("uid")
+        quality = data.get("quality")  # 0-5 scale (SM-2 algorithm)
+        time_spent = data.get("time_spent", 0)  # seconds
 
         if not uid:
             self.request.response.setStatus(400)
-            return {'error': 'UID required'}
+            return {"error": "UID required"}
 
         if quality is None or quality < 0 or quality > 5:
             self.request.response.setStatus(400)
-            return {'error': 'Quality must be between 0 and 5'}
+            return {"error": "Quality must be between 0 and 5"}
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
         brains = catalog(UID=uid)
 
         if not brains:
             self.request.response.setStatus(404)
-            return {'error': 'Item not found'}
+            return {"error": "Item not found"}
 
         obj = brains[0].getObject()
 
@@ -148,9 +145,9 @@ class SpacedRepetitionService(Service):
         sr_data = self._get_sr_data(obj)
 
         # Apply SM-2 algorithm
-        ease_factor = sr_data.get('ease_factor', 2.5)
-        interval = sr_data.get('interval', 1)
-        repetitions = sr_data.get('repetitions', 0)
+        ease_factor = sr_data.get("ease_factor", 2.5)
+        interval = sr_data.get("interval", 1)
+        repetitions = sr_data.get("repetitions", 0)
 
         if quality >= 3:  # Successful recall
             if repetitions == 0:
@@ -175,28 +172,28 @@ class SpacedRepetitionService(Service):
         now = datetime.now()
         next_review = now + timedelta(days=interval)
 
-        sr_data['quality'] = quality
-        sr_data['ease_factor'] = ease_factor
-        sr_data['interval'] = interval
-        sr_data['repetitions'] = repetitions
-        sr_data['last_review'] = now
-        sr_data['next_review'] = next_review
-        sr_data['time_spent'] = time_spent
+        sr_data["quality"] = quality
+        sr_data["ease_factor"] = ease_factor
+        sr_data["interval"] = interval
+        sr_data["repetitions"] = repetitions
+        sr_data["last_review"] = now
+        sr_data["next_review"] = next_review
+        sr_data["time_spent"] = time_spent
 
         # Add to history
-        if 'history' not in sr_data:
-            sr_data['history'] = PersistentList()
+        if "history" not in sr_data:
+            sr_data["history"] = PersistentList()
 
-        sr_data['history'].append({
-            'date': now.isoformat(),
-            'quality': quality,
-            'interval': interval,
-            'time_spent': time_spent
+        sr_data["history"].append({
+            "date": now.isoformat(),
+            "quality": quality,
+            "interval": interval,
+            "time_spent": time_spent,
         })
 
         # Keep only last 50 history entries
-        if len(sr_data['history']) > 50:
-            sr_data['history'] = PersistentList(sr_data['history'][-50:])
+        if len(sr_data["history"]) > 50:
+            sr_data["history"] = PersistentList(sr_data["history"][-50:])
 
         # Save SR data
         self._set_sr_data(obj, sr_data)
@@ -236,8 +233,8 @@ class SpacedRepetitionService(Service):
             obj = brain.getObject()
             sr_data = self._get_sr_data(obj)
 
-            if sr_data.get('next_review'):
-                review_date = sr_data['next_review'].date()
+            if sr_data.get("next_review"):
+                review_date = sr_data["next_review"].date()
                 date_key = review_date.isoformat()
 
                 if date_key not in schedule:
@@ -247,20 +244,22 @@ class SpacedRepetitionService(Service):
                         "overdue": review_date < today,
                     }
 
-                schedule[date_key]['items'].append({
-                    'uid': brain.UID,
-                    'title': brain.Title,
-                    'type': brain.portal_type,
-                    'interval': sr_data.get('interval', 1),
-                    'repetitions': sr_data.get('repetitions', 0)
+                schedule[date_key]["items"].append({
+                    "uid": brain.UID,
+                    "title": brain.Title,
+                    "type": brain.portal_type,
+                    "interval": sr_data.get("interval", 1),
+                    "repetitions": sr_data.get("repetitions", 0),
                 })
 
         # Convert to sorted list
-        schedule_list = sorted(schedule.values(), key=lambda x: x['date'])
+        schedule_list = sorted(schedule.values(), key=lambda x: x["date"])
 
         # Calculate statistics
-        total_scheduled = sum(len(day['items']) for day in schedule_list)
-        overdue_count = sum(len(day['items']) for day in schedule_list if day['overdue'])
+        total_scheduled = sum(len(day["items"]) for day in schedule_list)
+        overdue_count = sum(
+            len(day["items"]) for day in schedule_list if day["overdue"]
+        )
 
         # Next 7 days forecast
         forecast = []
@@ -321,27 +320,27 @@ class SpacedRepetitionService(Service):
             obj = brain.getObject()
             sr_data = self._get_sr_data(obj)
 
-            if sr_data.get('repetitions', 0) > 0:
-                stats['items_in_system'] += 1
+            if sr_data.get("repetitions", 0) > 0:
+                stats["items_in_system"] += 1
 
-                if sr_data.get('interval', 0) > 21:
-                    stats['mature_items'] += 1
+                if sr_data.get("interval", 0) > 21:
+                    stats["mature_items"] += 1
 
                 # Process history
-                for entry in sr_data.get('history', []):
-                    entry_date = datetime.fromisoformat(entry['date'])
+                for entry in sr_data.get("history", []):
+                    entry_date = datetime.fromisoformat(entry["date"])
 
                     if entry_date >= start_date:
-                        stats['total_reviews'] += 1
-                        quality = entry['quality']
+                        stats["total_reviews"] += 1
+                        quality = entry["quality"]
 
                         if quality >= 3:
                             stats["successful_reviews"] += 1
                         else:
-                            stats['failed_reviews'] += 1
+                            stats["failed_reviews"] += 1
 
                         total_quality += quality
-                        total_time += entry.get('time_spent', 0)
+                        total_time += entry.get("time_spent", 0)
 
                         # Daily aggregation
                         date_key = entry_date.date().isoformat()
@@ -352,13 +351,15 @@ class SpacedRepetitionService(Service):
                                 "time_spent": 0,
                             }
 
-                        stats['daily_stats'][date_key]['reviews'] += 1
+                        stats["daily_stats"][date_key]["reviews"] += 1
                         if quality >= 3:
-                            stats['daily_stats'][date_key]['successful'] += 1
-                        stats['daily_stats'][date_key]['time_spent'] += entry.get('time_spent', 0)
+                            stats["daily_stats"][date_key]["successful"] += 1
+                        stats["daily_stats"][date_key]["time_spent"] += entry.get(
+                            "time_spent", 0
+                        )
 
                         # Quality distribution
-                        stats['quality_distribution'][quality] += 1
+                        stats["quality_distribution"][quality] += 1
 
         # Calculate averages
         if stats["total_reviews"] > 0:
@@ -368,7 +369,7 @@ class SpacedRepetitionService(Service):
                 stats["successful_reviews"] / stats["total_reviews"] * 100, 1
             )
         else:
-            stats['success_rate'] = 0
+            stats["success_rate"] = 0
 
         # Convert daily stats to list
         daily_list = []
@@ -383,12 +384,9 @@ class SpacedRepetitionService(Service):
                 "time_spent": data["time_spent"],
             })
 
-        stats['daily_stats'] = daily_list
+        stats["daily_stats"] = daily_list
 
-        return {
-            'period_days': days,
-            'statistics': stats
-        }
+        return {"period_days": days, "statistics": stats}
 
     def get_settings(self):
         """Get user's spaced repetition settings."""
@@ -400,7 +398,7 @@ class SpacedRepetitionService(Service):
         member = api.user.get(user.getId())
 
         # Get or create settings
-        settings = member.getProperty('sr_settings', {})
+        settings = member.getProperty("sr_settings", {})
 
         if not settings:
             # Default settings
@@ -424,24 +422,27 @@ class SpacedRepetitionService(Service):
 
         data = json.loads(self.request.get("BODY", "{}"))
 
-        if 'daily_review_limit' in settings:
-            settings['daily_review_limit'] = max(1, min(100, int(settings['daily_review_limit'])))
+        if "daily_review_limit" in settings:
+            settings["daily_review_limit"] = max(
+                1, min(100, int(settings["daily_review_limit"]))
+            )
 
-        if 'new_items_per_day' in settings:
-            settings['new_items_per_day'] = max(0, min(50, int(settings['new_items_per_day'])))
+        if "new_items_per_day" in settings:
+            settings["new_items_per_day"] = max(
+                0, min(50, int(settings["new_items_per_day"]))
+            )
 
-        if 'minimum_ease_factor' in settings:
-            settings['minimum_ease_factor'] = max(1.0, min(3.0, float(settings['minimum_ease_factor'])))
+        if "minimum_ease_factor" in settings:
+            settings["minimum_ease_factor"] = max(
+                1.0, min(3.0, float(settings["minimum_ease_factor"]))
+            )
 
         # Save settings
         user = api.user.get_current()
         member = api.user.get(user.getId())
-        member.setMemberProperties(mapping={'sr_settings': settings})
+        member.setMemberProperties(mapping={"sr_settings": settings})
 
-        return {
-            'success': True,
-            'settings': settings
-        }
+        return {"success": True, "settings": settings}
 
     def _get_sr_data(self, obj):
         """Get spaced repetition data for an object."""
@@ -458,15 +459,15 @@ class SpacedRepetitionService(Service):
         if not sr_data.get("next_review"):
             return True  # New item
 
-        return sr_data['next_review'] <= now
+        return sr_data["next_review"] <= now
 
     def _calculate_retention(self, sr_data, now):
         """Calculate retention score based on forgetting curve."""
         if not sr_data.get("last_review"):
             return 0.0
 
-        days_since = (now - sr_data['last_review']).days
-        interval = sr_data.get('interval', 1)
+        days_since = (now - sr_data["last_review"]).days
+        interval = sr_data.get("interval", 1)
 
         # Forgetting curve: R = e^(-t/S)
         retention = math.exp(-days_since / (interval * 5))
@@ -480,8 +481,8 @@ class SpacedRepetitionService(Service):
             obj = brain.getObject()
             sr_data = self._get_sr_data(obj)
 
-            if sr_data.get('next_review'):
-                if next_date is None or sr_data['next_review'] < next_date:
-                    next_date = sr_data['next_review']
+            if sr_data.get("next_review"):
+                if next_date is None or sr_data["next_review"] < next_date:
+                    next_date = sr_data["next_review"]
 
         return next_date.isoformat() if next_date else None

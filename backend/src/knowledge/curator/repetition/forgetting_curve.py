@@ -7,7 +7,54 @@ from datetime import datetime
 from datetime import timedelta
 
 import math
-        days_ahead: int = None
+
+# Default retention threshold (90%)
+DEFAULT_RETENTION_THRESHOLD = 0.9
+
+
+class ForgettingCurve:
+    """Forgetting curve calculations and analysis."""
+
+    @classmethod
+    def calculate_retention(
+        cls,
+        days_elapsed: int,
+        interval: int = 1,
+        ease_factor: float = 2.5,
+        repetitions: int = 0,
+    ) -> float:
+        """Calculate retention based on forgetting curve."""
+        if days_elapsed <= 0:
+            return 1.0
+
+        # Calculate stability factor based on spaced repetition algorithm
+        stability = cls._calculate_stability(interval, ease_factor, repetitions)
+
+        # Exponential decay: R(t) = e^(-t/S)
+        retention = math.exp(-days_elapsed / stability)
+
+        return max(0.0, min(1.0, retention))
+
+    @classmethod
+    def _calculate_stability(
+        cls, interval: int, ease_factor: float, repetitions: int
+    ) -> float:
+        """Calculate memory stability based on spaced repetition factors."""
+        # Base stability increases with repetitions and ease factor
+        base_stability = max(1.0, interval * ease_factor)
+
+        # Additional stability from repetitions
+        repetition_factor = 1 + (repetitions * 0.1)
+
+        return base_stability * repetition_factor
+
+    @classmethod
+    def generate_curve_data(
+        cls,
+        interval: int = 1,
+        ease_factor: float = 2.5,
+        repetitions: int = 0,
+        days_ahead: int = None,
     ) -> list[dict[str, float]]:
         """
         Generate forgetting curve data points for visualization.
@@ -68,9 +115,7 @@ import math
 
     @classmethod
     def get_retention_alerts(
-        cls,
-        items: list[dict],
-        threshold: float = DEFAULT_RETENTION_THRESHOLD
+        cls, items: list[dict], threshold: float = DEFAULT_RETENTION_THRESHOLD
     ) -> list[dict]:
         """
         Get alerts for items at risk of being forgotten.
@@ -86,10 +131,10 @@ import math
         now = datetime.now()
 
         for item in items:
-            sr_data = item.get('sr_data', {})
+            sr_data = item.get("sr_data", {})
 
-            if sr_data.get('last_review'):
-                last_review = sr_data['last_review']
+            if sr_data.get("last_review"):
+                last_review = sr_data["last_review"]
                 if isinstance(last_review, str):
                     last_review = datetime.fromisoformat(last_review)
 
@@ -111,7 +156,7 @@ import math
                     })
 
         # Sort by retention (lowest first)
-        alerts.sort(key=lambda x: x['retention'])
+        alerts.sort(key=lambda x: x["retention"])
 
         return alerts
 
@@ -125,13 +170,10 @@ import math
         elif retention >= 0.2:
             return "high"
         else:
-            return 'critical'
+            return "critical"
 
     @classmethod
-    def analyze_learning_efficiency(
-        cls,
-        review_history: list[dict]
-    ) -> dict[str, any]:
+    def analyze_learning_efficiency(cls, review_history: list[dict]) -> dict[str, any]:
         """
         Analyze learning efficiency based on review history.
 
@@ -150,7 +192,7 @@ import math
             }
 
         total_reviews = len(review_history)
-        successful_reviews = sum(1 for r in review_history if r.get('quality', 0) >= 3)
+        successful_reviews = sum(1 for r in review_history if r.get("quality", 0) >= 3)
 
         # Calculate average retention at review time
         retention_values = []
@@ -170,7 +212,9 @@ import math
                 )
                 retention_values.append(retention)
 
-        avg_retention = sum(retention_values) / len(retention_values) if retention_values else 0
+        avg_retention = (
+            sum(retention_values) / len(retention_values) if retention_values else 0
+        )
 
         # Calculate efficiency score
         success_rate = successful_reviews / total_reviews if total_reviews > 0 else 0
@@ -184,15 +228,21 @@ import math
                 "Review items more frequently to maintain better retention"
             )
         elif avg_retention > 0.95:
-            recommendations.append("You might be reviewing too frequently - consider longer intervals")
+            recommendations.append(
+                "You might be reviewing too frequently - consider longer intervals"
+            )
 
         if success_rate < 0.8:
-            recommendations.append("Focus on understanding before moving to longer intervals")
+            recommendations.append(
+                "Focus on understanding before moving to longer intervals"
+            )
 
         # Check interval progression
         intervals = [r.get("interval", 1) for r in review_history]
         if len(intervals) > 3 and all(i <= 7 for i in intervals[-3:]):
-            recommendations.append("Your intervals aren't increasing - ensure quality responses")
+            recommendations.append(
+                "Your intervals aren't increasing - ensure quality responses"
+            )
 
         return {
             "efficiency_score": round(efficiency_score, 1),
@@ -205,9 +255,7 @@ import math
 
     @classmethod
     def predict_workload(
-        cls,
-        items: list[dict],
-        days_ahead: int = 30
+        cls, items: list[dict], days_ahead: int = 30
     ) -> list[dict[str, any]]:
         """
         Predict review workload for upcoming days.
@@ -223,10 +271,10 @@ import math
         today = datetime.now().date()
 
         for item in items:
-            sr_data = item.get('sr_data', {})
+            sr_data = item.get("sr_data", {})
 
-            if sr_data.get('next_review'):
-                next_review = sr_data['next_review']
+            if sr_data.get("next_review"):
+                next_review = sr_data["next_review"]
                 if isinstance(next_review, str):
                     next_review = datetime.fromisoformat(next_review).date()
                 elif isinstance(next_review, datetime):
@@ -237,17 +285,13 @@ import math
                 if 0 <= days_until <= days_ahead:
                     date_str = next_review.isoformat()
                     if date_str not in workload:
-                        workload[date_str] = {
-                            'date': date_str,
-                            'count': 0,
-                            'items': []
-                        }
+                        workload[date_str] = {"date": date_str, "count": 0, "items": []}
 
-                    workload[date_str]['count'] += 1
-                    workload[date_str]['items'].append({
-                        'title': item.get('title', 'Unknown'),
-                        'type': item.get('type', 'Unknown'),
-                        'interval': sr_data.get('interval', 1)
+                    workload[date_str]["count"] += 1
+                    workload[date_str]["items"].append({
+                        "title": item.get("title", "Unknown"),
+                        "type": item.get("type", "Unknown"),
+                        "interval": sr_data.get("interval", 1),
                     })
 
         # Fill in missing days
@@ -255,30 +299,24 @@ import math
             date = today + timedelta(days=day)
             date_str = date.isoformat()
             if date_str not in workload:
-                workload[date_str] = {
-                    'date': date_str,
-                    'count': 0,
-                    'items': []
-                }
+                workload[date_str] = {"date": date_str, "count": 0, "items": []}
 
         # Convert to sorted list
-        workload_list = sorted(workload.values(), key=lambda x: x['date'])
+        workload_list = sorted(workload.values(), key=lambda x: x["date"])
 
         # Add cumulative and average metrics
         total_items = sum(day["count"] for day in workload_list)
         avg_per_day = total_items / len(workload_list) if workload_list else 0
 
         for i, day in enumerate(workload_list):
-            day['cumulative'] = sum(d['count'] for d in workload_list[:i+1])
-            day['is_above_average'] = day['count'] > avg_per_day
+            day["cumulative"] = sum(d["count"] for d in workload_list[: i + 1])
+            day["is_above_average"] = day["count"] > avg_per_day
 
         return workload_list
 
     @classmethod
     def generate_retention_heatmap(
-        cls,
-        items: list[dict],
-        days: int = 30
+        cls, items: list[dict], days: int = 30
     ) -> dict[str, list[float]]:
         """
         Generate retention heatmap data for visualization.
@@ -293,8 +331,8 @@ import math
         heatmap_data = {}
 
         for item in items:
-            sr_data = item.get('sr_data', {})
-            item_id = item.get('uid', item.get('title', 'Unknown'))
+            sr_data = item.get("sr_data", {})
+            item_id = item.get("uid", item.get("title", "Unknown"))
 
             retention_values = []
             for day in range(days):

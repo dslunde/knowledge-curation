@@ -17,11 +17,7 @@ class ProjectLogView(BrowserView):
     def get_all_entries(self):
         """Get all log entries sorted by date."""
         entries = self.context.entries or []
-        return sorted(
-            entries,
-            key=lambda x: x.get('timestamp', ''),
-            reverse=True
-        )
+        return sorted(entries, key=lambda x: x.get("timestamp", ""), reverse=True)
 
     def get_entries_by_tag(self, tag):
         """Get entries filtered by tag."""
@@ -43,7 +39,7 @@ class ProjectLogView(BrowserView):
             "completed": "status-completed",
             "archived": "status-archived",
         }
-        return status_map.get(self.context.status, 'status-planning')
+        return status_map.get(self.context.status, "status-planning")
 
     def get_duration_days(self):
         """Get project duration in days."""

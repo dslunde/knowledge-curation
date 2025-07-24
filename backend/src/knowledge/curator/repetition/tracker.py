@@ -1,9 +1,19 @@
 """Performance Tracking for Spaced Repetition System."""
 
-        cls,
-        review_history: list[dict],
-        time_period: int | None = None
-    ) -> dict[str, any]:
+from datetime import datetime
+from datetime import timedelta
+from typing import Any
+from collections import defaultdict
+import statistics
+
+
+class PerformanceTracker:
+    """Track and analyze spaced repetition performance."""
+
+    @classmethod
+    def calculate_metrics(
+        cls, review_history: list[dict], time_period: int | None = None
+    ) -> dict[str, Any]:
         """
         Calculate comprehensive performance metrics.
 
@@ -37,7 +47,7 @@
         successful_reviews = sum(1 for q in qualities if q >= 3)
 
         # Time-based metrics
-        time_spent = sum(r.get('time_spent', 60) for r in filtered_history)
+        time_spent = sum(r.get("time_spent", 60) for r in filtered_history)
 
         # Calculate streaks
         current_streak, longest_streak = cls._calculate_streaks(filtered_history)
@@ -102,7 +112,7 @@
             return 0, 0
 
         # Sort by date
-        sorted_history = sorted(history, key=lambda x: x['date'])
+        sorted_history = sorted(history, key=lambda x: x["date"])
 
         current_streak = 0
         longest_streak = 0
@@ -125,7 +135,11 @@
     def _calculate_learning_velocity(cls, history: list[dict]) -> dict[str, float]:
         """Calculate how fast the user is learning new material."""
         if not history:
-            return {'items_per_week': 0, 'mastery_rate': 0, 'average_interval_growth': 0}
+            return {
+                "items_per_week": 0,
+                "mastery_rate": 0,
+                "average_interval_growth": 0,
+            }
 
         # Group by item
         items_data = defaultdict(list)
@@ -193,8 +207,8 @@
 
         for item_id, reviews in items_data.items():
             if reviews:
-                latest_ef = reviews[-1].get('ease_factor', 2.5)
-                qualities = [r['quality'] for r in reviews]
+                latest_ef = reviews[-1].get("ease_factor", 2.5)
+                qualities = [r["quality"] for r in reviews]
 
                 # Categorize by difficulty
                 if latest_ef < 1.5:
@@ -204,7 +218,7 @@
                 elif latest_ef < 2.3:
                     difficulty_groups["medium"].append(item_id)
                 else:
-                    difficulty_groups['easy'].append(item_id)
+                    difficulty_groups["easy"].append(item_id)
 
                 # Check for struggling pattern
                 if len(reviews) >= 3:
@@ -233,10 +247,10 @@
         for review in history:
             review_time = datetime.fromisoformat(review["date"])
             hour = review_time.hour
-            day = review_time.strftime('%A')
+            day = review_time.strftime("%A")
 
-            hour_performance[hour].append(review['quality'])
-            day_performance[day].append(review['quality'])
+            hour_performance[hour].append(review["quality"])
+            day_performance[day].append(review["quality"])
 
         # Calculate averages
         best_hours = []
@@ -248,7 +262,7 @@
                     "reviews": len(qualities),
                 })
 
-        best_hours.sort(key=lambda x: x['average_quality'], reverse=True)
+        best_hours.sort(key=lambda x: x["average_quality"], reverse=True)
 
         best_days = []
         for day, qualities in day_performance.items():
@@ -259,7 +273,7 @@
                     "reviews": len(qualities),
                 })
 
-        best_days.sort(key=lambda x: x['average_quality'], reverse=True)
+        best_days.sort(key=lambda x: x["average_quality"], reverse=True)
 
         return {
             "best_hours": best_hours[:3],
@@ -298,7 +312,7 @@
             return {}
 
         # Sort by date
-        sorted_history = sorted(history, key=lambda x: x['date'])
+        sorted_history = sorted(history, key=lambda x: x["date"])
 
         # Calculate moving averages
         window_size = 10
@@ -365,7 +379,7 @@
                     "description": f"Completed {milestone} reviews",
                 })
 
-        return sorted(milestones, key=lambda x: x['date'])
+        return sorted(milestones, key=lambda x: x["date"])
 
     @classmethod
     def _calculate_quality_distribution(cls, qualities: list[int]) -> dict[int, float]:
@@ -378,16 +392,11 @@
             distribution[q] += 1
 
         total = len(qualities)
-        return {
-            i: round(distribution[i] / total * 100, 1)
-            for i in range(6)
-        }
+        return {i: round(distribution[i] / total * 100, 1) for i in range(6)}
 
     @classmethod
     def generate_performance_report(
-        cls,
-        user_data: dict,
-        time_period: int = 30
+        cls, user_data: dict, time_period: int = 30
     ) -> dict[str, any]:
         """
         Generate a comprehensive performance report.
@@ -433,16 +442,20 @@
         """Generate insights from metrics."""
         insights = []
 
-        summary = metrics['summary']
-        if summary['success_rate'] > 90:
+        summary = metrics["summary"]
+        if summary["success_rate"] > 90:
             insights.append("Excellent performance! Your success rate is above 90%.")
-        elif summary['success_rate'] < 70:
-            insights.append("Your success rate is below 70%. Consider reviewing items more frequently.")
+        elif summary["success_rate"] < 70:
+            insights.append(
+                "Your success rate is below 70%. Consider reviewing items more frequently."
+            )
 
         # Streak insights
-        streaks = metrics['streaks']
-        if streaks['current'] >= 7:
-            insights.append(f"Great job! You're on a {streaks['current']}-day success streak.")
+        streaks = metrics["streaks"]
+        if streaks["current"] >= 7:
+            insights.append(
+                f"Great job! You're on a {streaks['current']}-day success streak."
+            )
 
         # Time pattern insights
         time_patterns = metrics.get("time_patterns", {})
@@ -457,8 +470,10 @@
         progress = metrics.get("progress", {})
         if progress.get("trend") == "improving":
             insights.append("Your performance is improving over time!")
-        elif progress.get('trend') == 'declining':
-            insights.append("Your performance has been declining. Consider adjusting your review schedule.")
+        elif progress.get("trend") == "declining":
+            insights.append(
+                "Your performance has been declining. Consider adjusting your review schedule."
+            )
 
         return insights
 
@@ -467,7 +482,7 @@
         """Generate actionable recommendations."""
         recommendations = []
 
-        summary = metrics['summary']
+        summary = metrics["summary"]
 
         # Time-based recommendations
         if summary["average_time_per_review"] > 120:
@@ -506,21 +521,25 @@
     @classmethod
     def _calculate_performance_grade(cls, metrics: dict) -> str:
         """Calculate overall performance grade."""
-        summary = metrics['summary']
+        summary = metrics["summary"]
 
         # Weighted scoring
         success_weight = 0.4
         consistency_weight = 0.3
         mastery_weight = 0.3
 
-        success_score = summary['success_rate'] / 100
-        consistency_score = metrics.get('time_patterns', {}).get('consistency_score', 0) / 100
-        mastery_score = metrics.get('learning_velocity', {}).get('mastery_rate', 0) / 100
+        success_score = summary["success_rate"] / 100
+        consistency_score = (
+            metrics.get("time_patterns", {}).get("consistency_score", 0) / 100
+        )
+        mastery_score = (
+            metrics.get("learning_velocity", {}).get("mastery_rate", 0) / 100
+        )
 
         total_score = (
-            success_score * success_weight +
-            consistency_score * consistency_weight +
-            mastery_score * mastery_weight
+            success_score * success_weight
+            + consistency_score * consistency_weight
+            + mastery_score * mastery_weight
         )
 
         if total_score >= 0.9:
@@ -532,4 +551,4 @@
         elif total_score >= 0.6:
             return "C"
         else:
-            return 'D'
+            return "D"

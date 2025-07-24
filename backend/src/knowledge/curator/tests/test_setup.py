@@ -3,9 +3,6 @@
 from knowledge.curator.testing import PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
 from plone import api
 from plone.app.testing import setRoles, TEST_USER_ID
-from knowledge.curator.testing import (
-    PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING,
-)
 
 import unittest
 
@@ -51,6 +48,5 @@ class TestUninstall(unittest.TestCase):
         """Test that IPloneAppKnowledgeLayer is removed."""
         from knowledge.curator.interfaces import IPloneAppKnowledgeLayer
         from plone.browserlayer import utils
-        self.assertNotIn(
-           IPloneAppKnowledgeLayer,
-           utils.registered_layers())
+
+        self.assertNotIn(IPloneAppKnowledgeLayer, utils.registered_layers())

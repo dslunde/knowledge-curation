@@ -6,7 +6,6 @@ from plone import api
 from plone.restapi.services import Service
 from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse
-from datetime import datetime, timedelta
 import math
 
 
@@ -50,10 +49,13 @@ class AnalyticsService(Service):
 
         # Get user's content
         query = {
-            'Creator': user.getId(),
-            'portal_type': [
-                'ResearchNote', 'LearningGoal', 'ProjectLog', 'BookmarkPlus'
-            ]
+            "Creator": user.getId(),
+            "portal_type": [
+                "ResearchNote",
+                "LearningGoal",
+                "ProjectLog",
+                "BookmarkPlus",
+            ],
         }
 
         brains = catalog(**query)
@@ -72,22 +74,22 @@ class AnalyticsService(Service):
         for brain in brains:
             # Count by type
             portal_type = brain.portal_type
-            stats['by_type'][portal_type] = stats['by_type'].get(portal_type, 0) + 1
+            stats["by_type"][portal_type] = stats["by_type"].get(portal_type, 0) + 1
 
             # Count by state
             state = brain.review_state
-            stats['by_state'][state] = stats['by_state'].get(state, 0) + 1
+            stats["by_state"][state] = stats["by_state"].get(state, 0) + 1
 
             # Count tags
             for tag in brain.Subject:
-                stats['tags'][tag] = stats['tags'].get(tag, 0) + 1
+                stats["tags"][tag] = stats["tags"].get(tag, 0) + 1
 
             # Count connections
             obj = brain.getObject()
-            if hasattr(obj, 'connections'):
-                stats['connections'] += len(getattr(obj, 'connections', []))
-            if hasattr(obj, 'related_notes'):
-                stats['connections'] += len(getattr(obj, 'related_notes', []))
+            if hasattr(obj, "connections"):
+                stats["connections"] += len(getattr(obj, "connections", []))
+            if hasattr(obj, "related_notes"):
+                stats["connections"] += len(getattr(obj, "related_notes", []))
 
         # Get recent activity (last 30 days)
         thirty_days_ago = datetime.now() - timedelta(days=30)
@@ -100,13 +102,16 @@ class AnalyticsService(Service):
             sort_limit=10,
         )
 
-        stats['recent_activity'] = [{
-            'uid': brain.UID,
-            'title': brain.Title,
-            'type': brain.portal_type,
-            'modified': brain.modified.ISO8601(),
-            'url': brain.getURL()
-        } for brain in recent_brains[:10]]
+        stats["recent_activity"] = [
+            {
+                "uid": brain.UID,
+                "title": brain.Title,
+                "type": brain.portal_type,
+                "modified": brain.modified.ISO8601(),
+                "url": brain.getURL(),
+            }
+            for brain in recent_brains[:10]
+        ]
 
         # Top tags
         stats["top_tags"] = sorted(
@@ -118,63 +123,61 @@ class AnalyticsService(Service):
     def _calculate_goal_stats(self, goals):
         """Calculate goal statistics helper."""
         goal_stats = {
-            'total': len(goals),
-            'completed': 0,
-            'in_progress': 0,
-            'planned': 0,
-            'average_progress': 0,
-            'by_priority': {'low': 0, 'medium': 0, 'high': 0}
+            "total": len(goals),
+            "completed": 0,
+            "in_progress": 0,
+            "planned": 0,
+            "average_progress": 0,
+            "by_priority": {"low": 0, "medium": 0, "high": 0},
         }
 
         total_progress = 0
         for brain in goals:
             try:
                 obj = brain.getObject()
-                progress = getattr(obj, 'progress', 0)
-                priority = getattr(obj, 'priority', 'medium')
+                progress = getattr(obj, "progress", 0)
+                priority = getattr(obj, "priority", "medium")
 
                 total_progress += progress
-                goal_stats['by_priority'][priority] += 1
+                goal_stats["by_priority"][priority] += 1
 
                 if progress >= 100:
-                    goal_stats['completed'] += 1
+                    goal_stats["completed"] += 1
                 elif progress > 0:
-                    goal_stats['in_progress'] += 1
+                    goal_stats["in_progress"] += 1
                 else:
-                    goal_stats['planned'] += 1
+                    goal_stats["planned"] += 1
             except (AttributeError, Unauthorized):
                 continue
 
         if goals:
-            goal_stats['average_progress'] = total_progress / len(goals)
+            goal_stats["average_progress"] = total_progress / len(goals)
 
         return goal_stats
 
     def _calculate_content_stats(self, user_id, start_date):
         """Calculate content statistics helper."""
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
 
         # Get all content created in timeframe
         content = catalog(
             Creator=user_id,
-            portal_type=[
-                'ResearchNote', 'LearningGoal', 'ProjectLog', 'BookmarkPlus'
-            ],
-            created={'query': start_date, 'range': 'min'}
+            portal_type=["ResearchNote", "LearningGoal", "ProjectLog", "BookmarkPlus"],
+            created={"query": start_date, "range": "min"},
         )
 
         content_stats = {
-            'total_items': len(content),
-            'by_type': {
-                'ResearchNote': 0,
-                'LearningGoal': 0,
-                'ProjectLog': 0,
-                'BookmarkPlus': 0
-            }
+            "total_items": len(content),
+            "by_type": {
+                "ResearchNote": 0,
+                "LearningGoal": 0,
+                "ProjectLog": 0,
+                "BookmarkPlus": 0,
+            },
         }
 
         for brain in content:
-            content_stats['by_type'][brain.portal_type] += 1
+            content_stats["by_type"][brain.portal_type] += 1
 
         return content_stats
 
@@ -232,12 +235,19 @@ class AnalyticsService(Service):
             strength = 1.0  # Default strength
 
             # Adjust strength based on connections and importance
-            if hasattr(obj, 'connections'):
-                strength += len(getattr(obj, 'connections', [])) * 0.1
+            if hasattr(obj, "connections"):
+                strength += len(getattr(obj, "connections", [])) * 0.1
 
-            if hasattr(obj, 'importance'):
-                importance_weights = {'low': 0.5, 'medium': 1.0, 'high': 1.5, 'critical': 2.0}
-                strength *= importance_weights.get(getattr(obj, 'importance', 'medium'), 1.0)
+            if hasattr(obj, "importance"):
+                importance_weights = {
+                    "low": 0.5,
+                    "medium": 1.0,
+                    "high": 1.5,
+                    "critical": 2.0,
+                }
+                strength *= importance_weights.get(
+                    getattr(obj, "importance", "medium"), 1.0
+                )
 
             retention = math.exp(-days_since_review / (strength * 5))  # 5 day half-life
 
@@ -253,7 +263,7 @@ class AnalyticsService(Service):
             })
 
         # Sort by retention score (lowest first - needs review)
-        curve_data.sort(key=lambda x: x['retention_score'])
+        curve_data.sort(key=lambda x: x["retention_score"])
 
         # Group by review urgency
         review_groups = {
@@ -272,7 +282,7 @@ class AnalyticsService(Service):
             elif retention < 0.8:
                 review_groups["later"].append(item)
             else:
-                review_groups['good'].append(item)
+                review_groups["good"].append(item)
 
         return {
             "forgetting_curve": curve_data[:50],  # Top 50 items
@@ -295,14 +305,14 @@ class AnalyticsService(Service):
         user = api.user.get_current()
 
         # Time range
-        days = int(self.request.get('days', 90))
-        interval = self.request.get('interval', 'week')  # day, week, month
+        days = int(self.request.get("days", 90))
+        interval = self.request.get("interval", "week")  # day, week, month
 
         # Calculate intervals
         intervals = []
         end_date = datetime.now()
 
-        if interval == 'day':
+        if interval == "day":
             for i in range(days):
                 date = end_date - timedelta(days=i)
                 intervals.append({
@@ -387,11 +397,7 @@ class AnalyticsService(Service):
                 },
             })
 
-        return {
-            'progress': progress_data,
-            'interval': interval,
-            'days': days
-        }
+        return {"progress": progress_data, "interval": interval, "days": days}
 
     def get_activity(self):
         """Get user activity heatmap data."""
@@ -419,13 +425,10 @@ class AnalyticsService(Service):
             date_str = date.isoformat()
 
             if date_str not in activity_map:
-                activity_map[date_str] = {
-                    'count': 0,
-                    'types': []
-                }
+                activity_map[date_str] = {"count": 0, "types": []}
 
-            activity_map[date_str]['count'] += 1
-            activity_map[date_str]['types'].append(brain.portal_type)
+            activity_map[date_str]["count"] += 1
+            activity_map[date_str]["types"].append(brain.portal_type)
 
         # Convert to list format
         activity_data = []
@@ -437,7 +440,7 @@ class AnalyticsService(Service):
                 "types": list(set(data["types"])),
             })
 
-        activity_data.sort(key=lambda x: x['date'])
+        activity_data.sort(key=lambda x: x["date"])
 
         return {
             "activity": activity_data,
@@ -456,11 +459,7 @@ class AnalyticsService(Service):
         catalog = api.portal.get_tool("portal_catalog")
         user = api.user.get_current()
 
-        insights = {
-            'patterns': [],
-            'recommendations': [],
-            'connections': []
-        }
+        insights = {"patterns": [], "recommendations": [], "connections": []}
 
         # Analyze tag patterns
         brains = catalog(
@@ -496,12 +495,9 @@ class AnalyticsService(Service):
             })
 
         # Analyze learning goal completion
-        goals = catalog(
-            Creator=user.getId(),
-            portal_type='LearningGoal'
-        )
+        goals = catalog(Creator=user.getId(), portal_type="LearningGoal")
 
-        completion_rates = {'low': [], 'medium': [], 'high': []}
+        completion_rates = {"low": [], "medium": [], "high": []}
 
         for brain in goals:
             obj = brain.getObject()

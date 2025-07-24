@@ -17,8 +17,8 @@ class TestSpacedRepetitionSystem(unittest.TestCase):
     layer = PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
 
     def setUp(self):
-        self.portal = self.layer['portal']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.portal = self.layer["portal"]
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
         # Create test content
         self.folder = api.content.create(
@@ -91,10 +91,10 @@ class TestSpacedRepetitionSystem(unittest.TestCase):
         # Get adaptive schedule
         schedule = ReviewUtilities.get_adaptive_schedule()
 
-        self.assertIn('performance', schedule)
-        self.assertIn('workload_forecast', schedule)
-        self.assertIn('optimal_times', schedule)
-        self.assertIn('recommendations', schedule)
+        self.assertIn("performance", schedule)
+        self.assertIn("workload_forecast", schedule)
+        self.assertIn("optimal_times", schedule)
+        self.assertIn("recommendations", schedule)
 
     def test_at_risk_detection(self):
         """Test detection of items at risk of being forgotten."""
@@ -114,8 +114,8 @@ class TestSpacedRepetitionSystem(unittest.TestCase):
         self.assertIn(item.UID(), at_risk_uids)
 
         # Check risk level
-        risk_item = next(i for i in at_risk if i['uid'] == item.UID())
-        self.assertIn(risk_item['risk_level'], ['high', 'critical'])
+        risk_item = next(i for i in at_risk if i["uid"] == item.UID())
+        self.assertIn(risk_item["risk_level"], ["high", "critical"])
 
     def test_bulk_operations(self):
         """Test bulk rescheduling operations."""
@@ -125,10 +125,10 @@ class TestSpacedRepetitionSystem(unittest.TestCase):
 
         # Bulk reschedule to optimal
         uids = [item.UID() for item in self.items]
-        results = ReviewUtilities.bulk_reschedule(uids, strategy='optimal')
+        results = ReviewUtilities.bulk_reschedule(uids, strategy="optimal")
 
-        self.assertEqual(len(results['success']), 5)
-        self.assertEqual(len(results['failed']), 0)
+        self.assertEqual(len(results["success"]), 5)
+        self.assertEqual(len(results["failed"]), 0)
 
         # Check all items have new review dates
         for item in self.items:
@@ -146,17 +146,17 @@ class TestSpacedRepetitionSystem(unittest.TestCase):
             item.update_review(quality=quality, time_spent=60 + i * 10)
             if i < len(qualities) - 1:
                 # Simulate time passing
-                item.last_review = datetime.now() - timedelta(days=20-i*2)
+                item.last_review = datetime.now() - timedelta(days=20 - i * 2)
 
         # Get performance stats
         stats = item.get_review_stats()
 
-        self.assertEqual(stats['total_reviews'], len(qualities))
-        self.assertGreater(stats['average_quality'], 3)
-        self.assertGreater(stats['success_rate'], 70)
+        self.assertEqual(stats["total_reviews"], len(qualities))
+        self.assertGreater(stats["average_quality"], 3)
+        self.assertGreater(stats["success_rate"], 70)
 
         # Check current streak (last 3 were successful)
-        self.assertGreaterEqual(stats['current_streak'], 3)
+        self.assertGreaterEqual(stats["current_streak"], 3)
 
     def test_review_interface_data(self):
         """Test data preparation for review interface."""
@@ -173,15 +173,15 @@ class TestSpacedRepetitionSystem(unittest.TestCase):
 
         # Check data structure
         for item_data in due_items:
-            self.assertIn('uid', item_data)
-            self.assertIn('title', item_data)
-            self.assertIn('sr_data', item_data)
-            self.assertIn('urgency_score', item_data)
+            self.assertIn("uid", item_data)
+            self.assertIn("title", item_data)
+            self.assertIn("sr_data", item_data)
+            self.assertIn("urgency_score", item_data)
 
             # Check SR data
-            sr_data = item_data['sr_data']
-            self.assertIn('retention_score', sr_data)
-            self.assertIn('mastery_level', sr_data)
+            sr_data = item_data["sr_data"]
+            self.assertIn("retention_score", sr_data)
+            self.assertIn("mastery_level", sr_data)
 
     def test_session_management(self):
         """Test learning session creation and management."""
@@ -206,14 +206,12 @@ class TestSpacedRepetitionSystem(unittest.TestCase):
         from knowledge.curator.repetition import ReviewScheduler
 
         items_data = ReviewUtilities.get_items_due_for_review()
-        session = ReviewScheduler.create_learning_session(
-            items_data, settings, 'mixed'
-        )
+        session = ReviewScheduler.create_learning_session(items_data, settings, "mixed")
 
-        self.assertIn('items', session)
-        self.assertIn('breaks', session)
-        self.assertIn('metadata', session)
-        self.assertEqual(session['type'], 'mixed')
+        self.assertIn("items", session)
+        self.assertIn("breaks", session)
+        self.assertIn("metadata", session)
+        self.assertEqual(session["type"], "mixed")
 
 
 def test_suite():

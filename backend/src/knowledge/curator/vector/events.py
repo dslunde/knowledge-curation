@@ -115,7 +115,9 @@ def workflow_transition(obj, event):
     new_state = event.new_state.id
     old_state = event.old_state.id if event.old_state else None
 
-    logger.info(f"Workflow transition for {obj.absolute_url()}: {old_state} -> {new_state}")
+    logger.info(
+        f"Workflow transition for {obj.absolute_url()}: {old_state} -> {new_state}"
+    )
 
     # Check if we should index or remove from index
     should_index_now = new_state in INDEXED_WORKFLOW_STATES
@@ -128,19 +130,25 @@ def workflow_transition(obj, event):
             # Entering an indexed state - create/update vector
             success = manager.update_content_vector(obj)
             if success:
-                logger.info(f"Created vector after transition to {new_state}: {obj.absolute_url()}")
+                logger.info(
+                    f"Created vector after transition to {new_state}: {obj.absolute_url()}"
+                )
 
         elif was_indexed and not should_index_now:
             # Leaving an indexed state - remove vector
             success = manager.delete_content_vector(obj.UID())
             if success:
-                logger.info(f"Deleted vector after transition to {new_state}: {obj.absolute_url()}")
+                logger.info(
+                    f"Deleted vector after transition to {new_state}: {obj.absolute_url()}"
+                )
 
         elif should_index_now and was_indexed:
             # Moving between indexed states - update vector
             success = manager.update_content_vector(obj)
             if success:
-                logger.info(f"Updated vector after transition to {new_state}: {obj.absolute_url()}")
+                logger.info(
+                    f"Updated vector after transition to {new_state}: {obj.absolute_url()}"
+                )
 
     except Exception as e:
         logger.error(f"Error in workflow transition handler: {e}")

@@ -25,15 +25,15 @@ class BulkOperationsService(Service):
     def reply(self):
         if self.request.method != "POST":
             self.request.response.setStatus(405)
-            return {'error': 'Method not allowed'}
+            return {"error": "Method not allowed"}
 
         if len(self.params) == 0:
             self.request.response.setStatus(400)
-            return {'error': 'Operation type required'}
+            return {"error": "Operation type required"}
 
         operation = self.params[0]
 
-        if operation == 'workflow':
+        if operation == "workflow":
             return self.bulk_workflow_transition()
         elif operation == "tag":
             return self.bulk_tag()
@@ -51,27 +51,23 @@ class BulkOperationsService(Service):
 
     def bulk_workflow_transition(self):
         """Perform bulk workflow transitions."""
-        data = json.loads(self.request.get('BODY', '{}'))
-        uids = data.get('uids', [])
-        transition = data.get('transition')
-        comment = data.get('comment', '')
+        data = json.loads(self.request.get("BODY", "{}"))
+        uids = data.get("uids", [])
+        transition = data.get("transition")
+        comment = data.get("comment", "")
 
         if not uids:
             self.request.response.setStatus(400)
-            return {'error': 'No items specified'}
+            return {"error": "No items specified"}
 
         if not transition:
             self.request.response.setStatus(400)
-            return {'error': 'No transition specified'}
+            return {"error": "No transition specified"}
 
-        catalog = api.portal.get_tool('portal_catalog')
-        workflow = api.portal.get_tool('portal_workflow')
+        catalog = api.portal.get_tool("portal_catalog")
+        workflow = api.portal.get_tool("portal_workflow")
 
-        results = {
-            'successful': [],
-            'failed': [],
-            'unauthorized': []
-        }
+        results = {"successful": [], "failed": [], "unauthorized": []}
 
         for uid in uids:
             brains = catalog(UID=uid)
@@ -118,27 +114,23 @@ class BulkOperationsService(Service):
 
     def bulk_tag(self):
         """Add or remove tags in bulk."""
-        data = json.loads(self.request.get('BODY', '{}'))
-        uids = data.get('uids', [])
-        add_tags = data.get('add_tags', [])
-        remove_tags = data.get('remove_tags', [])
-        operation_mode = data.get('mode', 'add')  # add, remove, replace
+        data = json.loads(self.request.get("BODY", "{}"))
+        uids = data.get("uids", [])
+        add_tags = data.get("add_tags", [])
+        remove_tags = data.get("remove_tags", [])
+        operation_mode = data.get("mode", "add")  # add, remove, replace
 
         if not uids:
             self.request.response.setStatus(400)
-            return {'error': 'No items specified'}
+            return {"error": "No items specified"}
 
-        if not add_tags and not remove_tags and operation_mode != 'replace':
+        if not add_tags and not remove_tags and operation_mode != "replace":
             self.request.response.setStatus(400)
-            return {'error': 'No tags specified'}
+            return {"error": "No tags specified"}
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
 
-        results = {
-            'successful': [],
-            'failed': [],
-            'unauthorized': []
-        }
+        results = {"successful": [], "failed": [], "unauthorized": []}
 
         for uid in uids:
             brains = catalog(UID=uid)
@@ -156,7 +148,7 @@ class BulkOperationsService(Service):
             try:
                 current_tags = list(obj.Subject())
 
-                if operation_mode == 'replace':
+                if operation_mode == "replace":
                     new_tags = add_tags
                 else:
                     # Add new tags
@@ -171,12 +163,12 @@ class BulkOperationsService(Service):
                             new_tags.remove(tag)
 
                 obj.setSubject(tuple(new_tags))
-                obj.reindexObject(idxs=['Subject'])
+                obj.reindexObject(idxs=["Subject"])
 
-                results['successful'].append({
-                    'uid': uid,
-                    'title': obj.Title(),
-                    'tags': new_tags
+                results["successful"].append({
+                    "uid": uid,
+                    "title": obj.Title(),
+                    "tags": new_tags,
                 })
             except Exception as e:
                 results["failed"].append({
@@ -203,20 +195,16 @@ class BulkOperationsService(Service):
 
     def bulk_delete(self):
         """Delete multiple items."""
-        data = json.loads(self.request.get('BODY', '{}'))
-        uids = data.get('uids', [])
+        data = json.loads(self.request.get("BODY", "{}"))
+        uids = data.get("uids", [])
 
         if not uids:
             self.request.response.setStatus(400)
-            return {'error': 'No items specified'}
+            return {"error": "No items specified"}
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
 
-        results = {
-            'successful': [],
-            'failed': [],
-            'unauthorized': []
-        }
+        results = {"successful": [], "failed": [], "unauthorized": []}
 
         for uid in uids:
             brains = catalog(UID=uid)
@@ -258,17 +246,17 @@ class BulkOperationsService(Service):
 
     def bulk_move(self):
         """Move multiple items to a new location."""
-        data = json.loads(self.request.get('BODY', '{}'))
-        uids = data.get('uids', [])
-        target_path = data.get('target_path')
+        data = json.loads(self.request.get("BODY", "{}"))
+        uids = data.get("uids", [])
+        target_path = data.get("target_path")
 
         if not uids:
             self.request.response.setStatus(400)
-            return {'error': 'No items specified'}
+            return {"error": "No items specified"}
 
         if not target_path:
             self.request.response.setStatus(400)
-            return {'error': 'No target path specified'}
+            return {"error": "No target path specified"}
 
         # Get target container
         try:
@@ -278,15 +266,11 @@ class BulkOperationsService(Service):
                 return {"error": "Target container not found"}
         except Exception:
             self.request.response.setStatus(400)
-            return {'error': 'Invalid target path'}
+            return {"error": "Invalid target path"}
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
 
-        results = {
-            'successful': [],
-            'failed': [],
-            'unauthorized': []
-        }
+        results = {"successful": [], "failed": [], "unauthorized": []}
 
         for uid in uids:
             brains = catalog(UID=uid)
@@ -309,25 +293,21 @@ class BulkOperationsService(Service):
                 })
                 continue
 
-        data = json.loads(self.request.get('BODY', '{}'))
-        uids = data.get('uids', [])
-        updates = data.get('updates', {})
+        data = json.loads(self.request.get("BODY", "{}"))
+        uids = data.get("uids", [])
+        updates = data.get("updates", {})
 
         if not uids:
             self.request.response.setStatus(400)
-            return {'error': 'No items specified'}
+            return {"error": "No items specified"}
 
         if not updates:
             self.request.response.setStatus(400)
-            return {'error': 'No updates specified'}
+            return {"error": "No updates specified"}
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
 
-        results = {
-            'successful': [],
-            'failed': [],
-            'unauthorized': []
-        }
+        results = {"successful": [], "failed": [], "unauthorized": []}
 
         # Allowed fields for bulk update
         allowed_fields = {
@@ -344,7 +324,7 @@ class BulkOperationsService(Service):
 
         if not filtered_updates:
             self.request.response.setStatus(400)
-            return {'error': 'No valid fields to update'}
+            return {"error": "No valid fields to update"}
 
         for uid in uids:
             brains = catalog(UID=uid)
@@ -367,10 +347,10 @@ class BulkOperationsService(Service):
 
                 obj.reindexObject()
 
-                results['successful'].append({
-                    'uid': uid,
-                    'title': obj.Title(),
-                    'updated_fields': list(filtered_updates.keys())
+                results["successful"].append({
+                    "uid": uid,
+                    "title": obj.Title(),
+                    "updated_fields": list(filtered_updates.keys()),
                 })
             except Exception as e:
                 results["failed"].append({
@@ -395,22 +375,20 @@ class BulkOperationsService(Service):
 
     def bulk_connect(self):
         """Create connections between multiple items."""
-        data = json.loads(self.request.get('BODY', '{}'))
-        source_uids = data.get('source_uids', [])
-        target_uids = data.get('target_uids', [])
-        connection_type = data.get('connection_type', 'bidirectional')  # unidirectional, bidirectional
+        data = json.loads(self.request.get("BODY", "{}"))
+        source_uids = data.get("source_uids", [])
+        target_uids = data.get("target_uids", [])
+        connection_type = data.get(
+            "connection_type", "bidirectional"
+        )  # unidirectional, bidirectional
 
         if not source_uids or not target_uids:
             self.request.response.setStatus(400)
-            return {'error': 'Source and target UIDs required'}
+            return {"error": "Source and target UIDs required"}
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
 
-        results = {
-            'successful': [],
-            'failed': [],
-            'unauthorized': []
-        }
+        results = {"successful": [], "failed": [], "unauthorized": []}
 
         for source_uid in source_uids:
             source_brains = catalog(UID=source_uid)
@@ -467,12 +445,12 @@ class BulkOperationsService(Service):
                                 target_obj.connections = target_connections
                                 target_obj.reindexObject()
 
-                    results['successful'].append({
-                        'source_uid': source_uid,
-                        'source_title': source_obj.Title(),
-                        'target_uid': target_uid,
-                        'target_title': target_obj.Title(),
-                        'type': connection_type
+                    results["successful"].append({
+                        "source_uid": source_uid,
+                        "source_title": source_obj.Title(),
+                        "target_uid": target_uid,
+                        "target_title": target_obj.Title(),
+                        "type": connection_type,
                     })
 
                 except Exception as e:
@@ -485,13 +463,13 @@ class BulkOperationsService(Service):
         transaction.commit()
 
         return {
-            'operation': 'bulk_connect',
-            'connection_type': connection_type,
-            'results': results,
-            'summary': {
-                'total_connections': len(source_uids) * len(target_uids),
-                'successful': len(results['successful']),
-                'failed': len(results['failed']),
-                'unauthorized': len(results['unauthorized'])
-            }
+            "operation": "bulk_connect",
+            "connection_type": connection_type,
+            "results": results,
+            "summary": {
+                "total_connections": len(source_uids) * len(target_uids),
+                "successful": len(results["successful"]),
+                "failed": len(results["failed"]),
+                "unauthorized": len(results["unauthorized"]),
+            },
         }

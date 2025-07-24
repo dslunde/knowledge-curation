@@ -1,9 +1,61 @@
 """Tests for Bulk Operations API."""
 
-        self.assertEqual(data['operation'], 'workflow_transition')
-        self.assertEqual(data['transition'], 'publish')
-        self.assertIn('results', data)
-        self.assertIn('summary', data)
+import unittest
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
+from plone.restapi.testing import RelativeSession
+from plone import api
+
+from knowledge.curator.testing import PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
+
+
+class TestBulkOperationsAPI(unittest.TestCase):
+    """Test bulk operations API endpoints."""
+
+    layer = PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
+
+    def setUp(self):
+        """Set up test environment."""
+        self.app = self.layer["app"]
+        self.portal = self.layer["portal"]
+        self.request = self.layer["request"]
+
+        # Set up REST API session
+        self.api_session = RelativeSession(self.portal.absolute_url())
+        self.api_session.headers.update({"Accept": "application/json"})
+        self.api_session.auth = (SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+
+        # Create test content
+        self.notes = []
+        for i in range(5):
+            note = api.content.create(
+                container=self.portal,
+                type="ResearchNote",
+                title=f"Test Note {i}",
+                tags=["test", f"note{i}"],
+            )
+            self.notes.append(note)
+
+    def test_bulk_workflow_transition(self):
+        """Test bulk workflow transition."""
+        uids = [note.UID() for note in self.notes[:3]]
+
+        response = self.api_session.post(
+            "/@knowledge-bulk/workflow",
+            json={
+                "uids": uids,
+                "transition": "publish",
+                "comment": "Bulk publishing test",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+
+        self.assertEqual(data["operation"], "workflow_transition")
+        self.assertEqual(data["transition"], "publish")
+        self.assertIn("results", data)
+        self.assertIn("summary", data)
 
         # Check summary
         summary = data["summary"]
@@ -27,8 +79,8 @@
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        self.assertEqual(data['operation'], 'bulk_tag')
-        self.assertEqual(data['mode'], 'add')
+        self.assertEqual(data["operation"], "bulk_tag")
+        self.assertEqual(data["mode"], "add")
 
         # Verify tags were added
         for result in data["results"]["successful"]:
@@ -97,8 +149,8 @@
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        self.assertEqual(data['operation'], 'bulk_delete')
-        self.assertEqual(data['summary']['successful'], 3)
+        self.assertEqual(data["operation"], "bulk_delete")
+        self.assertEqual(data["summary"]["successful"], 3)
 
         # Verify items were deleted
         catalog = api.portal.get_tool("portal_catalog")
@@ -109,7 +161,7 @@
     def test_bulk_move(self):
         """Test bulk move operation."""
         uids = [note.UID() for note in self.notes[:2]]
-        target_path = '/'.join(self.target_folder.getPhysicalPath())
+        target_path = "/".join(self.target_folder.getPhysicalPath())
 
         response = self.api_session.post(
             "/@knowledge-bulk/move", json={"uids": uids, "target_path": target_path}
@@ -118,8 +170,8 @@
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        self.assertEqual(data['operation'], 'bulk_move')
-        self.assertEqual(data['summary']['successful'], 2)
+        self.assertEqual(data["operation"], "bulk_move")
+        self.assertEqual(data["summary"]["successful"], 2)
 
         # Verify items were moved
         for result in data["results"]["successful"]:
@@ -151,8 +203,8 @@
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        self.assertEqual(data['operation'], 'bulk_update')
-        self.assertEqual(data['summary']['successful'], 3)
+        self.assertEqual(data["operation"], "bulk_update")
+        self.assertEqual(data["summary"]["successful"], 3)
 
         # Verify updates
         catalog = api.portal.get_tool("portal_catalog")
@@ -178,8 +230,8 @@
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-        self.assertEqual(data['operation'], 'bulk_connect')
-        self.assertEqual(data['connection_type'], 'bidirectional')
+        self.assertEqual(data["operation"], "bulk_connect")
+        self.assertEqual(data["connection_type"], "bidirectional")
 
         # Verify connections were created
         self.assertGreater(data["summary"]["successful"], 0)
@@ -227,8 +279,8 @@
 
         # Create new session with limited user
         limited_session = RelativeSession(self.portal_url)
-        limited_session.headers.update({'Accept': 'application/json'})
-        limited_session.auth = ('limited', 'secret')
+        limited_session.headers.update({"Accept": "application/json"})
+        limited_session.auth = ("limited", "secret")
 
         uids = [self.notes[0].UID()]
 
@@ -257,4 +309,4 @@
 
         self.assertEqual(response.status_code, 400)
         data = response.json()
-        self.assertIn('error', data)
+        self.assertIn("error", data)

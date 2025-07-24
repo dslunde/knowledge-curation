@@ -71,7 +71,7 @@ def handle_start_processing(obj):
 def handle_start_connecting(obj):
     """Handle entering the connecting state."""
     # Find and suggest related content
-    catalog = api.portal.get_tool('portal_catalog')
+    catalog = api.portal.get_tool("portal_catalog")
 
     # Simple tag-based suggestions for now
     if hasattr(obj, "tags") and obj.tags:
@@ -106,8 +106,8 @@ def handle_publishing(obj):
 
     annotations = IAnnotations(obj)
 
-    if 'knowledge.curator.draft' in annotations:
-        del annotations['knowledge.curator.draft']
+    if "knowledge.curator.draft" in annotations:
+        del annotations["knowledge.curator.draft"]
 
     # Log publication
     logger.info(f"Published knowledge item: {obj.absolute_url()}")
@@ -128,7 +128,7 @@ def send_completion_notification(obj):
     owner = obj.Creator()
     member = api.user.get(userid=owner)
 
-    if member and member.getProperty('email'):
+    if member and member.getProperty("email"):
         # In a real implementation, send email
         logger.info(
             f"Learning goal '{obj.title}' completed by {owner}. "

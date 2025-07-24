@@ -8,10 +8,13 @@ from .relationships import RelationshipType
 from BTrees.OOBTree import OOBTree
 from persistent.dict import PersistentDict
 from persistent.list import PersistentList
-from BTrees.OOBTree import OOBTree
 from zope.annotation.interfaces import IAnnotations
 from typing import Any
 import json
+
+from plone.app.relationfield.interfaces import IRelatedItems
+from zope.security import Unauthorized
+from plone import api
 
 
 GRAPH_ANNOTATION_KEY = "knowledge.curator.graph"
@@ -34,10 +37,10 @@ class GraphStorage:
         annotations = IAnnotations(self.context)
         if GRAPH_ANNOTATION_KEY not in annotations:
             annotations[GRAPH_ANNOTATION_KEY] = OOBTree()
-            annotations[GRAPH_ANNOTATION_KEY]['nodes'] = OOBTree()
-            annotations[GRAPH_ANNOTATION_KEY]['edges'] = PersistentList()
-            annotations[GRAPH_ANNOTATION_KEY]['indexes'] = OOBTree()
-            annotations[GRAPH_ANNOTATION_KEY]['metadata'] = PersistentDict()
+            annotations[GRAPH_ANNOTATION_KEY]["nodes"] = OOBTree()
+            annotations[GRAPH_ANNOTATION_KEY]["edges"] = PersistentList()
+            annotations[GRAPH_ANNOTATION_KEY]["indexes"] = OOBTree()
+            annotations[GRAPH_ANNOTATION_KEY]["metadata"] = PersistentDict()
 
     def _get_storage(self):
         """Get the annotation storage."""
@@ -53,8 +56,8 @@ class GraphStorage:
         storage = self._get_storage()
 
         # Clear existing data
-        storage['nodes'].clear()
-        storage['edges'][:] = []
+        storage["nodes"].clear()
+        storage["edges"][:] = []
 
         # Save nodes
         for uid, node in graph.nodes.items():
@@ -72,7 +75,7 @@ class GraphStorage:
                 if hasattr(node.modified, "isoformat")
                 else node.modified,
             }
-            storage['nodes'][uid] = PersistentDict(node_data)
+            storage["nodes"][uid] = PersistentDict(node_data)
 
         # Save edges
         for edge in graph.edges:
@@ -86,15 +89,15 @@ class GraphStorage:
                 if hasattr(edge.created, "isoformat")
                 else edge.created,
             }
-            storage['edges'].append(PersistentDict(edge_data))
+            storage["edges"].append(PersistentDict(edge_data))
 
         # Update indexes
         self._rebuild_indexes()
 
         # Update metadata
-        storage['metadata']['last_modified'] = api.portal.get_localized_time()
-        storage['metadata']['node_count'] = len(graph.nodes)
-        storage['metadata']['edge_count'] = len(graph.edges)
+        storage["metadata"]["last_modified"] = api.portal.get_localized_time()
+        storage["metadata"]["node_count"] = len(graph.nodes)
+        storage["metadata"]["edge_count"] = len(graph.edges)
 
     def load_graph(self) -> Graph:
         """Load graph from persistent storage.
@@ -248,47 +251,52 @@ class GraphStorage:
                 if hasattr(rel, "to_object"):
                     target = rel.to_object
                     if target:
-                        edge = Edge(uid, api.content.get_uuid(target),
-                                  RelationshipType.RELATED_TO.value)
+                        edge = Edge(
+                            uid,
+                            api.content.get_uuid(target),
+                            RelationshipType.RELATED_TO.value,
+                        )
                         graph.add_edge(edge)
 
     def _rebuild_indexes(self):
         """Rebuild graph indexes for efficient querying."""
         storage = self._get_storage()
-        indexes = storage['indexes']
+        indexes = storage["indexes"]
 
         # Clear existing indexes
         indexes.clear()
 
         # Node type index
-        indexes['by_type'] = OOBTree()
-        for uid, node_data in storage['nodes'].items():
-            node_type = node_data['type']
-            if node_type not in indexes['by_type']:
-                indexes['by_type'][node_type] = PersistentList()
-            indexes['by_type'][node_type].append(uid)
+        indexes["by_type"] = OOBTree()
+        for uid, node_data in storage["nodes"].items():
+            node_type = node_data["type"]
+            if node_type not in indexes["by_type"]:
+                indexes["by_type"][node_type] = PersistentList()
+            indexes["by_type"][node_type].append(uid)
 
         # Relationship type index
-        indexes['by_relationship'] = OOBTree()
-        for edge_data in storage['edges']:
-            rel_type = edge_data['type']
-            if rel_type not in indexes['by_relationship']:
-                indexes['by_relationship'][rel_type] = PersistentList()
-            indexes['by_relationship'][rel_type].append(
-                (edge_data['source'], edge_data['target'])
-            )
+        indexes["by_relationship"] = OOBTree()
+        for edge_data in storage["edges"]:
+            rel_type = edge_data["type"]
+            if rel_type not in indexes["by_relationship"]:
+                indexes["by_relationship"][rel_type] = PersistentList()
+            indexes["by_relationship"][rel_type].append((
+                edge_data["source"],
+                edge_data["target"],
+            ))
 
         # Tag index
-        indexes['by_tag'] = OOBTree()
-        for edge_data in storage['edges']:
-            if edge_data['type'] == RelationshipType.TAGGED_WITH.value:
-                tag_uid = edge_data['target']
-                if tag_uid not in indexes['by_tag']:
-                    indexes['by_tag'][tag_uid] = PersistentList()
-                indexes['by_tag'][tag_uid].append(edge_data['source'])
+        indexes["by_tag"] = OOBTree()
+        for edge_data in storage["edges"]:
+            if edge_data["type"] == RelationshipType.TAGGED_WITH.value:
+                tag_uid = edge_data["target"]
+                if tag_uid not in indexes["by_tag"]:
+                    indexes["by_tag"][tag_uid] = PersistentList()
+                indexes["by_tag"][tag_uid].append(edge_data["source"])
 
-    def query_nodes(self, node_type: str | None = None,
-                   properties: dict[str, Any] | None = None) -> list[Node]:
+    def query_nodes(
+        self, node_type: str | None = None, properties: dict[str, Any] | None = None
+    ) -> list[Node]:
         """Query nodes by type and properties.
 
         Args:
@@ -333,9 +341,12 @@ class GraphStorage:
 
         return results
 
-    def query_relationships(self, relationship_type: str | None = None,
-                          source_uid: str | None = None,
-                          target_uid: str | None = None) -> list[Edge]:
+    def query_relationships(
+        self,
+        relationship_type: str | None = None,
+        source_uid: str | None = None,
+        target_uid: str | None = None,
+    ) -> list[Edge]:
         """Query relationships by type and endpoints.
 
         Args:
@@ -375,13 +386,13 @@ class GraphStorage:
         storage = self._get_storage()
         graph = self.load_graph()
 
-        if 'by_tag' in storage['indexes'] and tag_uid in storage['indexes']['by_tag']:
-            node_uids = storage['indexes']['by_tag'][tag_uid]
+        if "by_tag" in storage["indexes"] and tag_uid in storage["indexes"]["by_tag"]:
+            node_uids = storage["indexes"]["by_tag"][tag_uid]
             return [graph.get_node(uid) for uid in node_uids if graph.get_node(uid)]
 
         return []
 
-    def export_graph(self, format: str = 'json') -> str:
+    def export_graph(self, format: str = "json") -> str:
         """Export graph to various formats.
 
         Args:
@@ -392,10 +403,10 @@ class GraphStorage:
         """
         graph = self.load_graph()
 
-        if format == 'json':
+        if format == "json":
             return json.dumps(graph.to_dict(), indent=2)
 
-        elif format == 'gexf':
+        elif format == "gexf":
             # GEXF format for Gephi
             gexf = ['<?xml version="1.0" encoding="UTF-8"?>']
             gexf.append('<gexf xmlns="http://www.gexf.net/1.2draft" version="1.2">')
@@ -405,21 +416,23 @@ class GraphStorage:
             gexf.append("    <nodes>")
             for node in graph.nodes.values():
                 gexf.append(f'      <node id="{node.uid}" label="{node.title}" />')
-            gexf.append('    </nodes>')
+            gexf.append("    </nodes>")
 
             # Edges
             gexf.append("    <edges>")
             for i, edge in enumerate(graph.edges):
-                gexf.append(f'      <edge id="{i}" source="{edge.source_uid}" '
-                          f'target="{edge.target_uid}" weight="{edge.weight}" />')
-            gexf.append('    </edges>')
+                gexf.append(
+                    f'      <edge id="{i}" source="{edge.source_uid}" '
+                    f'target="{edge.target_uid}" weight="{edge.weight}" />'
+                )
+            gexf.append("    </edges>")
 
-            gexf.append('  </graph>')
-            gexf.append('</gexf>')
+            gexf.append("  </graph>")
+            gexf.append("</gexf>")
 
-            return '\n'.join(gexf)
+            return "\n".join(gexf)
 
-        elif format == 'graphml':
+        elif format == "graphml":
             # GraphML format
             graphml = ['<?xml version="1.0" encoding="UTF-8"?>']
             graphml.append('<graphml xmlns="http://graphml.graphdrawing.org/xmlns">')
@@ -430,7 +443,7 @@ class GraphStorage:
                 graphml.append(f'    <node id="{node.uid}">')
                 graphml.append(f'      <data key="title">{node.title}</data>')
                 graphml.append(f'      <data key="type">{node.node_type}</data>')
-                graphml.append('    </node>')
+                graphml.append("    </node>")
 
             # Edges
             for edge in graph.edges:
@@ -441,17 +454,17 @@ class GraphStorage:
                     f'      <data key="type">{edge.relationship_type}</data>'
                 )
                 graphml.append(f'      <data key="weight">{edge.weight}</data>')
-                graphml.append('    </edge>')
+                graphml.append("    </edge>")
 
-            graphml.append('  </graph>')
-            graphml.append('</graphml>')
+            graphml.append("  </graph>")
+            graphml.append("</graphml>")
 
-            return '\n'.join(graphml)
+            return "\n".join(graphml)
 
         else:
             raise ValueError(f"Unsupported format: {format}")
 
-    def import_graph(self, data: str, format: str = 'json', merge: bool = True):
+    def import_graph(self, data: str, format: str = "json", merge: bool = True):
         """Import graph from various formats.
 
         Args:
@@ -459,7 +472,7 @@ class GraphStorage:
             format: Import format ('json')
             merge: Whether to merge with existing graph
         """
-        if output_format == "json":
+        if format == "json":
             import_data = json.loads(data)
 
             if merge:
@@ -475,9 +488,9 @@ class GraphStorage:
                         node_type = nt
                         break
 
-                properties = node_data.get('properties', {})
-                properties['created'] = node_data.get('created')
-                properties['modified'] = node_data.get('modified')
+                properties = node_data.get("properties", {})
+                properties["created"] = node_data.get("created")
+                properties["modified"] = node_data.get("modified")
 
                 node = Node(
                     uid=node_data["uid"],
@@ -525,13 +538,17 @@ class GraphStorage:
         # Count by relationship type
         rel_types = {}
         for edge in graph.edges:
-            rel_types[edge.relationship_type] = rel_types.get(edge.relationship_type, 0) + 1
+            rel_types[edge.relationship_type] = (
+                rel_types.get(edge.relationship_type, 0) + 1
+            )
 
         return {
-            'total_nodes': len(graph.nodes),
-            'total_edges': len(graph.edges),
-            'node_types': node_types,
-            'relationship_types': rel_types,
-            'last_modified': storage['metadata'].get('last_modified'),
-            'average_degree': len(graph.edges) * 2 / len(graph.nodes) if graph.nodes else 0
+            "total_nodes": len(graph.nodes),
+            "total_edges": len(graph.edges),
+            "node_types": node_types,
+            "relationship_types": rel_types,
+            "last_modified": storage["metadata"].get("last_modified"),
+            "average_degree": len(graph.edges) * 2 / len(graph.nodes)
+            if graph.nodes
+            else 0,
         }

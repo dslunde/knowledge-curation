@@ -39,8 +39,7 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
         factory = fti.factory
         obj = createObject(factory)
         self.assertTrue(
-            IBookmarkPlus.providedBy(obj),
-            f'IBookmarkPlus not provided by {obj}'
+            IBookmarkPlus.providedBy(obj), f"IBookmarkPlus not provided by {obj}"
         )
 
     def test_ct_bookmark_plus_adding(self):
@@ -57,8 +56,7 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
             importance="high",
         )
         self.assertTrue(
-            IBookmarkPlus.providedBy(obj),
-            f'IBookmarkPlus not provided by {obj.id}'
+            IBookmarkPlus.providedBy(obj), f"IBookmarkPlus not provided by {obj.id}"
         )
         # Check fields
         self.assertEqual(obj.title, "Python Documentation")
@@ -98,17 +96,17 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
         )
 
         # Test updating importance
-        self.assertTrue(obj.update_importance('critical'))
-        self.assertEqual(obj.importance, 'critical')
+        self.assertTrue(obj.update_importance("critical"))
+        self.assertEqual(obj.importance, "critical")
 
         # Test invalid importance
-        self.assertFalse(obj.update_importance('invalid'))
-        self.assertEqual(obj.importance, 'critical')  # Should remain unchanged
+        self.assertFalse(obj.update_importance("invalid"))
+        self.assertEqual(obj.importance, "critical")  # Should remain unchanged
 
         # Test high priority check
         self.assertTrue(obj.is_high_priority())  # unread + critical
 
-        obj.read_status = 'read'
+        obj.read_status = "read"
         self.assertFalse(obj.is_high_priority())  # read + critical
 
     def test_ct_bookmark_plus_tag_methods(self):
@@ -121,8 +119,8 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
         )
 
         # Test adding tags
-        obj.add_tag('python')
-        self.assertIn('python', obj.tags)
+        obj.add_tag("python")
+        self.assertIn("python", obj.tags)
 
         # Test duplicate prevention
         obj.add_tag("python")
@@ -163,10 +161,10 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
 
         # Test without notes
         summary = obj.get_summary_text()
-        self.assertIn('Test Bookmark', summary)
-        self.assertIn('A test bookmark', summary)
+        self.assertIn("Test Bookmark", summary)
+        self.assertIn("A test bookmark", summary)
 
         # Test with notes
         obj.notes = RichTextValue("Important notes about this resource")
         summary = obj.get_summary_text()
-        self.assertIn('Important notes', summary)
+        self.assertIn("Important notes", summary)

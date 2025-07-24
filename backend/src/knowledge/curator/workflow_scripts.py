@@ -71,7 +71,7 @@ def validate_for_publishing(state_change):
     if not obj.description:
         errors.append("Description is required")
 
-    if not getattr(obj, 'tags', None):
+    if not getattr(obj, "tags", None):
         errors.append("At least one tag is required")
 
     # Check AI processing
@@ -80,8 +80,7 @@ def validate_for_publishing(state_change):
 
     if errors:
         raise WorkflowException(
-            "Cannot publish. Please fix the following issues: " +
-            "; ".join(errors)
+            "Cannot publish. Please fix the following issues: " + "; ".join(errors)
         )
 
 
@@ -94,11 +93,11 @@ def record_start_time(state_change):
 
         annotations = IAnnotations(obj)
 
-        if 'knowledge.curator.learning_timeline' not in annotations:
-            annotations['knowledge.curator.learning_timeline'] = {}
+        if "knowledge.curator.learning_timeline" not in annotations:
+            annotations["knowledge.curator.learning_timeline"] = {}
 
-        timeline = annotations['knowledge.curator.learning_timeline']
-        timeline['started_at'] = datetime.now().isoformat()
+        timeline = annotations["knowledge.curator.learning_timeline"]
+        timeline["started_at"] = datetime.now().isoformat()
 
         # Initialize progress tracking
         if not hasattr(obj, "progress"):
@@ -155,17 +154,17 @@ def record_completion_time(state_change):
 
         annotations = IAnnotations(obj)
 
-        timeline = annotations.get('knowledge.curator.learning_timeline', {})
-        timeline['completed_at'] = datetime.now().isoformat()
+        timeline = annotations.get("knowledge.curator.learning_timeline", {})
+        timeline["completed_at"] = datetime.now().isoformat()
 
         # Calculate duration if start time exists
         if "started_at" in timeline:
             start = datetime.fromisoformat(timeline["started_at"])
             end = datetime.fromisoformat(timeline["completed_at"])
             duration = end - start
-            timeline['duration_days'] = duration.days
+            timeline["duration_days"] = duration.days
 
-        annotations['knowledge.curator.learning_timeline'] = timeline
+        annotations["knowledge.curator.learning_timeline"] = timeline
 
         # Set final progress to 100%
         obj.progress = 100.0

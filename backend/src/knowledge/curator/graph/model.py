@@ -34,8 +34,8 @@ class Node:
         self.title = title
         self.node_type = node_type
         self.properties = kwargs
-        self.created = kwargs.get('created', datetime.now())
-        self.modified = kwargs.get('modified', datetime.now())
+        self.created = kwargs.get("created", datetime.now())
+        self.modified = kwargs.get("modified", datetime.now())
 
     def to_dict(self) -> dict[str, Any]:
         """Convert node to dictionary representation."""
@@ -78,8 +78,14 @@ class Node:
 class Edge:
     """Represents an edge (relationship) in the knowledge graph."""
 
-    def __init__(self, source_uid: str, target_uid: str, relationship_type: str,
-                 weight: float = 1.0, **kwargs):
+    def __init__(
+        self,
+        source_uid: str,
+        target_uid: str,
+        relationship_type: str,
+        weight: float = 1.0,
+        **kwargs,
+    ):
         """Initialize an edge.
 
         Args:
@@ -94,7 +100,7 @@ class Edge:
         self.relationship_type = relationship_type
         self.weight = weight
         self.properties = kwargs
-        self.created = kwargs.get('created', datetime.now())
+        self.created = kwargs.get("created", datetime.now())
 
     def to_dict(self) -> dict[str, Any]:
         """Convert edge to dictionary representation."""
@@ -110,14 +116,18 @@ class Edge:
         }
 
     def __repr__(self):
-        return f"Edge({self.source_uid} --[{self.relationship_type}]--> {self.target_uid})"
+        return (
+            f"Edge({self.source_uid} --[{self.relationship_type}]--> {self.target_uid})"
+        )
 
     def __eq__(self, other):
         if not isinstance(other, Edge):
             return False
-        return (self.source_uid == other.source_uid and
-                self.target_uid == other.target_uid and
-                self.relationship_type == other.relationship_type)
+        return (
+            self.source_uid == other.source_uid
+            and self.target_uid == other.target_uid
+            and self.relationship_type == other.relationship_type
+        )
 
     def __hash__(self):
         return hash((self.source_uid, self.target_uid, self.relationship_type))
@@ -207,7 +217,9 @@ class Graph:
 
         return True
 
-    def remove_edge(self, source_uid: str, target_uid: str, relationship_type: str) -> bool:
+    def remove_edge(
+        self, source_uid: str, target_uid: str, relationship_type: str
+    ) -> bool:
         """Remove an edge from the graph.
 
         Args:
@@ -229,7 +241,8 @@ class Graph:
 
         # Update adjacency lists if no other edges exist between nodes
         has_other_edges = any(
-            e for e in self.edges
+            e
+            for e in self.edges
             if e.source_uid == source_uid and e.target_uid == target_uid
         )
         if not has_other_edges:
@@ -242,11 +255,15 @@ class Graph:
         """Get a node by its UID."""
         return self.nodes.get(uid)
 
-    def get_edge(self, source_uid: str, target_uid: str, relationship_type: str) -> Edge | None:
+    def get_edge(
+        self, source_uid: str, target_uid: str, relationship_type: str
+    ) -> Edge | None:
         """Get an edge by its endpoints and type."""
         return self.edge_index.get((source_uid, target_uid, relationship_type))
 
-    def get_neighbors(self, uid: str, relationship_type: str | None = None) -> list[str]:
+    def get_neighbors(
+        self, uid: str, relationship_type: str | None = None
+    ) -> list[str]:
         """Get neighboring nodes.
 
         Args:
@@ -270,7 +287,9 @@ class Graph:
 
         return neighbors
 
-    def get_incoming_neighbors(self, uid: str, relationship_type: str | None = None) -> list[str]:
+    def get_incoming_neighbors(
+        self, uid: str, relationship_type: str | None = None
+    ) -> list[str]:
         """Get nodes that point to this node.
 
         Args:
@@ -294,7 +313,9 @@ class Graph:
 
         return neighbors
 
-    def get_edges_from_node(self, uid: str, relationship_type: str | None = None) -> list[Edge]:
+    def get_edges_from_node(
+        self, uid: str, relationship_type: str | None = None
+    ) -> list[Edge]:
         """Get all edges originating from a node.
 
         Args:
@@ -314,7 +335,9 @@ class Graph:
                     edges.append(edge)
         return edges
 
-    def get_edges_to_node(self, uid: str, relationship_type: str | None = None) -> list[Edge]:
+    def get_edges_to_node(
+        self, uid: str, relationship_type: str | None = None
+    ) -> list[Edge]:
         """Get all edges pointing to a node.
 
         Args:
@@ -334,7 +357,7 @@ class Graph:
                     edges.append(edge)
         return edges
 
-    def get_subgraph(self, node_uids: list[str]) -> 'Graph':
+    def get_subgraph(self, node_uids: list[str]) -> "Graph":
         """Get a subgraph containing only specified nodes.
 
         Args:

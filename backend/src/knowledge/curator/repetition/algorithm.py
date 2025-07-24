@@ -34,7 +34,7 @@ class SM2Algorithm:
         repetitions: int = 0,
         ease_factor: float = DEFAULT_EASE_FACTOR,
         interval: int = 1,
-        **kwargs
+        **kwargs,
     ) -> dict[str, any]:
         """
         Calculate the next review parameters based on the SM-2 algorithm.
@@ -202,10 +202,7 @@ class SM2Algorithm:
         max_items = available_time // average_time_per_item
 
         # Sort by urgency (lowest retention probability first)
-        sorted_items = sorted(
-            items,
-            key=lambda x: x.get('retention_probability', 0)
-        )
+        sorted_items = sorted(items, key=lambda x: x.get("retention_probability", 0))
 
         return sorted_items[:max_items]
 
@@ -271,7 +268,7 @@ class SM2Algorithm:
 
             # Update for next iteration
             params = result
-            current_date = result['next_review_date']
+            current_date = result["next_review_date"]
 
             # Stop if interval exceeds remaining days
             if result["interval"] > (days - (current_date - datetime.now()).days):

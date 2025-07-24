@@ -1,38 +1,58 @@
 """Interfaces for knowledge.curator."""
 
-        title=_('Title'),
+from plone import schema
+from plone.app.textfield import RichText
+from plone.autoform.interfaces import IFormFieldProvider
+from plone.supermodel import model
+from zope.interface import Interface
+from zope.interface import provider
+from plone.theme.interfaces import IDefaultPloneLayer
+
+from knowledge.curator import _
+
+
+class IKnowledgeCuratorLayer(IDefaultPloneLayer):
+    """Marker interface for the knowledge curator theme layer."""
+
+
+@provider(IFormFieldProvider)
+class IResearchNote(model.Schema):
+    """Schema for Research Note content type."""
+
+    title = schema.TextLine(
+        title=_("Title"),
         required=True,
     )
 
     description = schema.Text(
-        title=_('Description'),
-        description=_('Brief description of the research note'),
+        title=_("Description"),
+        description=_("Brief description of the research note"),
         required=False,
     )
 
     content = RichText(
-        title=_('Content'),
-        description=_('Main content of the research note'),
+        title=_("Content"),
+        description=_("Main content of the research note"),
         required=True,
     )
 
     tags = schema.List(
-        title=_('Tags'),
-        description=_('Tags for categorization'),
+        title=_("Tags"),
+        description=_("Tags for categorization"),
         value_type=schema.TextLine(),
         required=False,
         default=[],
     )
 
     source_url = schema.URI(
-        title=_('Source URL'),
-        description=_('Original source of the research'),
+        title=_("Source URL"),
+        description=_("Original source of the research"),
         required=False,
     )
 
     key_insights = schema.List(
-        title=_('Key Insights'),
-        description=_('List of key insights from this research'),
+        title=_("Key Insights"),
+        description=_("List of key insights from this research"),
         value_type=schema.Text(),
         required=False,
         default=[],
@@ -47,33 +67,33 @@ class ILearningGoal(model.Schema):
     """Schema for Learning Goal content type."""
 
     title = schema.TextLine(
-        title=_('Title'),
+        title=_("Title"),
         required=True,
     )
 
     description = schema.Text(
-        title=_('Description'),
-        description=_('Detailed description of the learning goal'),
+        title=_("Description"),
+        description=_("Detailed description of the learning goal"),
         required=True,
     )
 
     target_date = schema.Date(
-        title=_('Target Date'),
-        description=_('Target completion date'),
+        title=_("Target Date"),
+        description=_("Target completion date"),
         required=False,
     )
 
     priority = schema.Choice(
-        title=_('Priority'),
-        description=_('Priority level of this goal'),
-        vocabulary='knowledge.curator.priority_vocabulary',
+        title=_("Priority"),
+        description=_("Priority level of this goal"),
+        vocabulary="knowledge.curator.priority_vocabulary",
         required=False,
         default="medium",
     )
 
     progress = schema.Int(
-        title=_('Progress'),
-        description=_('Progress percentage (0-100)'),
+        title=_("Progress"),
+        description=_("Progress percentage (0-100)"),
         required=False,
         default=0,
         min=0,
@@ -81,24 +101,24 @@ class ILearningGoal(model.Schema):
     )
 
     milestones = schema.List(
-        title=_('Milestones'),
-        description=_('List of milestones to achieve this goal'),
+        title=_("Milestones"),
+        description=_("List of milestones to achieve this goal"),
         value_type=schema.Text(),
         required=False,
         default=[],
     )
 
     related_notes = schema.List(
-        title=_('Related Notes'),
-        description=_('Research notes related to this goal'),
+        title=_("Related Notes"),
+        description=_("Research notes related to this goal"),
         value_type=schema.TextLine(),
         required=False,
         default=[],
     )
 
     reflection = schema.Text(
-        title=_('Reflection'),
-        description=_('Personal reflection on the learning process'),
+        title=_("Reflection"),
+        description=_("Personal reflection on the learning process"),
         required=False,
     )
 
@@ -108,49 +128,49 @@ class IProjectLog(model.Schema):
     """Schema for Project Log content type."""
 
     title = schema.TextLine(
-        title=_('Title'),
+        title=_("Title"),
         required=True,
     )
 
     description = schema.Text(
-        title=_('Description'),
-        description=_('Project description'),
+        title=_("Description"),
+        description=_("Project description"),
         required=True,
     )
 
     start_date = schema.Date(
-        title=_('Start Date'),
-        description=_('Project start date'),
+        title=_("Start Date"),
+        description=_("Project start date"),
         required=False,
     )
 
     status = schema.Choice(
-        title=_('Status'),
-        description=_('Current status of the project'),
-        vocabulary='knowledge.curator.project_status_vocabulary',
+        title=_("Status"),
+        description=_("Current status of the project"),
+        vocabulary="knowledge.curator.project_status_vocabulary",
         required=False,
         default="planning",
     )
 
     entries = schema.List(
-        title=_('Log Entries'),
-        description=_('Project log entries'),
+        title=_("Log Entries"),
+        description=_("Project log entries"),
         value_type=schema.Text(),
         required=False,
         default=[],
     )
 
     deliverables = schema.List(
-        title=_('Deliverables'),
-        description=_('Project deliverables'),
+        title=_("Deliverables"),
+        description=_("Project deliverables"),
         value_type=schema.Text(),
         required=False,
         default=[],
     )
 
     learnings = schema.Text(
-        title=_('Learnings'),
-        description=_('What was learned from this project'),
+        title=_("Learnings"),
+        description=_("What was learned from this project"),
         required=False,
     )
 
@@ -160,42 +180,42 @@ class IBookmarkPlus(model.Schema):
     """Schema for BookmarkPlus content type."""
 
     title = schema.TextLine(
-        title=_('Title'),
+        title=_("Title"),
         required=True,
     )
 
     url = schema.URI(
-        title=_('URL'),
-        description=_('The bookmarked URL'),
+        title=_("URL"),
+        description=_("The bookmarked URL"),
         required=True,
     )
 
     tags = schema.List(
-        title=_('Tags'),
-        description=_('Tags for categorization'),
+        title=_("Tags"),
+        description=_("Tags for categorization"),
         value_type=schema.TextLine(),
         required=False,
         default=[],
     )
 
     notes = schema.Text(
-        title=_('Notes'),
-        description=_('Personal notes about this bookmark'),
+        title=_("Notes"),
+        description=_("Personal notes about this bookmark"),
         required=False,
     )
 
     read_status = schema.Choice(
-        title=_('Read Status'),
-        description=_('Whether you have read this content'),
-        vocabulary='knowledge.curator.read_status_vocabulary',
+        title=_("Read Status"),
+        description=_("Whether you have read this content"),
+        vocabulary="knowledge.curator.read_status_vocabulary",
         required=False,
         default="unread",
     )
 
     importance = schema.Choice(
-        title=_('Importance'),
-        description=_('How important is this bookmark'),
-        vocabulary='knowledge.curator.importance_vocabulary',
+        title=_("Importance"),
+        description=_("How important is this bookmark"),
+        vocabulary="knowledge.curator.importance_vocabulary",
         required=False,
         default="medium",
     )

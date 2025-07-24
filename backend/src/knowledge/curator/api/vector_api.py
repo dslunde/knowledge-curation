@@ -261,8 +261,5 @@ class VectorClusteringService(Service):
         return {
             "clusters": clusters,
             "n_clusters": len(clusters),
-            "parameters": {
-                "content_types": content_types,
-                "n_clusters": n_clusters
-            }
+            "parameters": {"content_types": content_types, "n_clusters": n_clusters},
         }

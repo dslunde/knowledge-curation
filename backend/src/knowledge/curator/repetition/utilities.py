@@ -6,7 +6,17 @@ from knowledge.curator.repetition import ForgettingCurve
 from knowledge.curator.repetition import PerformanceTracker
 from knowledge.curator.repetition import ReviewScheduler
 from plone import api
-        limit: int | None = None
+
+
+class ReviewUtilities:
+    """Utilities for managing spaced repetition reviews."""
+
+    @classmethod
+    def get_items_due_for_review(
+        cls,
+        user_id: str | None = None,
+        portal_types: list[str] | None = None,
+        limit: int | None = None,
     ) -> list[dict]:
         """
         Get items due for review.
@@ -24,15 +34,12 @@ from plone import api
             user_id = user.getId()
 
         if portal_types is None:
-            portal_types = ['ResearchNote', 'BookmarkPlus', 'LearningGoal']
+            portal_types = ["ResearchNote", "BookmarkPlus", "LearningGoal"]
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
 
         # Query for user's items
-        brains = catalog(
-            Creator=user_id,
-            portal_type=portal_types
-        )
+        brains = catalog(Creator=user_id, portal_type=portal_types)
 
         due_items = []
         now = datetime.now()
@@ -93,7 +100,7 @@ from plone import api
                 continue
 
         # Sort by urgency (highest first)
-        due_items.sort(key=lambda x: x['urgency_score'], reverse=True)
+        due_items.sort(key=lambda x: x["urgency_score"], reverse=True)
 
         # Apply limit if specified
         if limit:
@@ -137,13 +144,11 @@ from plone import api
         elif interval < 90:
             return "mature"
         else:
-            return 'mastered'
+            return "mastered"
 
     @classmethod
     def calculate_optimal_review_times(
-        cls,
-        items: list[dict],
-        target_retention: float = 0.9
+        cls, items: list[dict], target_retention: float = 0.9
     ) -> list[dict]:
         """
         Calculate optimal review times for items.
@@ -158,7 +163,7 @@ from plone import api
         results = []
 
         for item in items:
-            sr_data = item.get('sr_data', {})
+            sr_data = item.get("sr_data", {})
 
             optimal_days = ForgettingCurve.find_optimal_review_day(
                 interval=sr_data.get("interval", 1),
@@ -167,8 +172,8 @@ from plone import api
                 target_retention=target_retention,
             )
 
-            if sr_data.get('last_review'):
-                last_review = datetime.fromisoformat(sr_data['last_review'])
+            if sr_data.get("last_review"):
+                last_review = datetime.fromisoformat(sr_data["last_review"])
                 optimal_date = last_review + timedelta(days=optimal_days)
             else:
                 optimal_date = datetime.now()
@@ -184,10 +189,7 @@ from plone import api
 
     @classmethod
     def handle_review_response(
-        cls,
-        uid: str,
-        quality: int,
-        time_spent: int | None = None
+        cls, uid: str, quality: int, time_spent: int | None = None
     ) -> dict:
         """
         Handle a review response and update the item.
@@ -232,9 +234,7 @@ from plone import api
 
     @classmethod
     def get_adaptive_schedule(
-        cls,
-        user_id: str | None = None,
-        days_ahead: int = 30
+        cls, user_id: str | None = None, days_ahead: int = 30
     ) -> dict:
         """
         Get adaptive review schedule based on performance.
@@ -338,20 +338,14 @@ from plone import api
 
     @classmethod
     def _generate_schedule_recommendations(
-        cls,
-        performance: dict,
-        workload: list[dict],
-        optimal_times: dict
+        cls, performance: dict, workload: list[dict], optimal_times: dict
     ) -> list[str]:
         """Generate schedule recommendations."""
         recommendations = []
 
         # Check for overload days
-        avg_daily = sum(day['count'] for day in workload[:30]) / 30
-        overload_days = [
-            day for day in workload[:7]
-            if day['count'] > avg_daily * 1.5
-        ]
+        avg_daily = sum(day["count"] for day in workload[:30]) / 30
+        overload_days = [day for day in workload[:7] if day["count"] > avg_daily * 1.5]
 
         if overload_days:
             recommendations.append(
@@ -378,9 +372,7 @@ from plone import api
 
     @classmethod
     def get_items_at_risk(
-        cls,
-        user_id: str | None = None,
-        retention_threshold: float = 0.8
+        cls, user_id: str | None = None, retention_threshold: float = 0.8
     ) -> list[dict]:
         """
         Get items at risk of being forgotten.
@@ -402,7 +394,7 @@ from plone import api
         ]
 
         # Sort by retention (lowest first)
-        at_risk.sort(key=lambda x: x['sr_data']['retention_score'])
+        at_risk.sort(key=lambda x: x["sr_data"]["retention_score"])
 
         # Add risk level
         for item in at_risk:
@@ -414,16 +406,12 @@ from plone import api
             elif retention < 0.8:
                 item["risk_level"] = "medium"
             else:
-                item['risk_level'] = 'low'
+                item["risk_level"] = "low"
 
         return at_risk
 
     @classmethod
-    def bulk_reschedule(
-        cls,
-        uids: list[str],
-        strategy: str = 'optimal'
-    ) -> dict:
+    def bulk_reschedule(cls, uids: list[str], strategy: str = "optimal") -> dict:
         """
         Bulk reschedule items.
 
@@ -434,13 +422,9 @@ from plone import api
         Returns:
             Results of rescheduling
         """
-        results = {
-            'success': [],
-            'failed': [],
-            'total': len(uids)
-        }
+        results = {"success": [], "failed": [], "total": len(uids)}
 
-        catalog = api.portal.get_tool('portal_catalog')
+        catalog = api.portal.get_tool("portal_catalog")
 
         for uid in uids:
             try:
@@ -451,14 +435,11 @@ from plone import api
 
                 obj = brains[0].getObject()
 
-                if not api.user.has_permission('Modify portal content', obj=obj):
-                    results['failed'].append({
-                        'uid': uid,
-                        'error': 'Permission denied'
-                    })
+                if not api.user.has_permission("Modify portal content", obj=obj):
+                    results["failed"].append({"uid": uid, "error": "Permission denied"})
                     continue
 
-                if strategy == 'optimal':
+                if strategy == "optimal":
                     # Calculate optimal interval
                     optimal_days = ForgettingCurve.find_optimal_review_day(
                         interval=obj.interval or 1,
@@ -467,27 +448,26 @@ from plone import api
                     )
                     obj.next_review = datetime.now() + timedelta(days=optimal_days)
 
-                elif strategy == 'reset':
+                elif strategy == "reset":
                     # Reset to beginning
                     obj.reset_repetition()
 
-                elif strategy == 'postpone':
+                elif strategy == "postpone":
                     # Postpone by current interval
                     days = obj.interval or 1
                     obj.next_review = datetime.now() + timedelta(days=days)
 
                 obj.reindexObject()
 
-                results['success'].append({
-                    'uid': uid,
-                    'title': obj.Title(),
-                    'new_review_date': obj.next_review.isoformat() if obj.next_review else None
+                results["success"].append({
+                    "uid": uid,
+                    "title": obj.Title(),
+                    "new_review_date": obj.next_review.isoformat()
+                    if obj.next_review
+                    else None,
                 })
 
             except Exception as e:
-                results['failed'].append({
-                    'uid': uid,
-                    'error': str(e)
-                })
+                results["failed"].append({"uid": uid, "error": str(e)})
 
         return results

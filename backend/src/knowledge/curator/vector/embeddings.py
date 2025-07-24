@@ -52,7 +52,7 @@ class EmbeddingGenerator:
         try:
             # Truncate text if needed
             if len(text) > self.max_sequence_length * 4:  # Rough character estimate
-                text = text[:self.max_sequence_length * 4]
+                text = text[: self.max_sequence_length * 4]
 
             embedding = self.model.encode(text, convert_to_numpy=True)
             return embedding.tolist()
@@ -61,8 +61,9 @@ class EmbeddingGenerator:
             logger.error(f"Failed to generate embedding: {e}")
             return [0.0] * self.embedding_dimension
 
-    def generate_embeddings(self, texts: list[str], batch_size: int = 32,
-                          show_progress: bool = False) -> list[list[float]]:
+    def generate_embeddings(
+        self, texts: list[str], batch_size: int = 32, show_progress: bool = False
+    ) -> list[list[float]]:
         """Generate embeddings for multiple texts in batches."""
         if not texts:
             return []
@@ -196,8 +197,9 @@ class EmbeddingGenerator:
             logger.error(f"Failed to prepare content text: {e}")
             return ""
 
-    def calculate_similarity(self, embedding1: list[float],
-                           embedding2: list[float]) -> float:
+    def calculate_similarity(
+        self, embedding1: list[float], embedding2: list[float]
+    ) -> float:
         """Calculate cosine similarity between two embeddings."""
         try:
             # Convert to numpy arrays
