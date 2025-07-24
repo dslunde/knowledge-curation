@@ -7,11 +7,7 @@
   <class class=".learning_goal.LearningGoal">
     <require
         permission="zope2.View"
-        interface="knowledge.curator.interfaces.ILearningGoal"
-        />
-    <require
-        permission="zope2.View"
-        set_schema="knowledge.curator.interfaces.ILearningGoal"
+        attributes="add_milestone update_milestone complete_milestone calculate_progress update_progress add_related_note remove_related_note is_overdue"
         />
   </class>
 

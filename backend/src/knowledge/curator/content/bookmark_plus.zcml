@@ -7,11 +7,7 @@
   <class class=".bookmark_plus.BookmarkPlus">
     <require
         permission="zope2.View"
-        interface="knowledge.curator.interfaces.IBookmarkPlus"
-        />
-    <require
-        permission="zope2.View"
-        set_schema="knowledge.curator.interfaces.IBookmarkPlus"
+        attributes="get_embedding update_embedding mark_as_read mark_as_reading get_read_date get_reading_started_date add_tag remove_tag update_importance is_high_priority get_summary_text"
         />
   </class>
 

@@ -7,6 +7,7 @@ from plone.supermodel import model
 from zope import schema
 from zope.component import adapter
 from zope.interface import implementer
+from zope.interface import Interface
 from zope.interface import provider
 
 from knowledge.curator.repetition import ForgettingCurve
@@ -105,7 +106,7 @@ class ISpacedRepetition(model.Schema):
 
 
 @implementer(ISpacedRepetition)
-@adapter(ISpacedRepetition)
+@adapter(Interface)
 class SpacedRepetition:
     """Adapter for spaced repetition functionality."""
 

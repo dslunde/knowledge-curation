@@ -7,11 +7,7 @@
   <class class=".project_log.ProjectLog">
     <require
         permission="zope2.View"
-        interface="knowledge.curator.interfaces.IProjectLog"
-        />
-    <require
-        permission="zope2.View"
-        set_schema="knowledge.curator.interfaces.IProjectLog"
+        attributes="add_entry update_entry get_entries_by_tag get_recent_entries add_deliverable add_learning update_status get_duration"
         />
   </class>
 

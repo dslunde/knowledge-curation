@@ -7,11 +7,7 @@
   <class class=".research_note.ResearchNote">
     <require
         permission="zope2.View"
-        interface="knowledge.curator.interfaces.IResearchNote"
-        />
-    <require
-        permission="zope2.View"
-        set_schema="knowledge.curator.interfaces.IResearchNote"
+        attributes="get_embedding update_embedding add_connection remove_connection get_connections add_insight"
         />
   </class>
 

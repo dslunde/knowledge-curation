@@ -64,7 +64,7 @@ class IKnowledgeGraphBehavior(model.Schema):
         title=_("Graph Metadata"),
         description=_("Additional metadata for knowledge graph"),
         key_type=schema.TextLine(),
-        value_type=schema.Field(),
+        value_type=schema.TextLine(),
         required=False,
         default={},
     )
