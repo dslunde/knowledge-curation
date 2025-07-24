@@ -7,6 +7,10 @@ from datetime import datetime
 from datetime import timedelta
 
 import math
+<<<<<<< HEAD
+=======
+from datetime import datetime, timedelta
+>>>>>>> fixing_linting_and_tests
 
 
 class ForgettingCurve:
@@ -81,7 +85,11 @@ class ForgettingCurve:
         interval: int,
         ease_factor: float = 2.5,
         repetitions: int = 0,
+<<<<<<< HEAD
         days_ahead: int = None,
+=======
+        days_ahead: int = None
+>>>>>>> fixing_linting_and_tests
     ) -> list[dict[str, float]]:
         """
         Generate forgetting curve data points for visualization.
@@ -142,7 +150,13 @@ class ForgettingCurve:
 
     @classmethod
     def get_retention_alerts(
+<<<<<<< HEAD
         cls, items: list[dict], threshold: float = DEFAULT_RETENTION_THRESHOLD
+=======
+        cls,
+        items: list[dict],
+        threshold: float = DEFAULT_RETENTION_THRESHOLD
+>>>>>>> fixing_linting_and_tests
     ) -> list[dict]:
         """
         Get alerts for items at risk of being forgotten.
@@ -158,10 +172,17 @@ class ForgettingCurve:
         now = datetime.now()
 
         for item in items:
+<<<<<<< HEAD
             sr_data = item.get("sr_data", {})
 
             if sr_data.get("last_review"):
                 last_review = sr_data["last_review"]
+=======
+            sr_data = item.get('sr_data', {})
+
+            if sr_data.get('last_review'):
+                last_review = sr_data['last_review']
+>>>>>>> fixing_linting_and_tests
                 if isinstance(last_review, str):
                     last_review = datetime.fromisoformat(last_review)
 
@@ -183,7 +204,11 @@ class ForgettingCurve:
                     })
 
         # Sort by retention (lowest first)
+<<<<<<< HEAD
         alerts.sort(key=lambda x: x["retention"])
+=======
+        alerts.sort(key=lambda x: x['retention'])
+>>>>>>> fixing_linting_and_tests
 
         return alerts
 
@@ -197,10 +222,20 @@ class ForgettingCurve:
         elif retention >= 0.2:
             return "high"
         else:
+<<<<<<< HEAD
             return "critical"
 
     @classmethod
     def analyze_learning_efficiency(cls, review_history: list[dict]) -> dict[str, any]:
+=======
+            return 'critical'
+
+    @classmethod
+    def analyze_learning_efficiency(
+        cls,
+        review_history: list[dict]
+    ) -> dict[str, any]:
+>>>>>>> fixing_linting_and_tests
         """
         Analyze learning efficiency based on review history.
 
@@ -219,7 +254,11 @@ class ForgettingCurve:
             }
 
         total_reviews = len(review_history)
+<<<<<<< HEAD
         successful_reviews = sum(1 for r in review_history if r.get("quality", 0) >= 3)
+=======
+        successful_reviews = sum(1 for r in review_history if r.get('quality', 0) >= 3)
+>>>>>>> fixing_linting_and_tests
 
         # Calculate average retention at review time
         retention_values = []
@@ -239,9 +278,13 @@ class ForgettingCurve:
                 )
                 retention_values.append(retention)
 
+<<<<<<< HEAD
         avg_retention = (
             sum(retention_values) / len(retention_values) if retention_values else 0
         )
+=======
+        avg_retention = sum(retention_values) / len(retention_values) if retention_values else 0
+>>>>>>> fixing_linting_and_tests
 
         # Calculate efficiency score
         success_rate = successful_reviews / total_reviews if total_reviews > 0 else 0
@@ -255,6 +298,7 @@ class ForgettingCurve:
                 "Review items more frequently to maintain better retention"
             )
         elif avg_retention > 0.95:
+<<<<<<< HEAD
             recommendations.append(
                 "You might be reviewing too frequently - consider longer intervals"
             )
@@ -263,13 +307,23 @@ class ForgettingCurve:
             recommendations.append(
                 "Focus on understanding before moving to longer intervals"
             )
+=======
+            recommendations.append("You might be reviewing too frequently - consider longer intervals")
+
+        if success_rate < 0.8:
+            recommendations.append("Focus on understanding before moving to longer intervals")
+>>>>>>> fixing_linting_and_tests
 
         # Check interval progression
         intervals = [r.get("interval", 1) for r in review_history]
         if len(intervals) > 3 and all(i <= 7 for i in intervals[-3:]):
+<<<<<<< HEAD
             recommendations.append(
                 "Your intervals aren't increasing - ensure quality responses"
             )
+=======
+            recommendations.append("Your intervals aren't increasing - ensure quality responses")
+>>>>>>> fixing_linting_and_tests
 
         return {
             "efficiency_score": round(efficiency_score, 1),
@@ -282,7 +336,13 @@ class ForgettingCurve:
 
     @classmethod
     def predict_workload(
+<<<<<<< HEAD
         cls, items: list[dict], days_ahead: int = 30
+=======
+        cls,
+        items: list[dict],
+        days_ahead: int = 30
+>>>>>>> fixing_linting_and_tests
     ) -> list[dict[str, any]]:
         """
         Predict review workload for upcoming days.
@@ -298,10 +358,17 @@ class ForgettingCurve:
         today = datetime.now().date()
 
         for item in items:
+<<<<<<< HEAD
             sr_data = item.get("sr_data", {})
 
             if sr_data.get("next_review"):
                 next_review = sr_data["next_review"]
+=======
+            sr_data = item.get('sr_data', {})
+
+            if sr_data.get('next_review'):
+                next_review = sr_data['next_review']
+>>>>>>> fixing_linting_and_tests
                 if isinstance(next_review, str):
                     next_review = datetime.fromisoformat(next_review).date()
                 elif isinstance(next_review, datetime):
@@ -312,6 +379,7 @@ class ForgettingCurve:
                 if 0 <= days_until <= days_ahead:
                     date_str = next_review.isoformat()
                     if date_str not in workload:
+<<<<<<< HEAD
                         workload[date_str] = {"date": date_str, "count": 0, "items": []}
 
                     workload[date_str]["count"] += 1
@@ -319,6 +387,19 @@ class ForgettingCurve:
                         "title": item.get("title", "Unknown"),
                         "type": item.get("type", "Unknown"),
                         "interval": sr_data.get("interval", 1),
+=======
+                        workload[date_str] = {
+                            'date': date_str,
+                            'count': 0,
+                            'items': []
+                        }
+
+                    workload[date_str]['count'] += 1
+                    workload[date_str]['items'].append({
+                        'title': item.get('title', 'Unknown'),
+                        'type': item.get('type', 'Unknown'),
+                        'interval': sr_data.get('interval', 1)
+>>>>>>> fixing_linting_and_tests
                     })
 
         # Fill in missing days
@@ -326,24 +407,46 @@ class ForgettingCurve:
             date = today + timedelta(days=day)
             date_str = date.isoformat()
             if date_str not in workload:
+<<<<<<< HEAD
                 workload[date_str] = {"date": date_str, "count": 0, "items": []}
 
         # Convert to sorted list
         workload_list = sorted(workload.values(), key=lambda x: x["date"])
+=======
+                workload[date_str] = {
+                    'date': date_str,
+                    'count': 0,
+                    'items': []
+                }
+
+        # Convert to sorted list
+        workload_list = sorted(workload.values(), key=lambda x: x['date'])
+>>>>>>> fixing_linting_and_tests
 
         # Add cumulative and average metrics
         total_items = sum(day["count"] for day in workload_list)
         avg_per_day = total_items / len(workload_list) if workload_list else 0
 
         for i, day in enumerate(workload_list):
+<<<<<<< HEAD
             day["cumulative"] = sum(d["count"] for d in workload_list[: i + 1])
             day["is_above_average"] = day["count"] > avg_per_day
+=======
+            day['cumulative'] = sum(d['count'] for d in workload_list[:i+1])
+            day['is_above_average'] = day['count'] > avg_per_day
+>>>>>>> fixing_linting_and_tests
 
         return workload_list
 
     @classmethod
     def generate_retention_heatmap(
+<<<<<<< HEAD
         cls, items: list[dict], days: int = 30
+=======
+        cls,
+        items: list[dict],
+        days: int = 30
+>>>>>>> fixing_linting_and_tests
     ) -> dict[str, list[float]]:
         """
         Generate retention heatmap data for visualization.
@@ -358,8 +461,13 @@ class ForgettingCurve:
         heatmap_data = {}
 
         for item in items:
+<<<<<<< HEAD
             sr_data = item.get("sr_data", {})
             item_id = item.get("uid", item.get("title", "Unknown"))
+=======
+            sr_data = item.get('sr_data', {})
+            item_id = item.get('uid', item.get('title', 'Unknown'))
+>>>>>>> fixing_linting_and_tests
 
             retention_values = []
             for day in range(days):

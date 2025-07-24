@@ -16,6 +16,7 @@ class IKnowledgeGraphBehavior(model.Schema):
     """Behavior for knowledge graph relationships."""
 
     directives.fieldset(
+<<<<<<< HEAD
         "knowledge_graph",
         label=_("Knowledge Graph"),
         fields=[
@@ -30,30 +31,55 @@ class IKnowledgeGraphBehavior(model.Schema):
     connections = schema.List(
         title=_("Connections"),
         description=_("Related notes and content (UIDs)"),
+=======
+        'knowledge_graph',
+        label=_('Knowledge Graph'),
+        fields=['connections', 'embedding_vector', 'related_concepts', 'concept_weight', 'graph_metadata'],
+    )
+
+    connections = schema.List(
+        title=_('Connections'),
+        description=_('Related notes and content (UIDs)'),
+>>>>>>> fixing_linting_and_tests
         value_type=schema.TextLine(),
         required=False,
         default=[],
     )
 
     embedding_vector = schema.List(
+<<<<<<< HEAD
         title=_("Embedding Vector"),
         description=_("AI-generated embedding vector for similarity search"),
+=======
+        title=_('Embedding Vector'),
+        description=_('AI-generated embedding vector for similarity search'),
+>>>>>>> fixing_linting_and_tests
         value_type=schema.Float(),
         required=False,
         readonly=True,
     )
 
     related_concepts = schema.List(
+<<<<<<< HEAD
         title=_("Related Concepts"),
         description=_("Concepts related to this content"),
+=======
+        title=_('Related Concepts'),
+        description=_('Concepts related to this content'),
+>>>>>>> fixing_linting_and_tests
         value_type=schema.TextLine(),
         required=False,
         default=[],
     )
 
     concept_weight = schema.Float(
+<<<<<<< HEAD
         title=_("Concept Weight"),
         description=_("Weight of this content in the knowledge graph"),
+=======
+        title=_('Concept Weight'),
+        description=_('Weight of this content in the knowledge graph'),
+>>>>>>> fixing_linting_and_tests
         required=False,
         default=1.0,
         min=0.0,
@@ -61,8 +87,13 @@ class IKnowledgeGraphBehavior(model.Schema):
     )
 
     graph_metadata = schema.Dict(
+<<<<<<< HEAD
         title=_("Graph Metadata"),
         description=_("Additional metadata for knowledge graph"),
+=======
+        title=_('Graph Metadata'),
+        description=_('Additional metadata for knowledge graph'),
+>>>>>>> fixing_linting_and_tests
         key_type=schema.TextLine(),
         value_type=schema.Field(),
         required=False,
@@ -81,7 +112,11 @@ class KnowledgeGraphBehavior:
     @property
     def connections(self):
         """Get connections."""
+<<<<<<< HEAD
         return getattr(self.context, "connections", [])
+=======
+        return getattr(self.context, 'connections', [])
+>>>>>>> fixing_linting_and_tests
 
     @connections.setter
     def connections(self, value):
@@ -91,7 +126,11 @@ class KnowledgeGraphBehavior:
     @property
     def embedding_vector(self):
         """Get embedding vector."""
+<<<<<<< HEAD
         return getattr(self.context, "embedding_vector", [])
+=======
+        return getattr(self.context, 'embedding_vector', [])
+>>>>>>> fixing_linting_and_tests
 
     @embedding_vector.setter
     def embedding_vector(self, value):
@@ -101,7 +140,11 @@ class KnowledgeGraphBehavior:
     @property
     def related_concepts(self):
         """Get related concepts."""
+<<<<<<< HEAD
         return getattr(self.context, "related_concepts", [])
+=======
+        return getattr(self.context, 'related_concepts', [])
+>>>>>>> fixing_linting_and_tests
 
     @related_concepts.setter
     def related_concepts(self, value):

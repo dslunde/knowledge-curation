@@ -20,6 +20,10 @@ def knowledge_item_workflow_changed(obj, event):
         return
 
     transition_id = event.transition.id
+<<<<<<< HEAD
+=======
+    new_state = event.new_state.id
+>>>>>>> fixing_linting_and_tests
 
     # Handle specific transitions
     if transition_id == "start_processing":
@@ -69,7 +73,11 @@ def handle_start_processing(obj):
 def handle_start_connecting(obj):
     """Handle entering the connecting state."""
     # Find and suggest related content
+<<<<<<< HEAD
     catalog = api.portal.get_tool("portal_catalog")
+=======
+    catalog = api.portal.get_tool('portal_catalog')
+>>>>>>> fixing_linting_and_tests
 
     # Simple tag-based suggestions for now
     if hasattr(obj, "tags") and obj.tags:
@@ -104,8 +112,13 @@ def handle_publishing(obj):
 
     annotations = IAnnotations(obj)
 
+<<<<<<< HEAD
     if "knowledge.curator.draft" in annotations:
         del annotations["knowledge.curator.draft"]
+=======
+    if 'knowledge.curator.draft' in annotations:
+        del annotations['knowledge.curator.draft']
+>>>>>>> fixing_linting_and_tests
 
     # Log publication
     logger.info(f"Published knowledge item: {obj.absolute_url()}")
@@ -126,7 +139,11 @@ def send_completion_notification(obj):
     owner = obj.Creator()
     member = api.user.get(userid=owner)
 
+<<<<<<< HEAD
     if member and member.getProperty("email"):
+=======
+    if member and member.getProperty('email'):
+>>>>>>> fixing_linting_and_tests
         # In a real implementation, send email
         logger.info(
             f"Learning goal '{obj.title}' completed by {owner}. "
@@ -145,7 +162,10 @@ def send_completion_notification(obj):
 def log_abandonment(obj):
     """Log when a learning goal is abandoned."""
     from datetime import datetime
+<<<<<<< HEAD
     from zope.annotation.interfaces import IAnnotations
+=======
+>>>>>>> fixing_linting_and_tests
 
     annotations = IAnnotations(obj)
     annotations["knowledge.curator.abandoned"] = {

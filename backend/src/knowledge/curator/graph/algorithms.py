@@ -1,5 +1,11 @@
 """Graph algorithms for analysis and traversal."""
 
+<<<<<<< HEAD
+=======
+from typing import Any
+from collections import deque
+import heapq
+>>>>>>> fixing_linting_and_tests
 from .model import Graph
 from .relationships import RelationshipType
 from collections import deque
@@ -19,9 +25,14 @@ class GraphAlgorithms:
         """
         self.graph = graph
 
+<<<<<<< HEAD
     def shortest_path(
         self, start_uid: str, end_uid: str, relationship_types: list[str] | None = None
     ) -> list[str] | None:
+=======
+    def shortest_path(self, start_uid: str, end_uid: str,
+                     relationship_types: list[str] | None = None) -> list[str] | None:
+>>>>>>> fixing_linting_and_tests
         """Find shortest path between two nodes using Dijkstra's algorithm.
 
         Args:
@@ -74,9 +85,13 @@ class GraphAlgorithms:
                 neighbor_uid = edge.target_uid
                 if neighbor_uid not in visited:
                     # Use inverse of weight as distance (higher weight = shorter distance)
+<<<<<<< HEAD
                     distance = current_dist + (
                         1.0 / edge.weight if edge.weight > 0 else float("inf")
                     )
+=======
+                    distance = current_dist + (1.0 / edge.weight if edge.weight > 0 else float('inf'))
+>>>>>>> fixing_linting_and_tests
 
                     if distance < distances[neighbor_uid]:
                         distances[neighbor_uid] = distance
@@ -85,9 +100,13 @@ class GraphAlgorithms:
 
         return None
 
+<<<<<<< HEAD
     def all_paths(
         self, start_uid: str, end_uid: str, max_length: int = 5
     ) -> list[list[str]]:
+=======
+    def all_paths(self, start_uid: str, end_uid: str, max_length: int = 5) -> list[list[str]]:
+>>>>>>> fixing_linting_and_tests
         """Find all paths between two nodes up to a maximum length.
 
         Args:
@@ -160,7 +179,11 @@ class GraphAlgorithms:
         centrality = dict.fromkeys(self.graph.nodes, 0.0)
         nodes = list(self.graph.nodes.keys())
 
+<<<<<<< HEAD
         for _i, start_uid in enumerate(nodes):
+=======
+        for i, start_uid in enumerate(nodes):
+>>>>>>> fixing_linting_and_tests
             # Single source shortest paths
             S = []  # Stack of nodes in order of distance
             P = {uid: [] for uid in nodes}  # Predecessors
@@ -229,12 +252,17 @@ class GraphAlgorithms:
 
         return centrality
 
+<<<<<<< HEAD
     def pagerank(
         self,
         damping_factor: float = 0.85,
         max_iterations: int = 100,
         tolerance: float = 1e-6,
     ) -> dict[str, float]:
+=======
+    def pagerank(self, damping_factor: float = 0.85, max_iterations: int = 100,
+                tolerance: float = 1e-6) -> dict[str, float]:
+>>>>>>> fixing_linting_and_tests
         """Calculate PageRank scores for all nodes.
 
         Args:
@@ -252,7 +280,11 @@ class GraphAlgorithms:
         # Initialize scores
         scores = dict.fromkeys(self.graph.nodes, 1.0 / n)
 
+<<<<<<< HEAD
         for _iteration in range(max_iterations):
+=======
+        for iteration in range(max_iterations):
+>>>>>>> fixing_linting_and_tests
             new_scores = {}
             diff = 0.0
 
@@ -370,9 +402,13 @@ class GraphAlgorithms:
 
         return clusters
 
+<<<<<<< HEAD
     def find_knowledge_gaps(
         self, min_importance: float = 0.5
     ) -> list[tuple[str, str, float]]:
+=======
+    def find_knowledge_gaps(self, min_importance: float = 0.5) -> list[tuple[str, str, float]]:
+>>>>>>> fixing_linting_and_tests
         """Find potential missing connections (knowledge gaps).
 
         Args:
@@ -415,10 +451,16 @@ class GraphAlgorithms:
                 # Calculate gap score
                 if common_neighbors > 0 and path_distance > 2:
                     gap_score = (
+<<<<<<< HEAD
                         (node1_importance + node2_importance)
                         / 2
                         * (common_neighbors / 10)
                         * (1 / path_distance)
+=======
+                        (node1_importance + node2_importance) / 2 *
+                        (common_neighbors / 10) *
+                        (1 / path_distance)
+>>>>>>> fixing_linting_and_tests
                     )
 
                     if gap_score >= min_importance:
@@ -429,9 +471,13 @@ class GraphAlgorithms:
 
         return gaps
 
+<<<<<<< HEAD
     def calculate_knowledge_density(
         self, subgraph_nodes: set[str] | None = None
     ) -> float:
+=======
+    def calculate_knowledge_density(self, subgraph_nodes: set[str] | None = None) -> float:
+>>>>>>> fixing_linting_and_tests
         """Calculate knowledge density of the graph or subgraph.
 
         Args:
@@ -488,7 +534,13 @@ class GraphAlgorithms:
 
         # Sort and return top N
         sorted_concepts = sorted(
+<<<<<<< HEAD
             combined_scores.items(), key=lambda x: x[1], reverse=True
+=======
+            combined_scores.items(),
+            key=lambda x: x[1],
+            reverse=True
+>>>>>>> fixing_linting_and_tests
         )
 
         return sorted_concepts[:top_n]
@@ -531,6 +583,11 @@ class GraphAlgorithms:
                 "incoming": incoming,
                 "total": outgoing + incoming,
             },
+<<<<<<< HEAD
             "community": communities.get(uid, -1),
             "node_info": self.graph.get_node(uid).to_dict(),
+=======
+            'community': communities.get(uid, -1),
+            'node_info': self.graph.get_node(uid).to_dict()
+>>>>>>> fixing_linting_and_tests
         }

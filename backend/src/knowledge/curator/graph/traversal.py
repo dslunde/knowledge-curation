@@ -1,7 +1,14 @@
 """Graph traversal utilities for navigation and exploration."""
 
+<<<<<<< HEAD
 from .model import Graph
 from .model import Node
+=======
+from typing import Any
+from collections.abc import Callable
+from collections import deque
+from .model import Graph, Node
+>>>>>>> fixing_linting_and_tests
 from .relationships import RelationshipType
 from collections import deque
 from collections.abc import Callable
@@ -19,6 +26,7 @@ class GraphTraversal:
         """
         self.graph = graph
 
+<<<<<<< HEAD
     def breadth_first_search(
         self,
         start_uid: str,
@@ -26,6 +34,12 @@ class GraphTraversal:
         max_depth: int | None = None,
         relationship_types: list[str] | None = None,
     ) -> list[tuple[Node, int]]:
+=======
+    def breadth_first_search(self, start_uid: str,
+                           visit_func: Callable[[Node, int], bool] | None = None,
+                           max_depth: int | None = None,
+                           relationship_types: list[str] | None = None) -> list[tuple[Node, int]]:
+>>>>>>> fixing_linting_and_tests
         """Perform breadth-first search from a starting node.
 
         Args:
@@ -74,6 +88,7 @@ class GraphTraversal:
 
         return result
 
+<<<<<<< HEAD
     def depth_first_search(
         self,
         start_uid: str,
@@ -81,6 +96,12 @@ class GraphTraversal:
         max_depth: int | None = None,
         relationship_types: list[str] | None = None,
     ) -> list[tuple[Node, int]]:
+=======
+    def depth_first_search(self, start_uid: str,
+                         visit_func: Callable[[Node, int], bool] | None = None,
+                         max_depth: int | None = None,
+                         relationship_types: list[str] | None = None) -> list[tuple[Node, int]]:
+>>>>>>> fixing_linting_and_tests
         """Perform depth-first search from a starting node.
 
         Args:
@@ -160,9 +181,14 @@ class GraphTraversal:
 
         return component
 
+<<<<<<< HEAD
     def get_neighborhood(
         self, center_uid: str, radius: int = 1, include_incoming: bool = True
     ) -> dict[str, int]:
+=======
+    def get_neighborhood(self, center_uid: str, radius: int = 1,
+                        include_incoming: bool = True) -> dict[str, int]:
+>>>>>>> fixing_linting_and_tests
         """Get all nodes within a certain distance from center node.
 
         Args:
@@ -203,6 +229,7 @@ class GraphTraversal:
 
         return distances
 
+<<<<<<< HEAD
     def find_all_paths(
         self,
         start_uid: str,
@@ -210,6 +237,11 @@ class GraphTraversal:
         max_length: int = 5,
         relationship_types: list[str] | None = None,
     ) -> list[list[str]]:
+=======
+    def find_all_paths(self, start_uid: str, end_uid: str,
+                      max_length: int = 5,
+                      relationship_types: list[str] | None = None) -> list[list[str]]:
+>>>>>>> fixing_linting_and_tests
         """Find all paths between two nodes.
 
         Args:
@@ -285,7 +317,12 @@ class GraphTraversal:
             score = 0
             for i in range(len(path) - 1):
                 edge = self.graph.get_edge(
+<<<<<<< HEAD
                     path[i], path[i + 1], RelationshipType.PREREQUISITE_OF.value
+=======
+                    path[i], path[i+1],
+                    RelationshipType.PREREQUISITE_OF.value
+>>>>>>> fixing_linting_and_tests
                 )
                 if not edge:
                     edge = self.graph.get_edge(
@@ -303,9 +340,13 @@ class GraphTraversal:
 
         return best_path
 
+<<<<<<< HEAD
     def explore_topic(
         self, topic_uid: str, max_nodes: int = 20
     ) -> list[tuple[Node, float]]:
+=======
+    def explore_topic(self, topic_uid: str, max_nodes: int = 20) -> list[tuple[Node, float]]:
+>>>>>>> fixing_linting_and_tests
         """Explore nodes related to a topic, ranked by relevance.
 
         Args:
@@ -358,9 +399,13 @@ class GraphTraversal:
 
         return result
 
+<<<<<<< HEAD
     def get_breadcrumb_path(
         self, target_uid: str, root_uid: str | None = None
     ) -> list[str]:
+=======
+    def get_breadcrumb_path(self, target_uid: str, root_uid: str | None = None) -> list[str]:
+>>>>>>> fixing_linting_and_tests
         """Get breadcrumb navigation path from root to target.
 
         Args:
@@ -416,9 +461,15 @@ class GraphTraversal:
 
         return path if path else [target_uid]
 
+<<<<<<< HEAD
     def suggest_next_nodes(
         self, current_uid: str, visited_uids: set[str], limit: int = 5
     ) -> list[tuple[Node, str, float]]:
+=======
+    def suggest_next_nodes(self, current_uid: str,
+                          visited_uids: set[str],
+                          limit: int = 5) -> list[tuple[Node, str, float]]:
+>>>>>>> fixing_linting_and_tests
         """Suggest next nodes to explore based on current position and history.
 
         Args:
@@ -502,9 +553,14 @@ class GraphTraversal:
                 # Find central node
                 degree_counts = {}
                 for node_uid in component:
+<<<<<<< HEAD
                     degree = len(self.graph.get_neighbors(node_uid)) + len(
                         self.graph.get_incoming_neighbors(node_uid)
                     )
+=======
+                    degree = (len(self.graph.get_neighbors(node_uid)) +
+                             len(self.graph.get_incoming_neighbors(node_uid)))
+>>>>>>> fixing_linting_and_tests
                     degree_counts[node_uid] = degree
 
                 central_uid = max(degree_counts.items(), key=lambda x: x[1])[0]
@@ -524,6 +580,10 @@ class GraphTraversal:
                 processed.update(component)
 
         # Sort by size
+<<<<<<< HEAD
         clusters.sort(key=lambda x: x["size"], reverse=True)
+=======
+        clusters.sort(key=lambda x: x['size'], reverse=True)
+>>>>>>> fixing_linting_and_tests
 
         return clusters

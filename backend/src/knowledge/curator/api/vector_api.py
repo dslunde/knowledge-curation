@@ -2,7 +2,10 @@
 
 from knowledge.curator.vector.management import VectorCollectionManager
 from knowledge.curator.vector.search import SimilaritySearch
+<<<<<<< HEAD
 from plone import api
+=======
+>>>>>>> fixing_linting_and_tests
 from plone.restapi.services import Service
 from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse
@@ -262,5 +265,12 @@ class VectorClusteringService(Service):
         return {
             "clusters": clusters,
             "n_clusters": len(clusters),
+<<<<<<< HEAD
             "parameters": {"content_types": content_types, "n_clusters": n_clusters},
+=======
+            "parameters": {
+                "content_types": content_types,
+                "n_clusters": n_clusters
+            }
+>>>>>>> fixing_linting_and_tests
         }

@@ -1,7 +1,10 @@
 """Views for Learning Goal content type."""
 
 from plone import api
+<<<<<<< HEAD
 from Products.Five.browser import BrowserView
+=======
+>>>>>>> fixing_linting_and_tests
 
 
 class LearningGoalView(BrowserView):
@@ -26,11 +29,19 @@ class LearningGoalView(BrowserView):
 
     def get_completed_milestones(self):
         """Get only completed milestones."""
+<<<<<<< HEAD
         return [m for m in self.get_milestones() if m.get("completed", False)]
 
     def get_pending_milestones(self):
         """Get only pending milestones."""
         return [m for m in self.get_milestones() if not m.get("completed", False)]
+=======
+        return [m for m in self.get_milestones() if m.get('completed', False)]
+
+    def get_pending_milestones(self):
+        """Get only pending milestones."""
+        return [m for m in self.get_milestones() if not m.get('completed', False)]
+>>>>>>> fixing_linting_and_tests
 
     def is_overdue(self):
         """Check if the goal is overdue."""
@@ -56,4 +67,8 @@ class LearningGoalView(BrowserView):
             "medium": "priority-medium",
             "high": "priority-high",
         }
+<<<<<<< HEAD
         return priority_map.get(self.context.priority, "priority-medium")
+=======
+        return priority_map.get(self.context.priority, 'priority-medium')
+>>>>>>> fixing_linting_and_tests

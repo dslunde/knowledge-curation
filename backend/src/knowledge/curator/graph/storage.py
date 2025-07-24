@@ -8,11 +8,17 @@ from .relationships import RelationshipType
 from BTrees.OOBTree import OOBTree
 from persistent.dict import PersistentDict
 from persistent.list import PersistentList
+<<<<<<< HEAD
 from plone import api
 from plone.app.relationfield.behavior import IRelatedItems
 from typing import Any
 from zope.annotation.interfaces import IAnnotations
 
+=======
+from BTrees.OOBTree import OOBTree
+from zope.annotation.interfaces import IAnnotations
+from typing import Any
+>>>>>>> fixing_linting_and_tests
 import json
 
 
@@ -36,10 +42,17 @@ class GraphStorage:
         annotations = IAnnotations(self.context)
         if GRAPH_ANNOTATION_KEY not in annotations:
             annotations[GRAPH_ANNOTATION_KEY] = OOBTree()
+<<<<<<< HEAD
             annotations[GRAPH_ANNOTATION_KEY]["nodes"] = OOBTree()
             annotations[GRAPH_ANNOTATION_KEY]["edges"] = PersistentList()
             annotations[GRAPH_ANNOTATION_KEY]["indexes"] = OOBTree()
             annotations[GRAPH_ANNOTATION_KEY]["metadata"] = PersistentDict()
+=======
+            annotations[GRAPH_ANNOTATION_KEY]['nodes'] = OOBTree()
+            annotations[GRAPH_ANNOTATION_KEY]['edges'] = PersistentList()
+            annotations[GRAPH_ANNOTATION_KEY]['indexes'] = OOBTree()
+            annotations[GRAPH_ANNOTATION_KEY]['metadata'] = PersistentDict()
+>>>>>>> fixing_linting_and_tests
 
     def _get_storage(self):
         """Get the annotation storage."""
@@ -55,8 +68,13 @@ class GraphStorage:
         storage = self._get_storage()
 
         # Clear existing data
+<<<<<<< HEAD
         storage["nodes"].clear()
         storage["edges"][:] = []
+=======
+        storage['nodes'].clear()
+        storage['edges'][:] = []
+>>>>>>> fixing_linting_and_tests
 
         # Save nodes
         for uid, node in graph.nodes.items():
@@ -74,7 +92,11 @@ class GraphStorage:
                 if hasattr(node.modified, "isoformat")
                 else node.modified,
             }
+<<<<<<< HEAD
             storage["nodes"][uid] = PersistentDict(node_data)
+=======
+            storage['nodes'][uid] = PersistentDict(node_data)
+>>>>>>> fixing_linting_and_tests
 
         # Save edges
         for edge in graph.edges:
@@ -88,15 +110,25 @@ class GraphStorage:
                 if hasattr(edge.created, "isoformat")
                 else edge.created,
             }
+<<<<<<< HEAD
             storage["edges"].append(PersistentDict(edge_data))
+=======
+            storage['edges'].append(PersistentDict(edge_data))
+>>>>>>> fixing_linting_and_tests
 
         # Update indexes
         self._rebuild_indexes()
 
         # Update metadata
+<<<<<<< HEAD
         storage["metadata"]["last_modified"] = api.portal.get_localized_time()
         storage["metadata"]["node_count"] = len(graph.nodes)
         storage["metadata"]["edge_count"] = len(graph.edges)
+=======
+        storage['metadata']['last_modified'] = api.portal.get_localized_time()
+        storage['metadata']['node_count'] = len(graph.nodes)
+        storage['metadata']['edge_count'] = len(graph.edges)
+>>>>>>> fixing_linting_and_tests
 
     def load_graph(self) -> Graph:
         """Load graph from persistent storage.
@@ -250,22 +282,32 @@ class GraphStorage:
                 if hasattr(rel, "to_object"):
                     target = rel.to_object
                     if target:
+<<<<<<< HEAD
                         edge = Edge(
                             uid,
                             api.content.get_uuid(target),
                             RelationshipType.RELATED_TO.value,
                         )
+=======
+                        edge = Edge(uid, api.content.get_uuid(target),
+                                  RelationshipType.RELATED_TO.value)
+>>>>>>> fixing_linting_and_tests
                         graph.add_edge(edge)
 
     def _rebuild_indexes(self):
         """Rebuild graph indexes for efficient querying."""
         storage = self._get_storage()
+<<<<<<< HEAD
         indexes = storage["indexes"]
+=======
+        indexes = storage['indexes']
+>>>>>>> fixing_linting_and_tests
 
         # Clear existing indexes
         indexes.clear()
 
         # Node type index
+<<<<<<< HEAD
         indexes["by_type"] = OOBTree()
         for uid, node_data in storage["nodes"].items():
             node_type = node_data["type"]
@@ -296,6 +338,36 @@ class GraphStorage:
     def query_nodes(
         self, node_type: str | None = None, properties: dict[str, Any] | None = None
     ) -> list[Node]:
+=======
+        indexes['by_type'] = OOBTree()
+        for uid, node_data in storage['nodes'].items():
+            node_type = node_data['type']
+            if node_type not in indexes['by_type']:
+                indexes['by_type'][node_type] = PersistentList()
+            indexes['by_type'][node_type].append(uid)
+
+        # Relationship type index
+        indexes['by_relationship'] = OOBTree()
+        for edge_data in storage['edges']:
+            rel_type = edge_data['type']
+            if rel_type not in indexes['by_relationship']:
+                indexes['by_relationship'][rel_type] = PersistentList()
+            indexes['by_relationship'][rel_type].append(
+                (edge_data['source'], edge_data['target'])
+            )
+
+        # Tag index
+        indexes['by_tag'] = OOBTree()
+        for edge_data in storage['edges']:
+            if edge_data['type'] == RelationshipType.TAGGED_WITH.value:
+                tag_uid = edge_data['target']
+                if tag_uid not in indexes['by_tag']:
+                    indexes['by_tag'][tag_uid] = PersistentList()
+                indexes['by_tag'][tag_uid].append(edge_data['source'])
+
+    def query_nodes(self, node_type: str | None = None,
+                   properties: dict[str, Any] | None = None) -> list[Node]:
+>>>>>>> fixing_linting_and_tests
         """Query nodes by type and properties.
 
         Args:
@@ -340,12 +412,18 @@ class GraphStorage:
 
         return results
 
+<<<<<<< HEAD
     def query_relationships(
         self,
         relationship_type: str | None = None,
         source_uid: str | None = None,
         target_uid: str | None = None,
     ) -> list[Edge]:
+=======
+    def query_relationships(self, relationship_type: str | None = None,
+                          source_uid: str | None = None,
+                          target_uid: str | None = None) -> list[Edge]:
+>>>>>>> fixing_linting_and_tests
         """Query relationships by type and endpoints.
 
         Args:
@@ -385,13 +463,22 @@ class GraphStorage:
         storage = self._get_storage()
         graph = self.load_graph()
 
+<<<<<<< HEAD
         if "by_tag" in storage["indexes"] and tag_uid in storage["indexes"]["by_tag"]:
             node_uids = storage["indexes"]["by_tag"][tag_uid]
+=======
+        if 'by_tag' in storage['indexes'] and tag_uid in storage['indexes']['by_tag']:
+            node_uids = storage['indexes']['by_tag'][tag_uid]
+>>>>>>> fixing_linting_and_tests
             return [graph.get_node(uid) for uid in node_uids if graph.get_node(uid)]
 
         return []
 
+<<<<<<< HEAD
     def export_graph(self, output_format: str = "json") -> str:
+=======
+    def export_graph(self, format: str = 'json') -> str:
+>>>>>>> fixing_linting_and_tests
         """Export graph to various formats.
 
         Args:
@@ -402,10 +489,17 @@ class GraphStorage:
         """
         graph = self.load_graph()
 
+<<<<<<< HEAD
         if output_format == "json":
             return json.dumps(graph.to_dict(), indent=2)
 
         elif output_format == "gexf":
+=======
+        if format == 'json':
+            return json.dumps(graph.to_dict(), indent=2)
+
+        elif format == 'gexf':
+>>>>>>> fixing_linting_and_tests
             # GEXF format for Gephi
             gexf = ['<?xml version="1.0" encoding="UTF-8"?>']
             gexf.append('<gexf xmlns="http://www.gexf.net/1.2draft" version="1.2">')
@@ -415,11 +509,16 @@ class GraphStorage:
             gexf.append("    <nodes>")
             for node in graph.nodes.values():
                 gexf.append(f'      <node id="{node.uid}" label="{node.title}" />')
+<<<<<<< HEAD
             gexf.append("    </nodes>")
+=======
+            gexf.append('    </nodes>')
+>>>>>>> fixing_linting_and_tests
 
             # Edges
             gexf.append("    <edges>")
             for i, edge in enumerate(graph.edges):
+<<<<<<< HEAD
                 gexf.append(
                     f'      <edge id="{i}" source="{edge.source_uid}" '
                     f'target="{edge.target_uid}" weight="{edge.weight}" />'
@@ -432,6 +531,18 @@ class GraphStorage:
             return "\n".join(gexf)
 
         elif output_format == "graphml":
+=======
+                gexf.append(f'      <edge id="{i}" source="{edge.source_uid}" '
+                          f'target="{edge.target_uid}" weight="{edge.weight}" />')
+            gexf.append('    </edges>')
+
+            gexf.append('  </graph>')
+            gexf.append('</gexf>')
+
+            return '\n'.join(gexf)
+
+        elif format == 'graphml':
+>>>>>>> fixing_linting_and_tests
             # GraphML format
             graphml = ['<?xml version="1.0" encoding="UTF-8"?>']
             graphml.append('<graphml xmlns="http://graphml.graphdrawing.org/xmlns">')
@@ -442,7 +553,11 @@ class GraphStorage:
                 graphml.append(f'    <node id="{node.uid}">')
                 graphml.append(f'      <data key="title">{node.title}</data>')
                 graphml.append(f'      <data key="type">{node.node_type}</data>')
+<<<<<<< HEAD
                 graphml.append("    </node>")
+=======
+                graphml.append('    </node>')
+>>>>>>> fixing_linting_and_tests
 
             # Edges
             for edge in graph.edges:
@@ -453,6 +568,7 @@ class GraphStorage:
                     f'      <data key="type">{edge.relationship_type}</data>'
                 )
                 graphml.append(f'      <data key="weight">{edge.weight}</data>')
+<<<<<<< HEAD
                 graphml.append("    </edge>")
 
             graphml.append("  </graph>")
@@ -464,6 +580,19 @@ class GraphStorage:
             raise ValueError(f"Unsupported format: {output_format}")
 
     def import_graph(self, data: str, output_format: str = "json", merge: bool = True):
+=======
+                graphml.append('    </edge>')
+
+            graphml.append('  </graph>')
+            graphml.append('</graphml>')
+
+            return '\n'.join(graphml)
+
+        else:
+            raise ValueError(f"Unsupported format: {format}")
+
+    def import_graph(self, data: str, format: str = 'json', merge: bool = True):
+>>>>>>> fixing_linting_and_tests
         """Import graph from various formats.
 
         Args:
@@ -487,9 +616,15 @@ class GraphStorage:
                         node_type = nt
                         break
 
+<<<<<<< HEAD
                 properties = node_data.get("properties", {})
                 properties["created"] = node_data.get("created")
                 properties["modified"] = node_data.get("modified")
+=======
+                properties = node_data.get('properties', {})
+                properties['created'] = node_data.get('created')
+                properties['modified'] = node_data.get('modified')
+>>>>>>> fixing_linting_and_tests
 
                 node = Node(
                     uid=node_data["uid"],
@@ -513,7 +648,11 @@ class GraphStorage:
             self.save_graph(graph)
 
         else:
+<<<<<<< HEAD
             raise ValueError(f"Unsupported format: {output_format}")
+=======
+            raise ValueError(f"Unsupported format: {format}")
+>>>>>>> fixing_linting_and_tests
 
     def get_statistics(self) -> dict[str, Any]:
         """Get graph statistics.
@@ -537,6 +676,7 @@ class GraphStorage:
         # Count by relationship type
         rel_types = {}
         for edge in graph.edges:
+<<<<<<< HEAD
             rel_types[edge.relationship_type] = (
                 rel_types.get(edge.relationship_type, 0) + 1
             )
@@ -550,4 +690,15 @@ class GraphStorage:
             "average_degree": len(graph.edges) * 2 / len(graph.nodes)
             if graph.nodes
             else 0,
+=======
+            rel_types[edge.relationship_type] = rel_types.get(edge.relationship_type, 0) + 1
+
+        return {
+            'total_nodes': len(graph.nodes),
+            'total_edges': len(graph.edges),
+            'node_types': node_types,
+            'relationship_types': rel_types,
+            'last_modified': storage['metadata'].get('last_modified'),
+            'average_degree': len(graph.edges) * 2 / len(graph.nodes) if graph.nodes else 0
+>>>>>>> fixing_linting_and_tests
         }

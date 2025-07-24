@@ -5,13 +5,12 @@ from plone.restapi.services import Service
 from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse
 
-
 @implementer(IPublishTraverse)
 class KnowledgeGraphService(Service):
     """Service for knowledge graph operations."""
 
     def __init__(self, context, request):
-        super(KnowledgeGraphService, self).__init__(context, request)
+        super().__init__(context, request)
         self.params = []
 
     def publishTraverse(self, request, name):
@@ -39,6 +38,8 @@ class KnowledgeGraphService(Service):
 
         catalog = api.portal.get_tool("portal_catalog")
 
+        catalog = api.portal.get_tool('portal_catalog')
+
         # Get all knowledge items
         brains = catalog(
             portal_type=["ResearchNote", "LearningGoal", "ProjectLog", "BookmarkPlus"],
@@ -64,6 +65,7 @@ class KnowledgeGraphService(Service):
             }
 
             # Add type-specific data
+<<<<<<< HEAD
             if hasattr(obj, "tags"):
                 node["tags"] = getattr(obj, "tags", [])
 
@@ -72,6 +74,16 @@ class KnowledgeGraphService(Service):
 
             if hasattr(obj, "status"):
                 node["status"] = getattr(obj, "status", "")
+=======
+            if hasattr(obj, 'tags'):
+                node['tags'] = getattr(obj, 'tags', [])
+
+            if hasattr(obj, 'progress'):
+                node['progress'] = getattr(obj, 'progress', 0)
+
+            if hasattr(obj, 'status'):
+                node['status'] = getattr(obj, 'status', '')
+>>>>>>> fixing_linting_and_tests
 
             nodes.append(node)
 
@@ -95,7 +107,15 @@ class KnowledgeGraphService(Service):
                     }
                     edges.append(edge)
 
+<<<<<<< HEAD
         return {"nodes": nodes, "edges": edges, "count": len(nodes)}
+=======
+        return {
+            'nodes': nodes,
+            'edges': edges,
+            'count': len(nodes)
+        }
+>>>>>>> fixing_linting_and_tests
 
     def get_connections(self):
         """Get connections for a specific item."""
@@ -104,7 +124,11 @@ class KnowledgeGraphService(Service):
             return {"error": "Unauthorized"}
 
         connections = []
+<<<<<<< HEAD
         catalog = api.portal.get_tool("portal_catalog")
+=======
+        catalog = api.portal.get_tool('portal_catalog')
+>>>>>>> fixing_linting_and_tests
 
         # Get direct connections
         if hasattr(self.context, "connections"):
@@ -151,7 +175,14 @@ class KnowledgeGraphService(Service):
                     "connection_type": "reference",
                 })
 
+<<<<<<< HEAD
         return {"connections": connections, "count": len(connections)}
+=======
+        return {
+            'connections': connections,
+            'count': len(connections)
+        }
+>>>>>>> fixing_linting_and_tests
 
     def suggest_connections(self):
         """Suggest potential connections based on similarity."""
@@ -163,6 +194,7 @@ class KnowledgeGraphService(Service):
             return {"suggestions": [], "message": "No embedding vector available"}
 
         suggestions = []
+<<<<<<< HEAD
         catalog = api.portal.get_tool("portal_catalog")
         current_vector = getattr(self.context, "embedding_vector", [])
 
@@ -175,6 +207,20 @@ class KnowledgeGraphService(Service):
             existing_connections.update(getattr(self.context, "connections", []))
         if hasattr(self.context, "related_notes"):
             existing_connections.update(getattr(self.context, "related_notes", []))
+=======
+        catalog = api.portal.get_tool('portal_catalog')
+        current_vector = getattr(self.context, 'embedding_vector', [])
+
+        if not current_vector:
+            return {'suggestions': [], 'message': 'No embedding vector available'}
+
+        # Get existing connections to exclude
+        existing_connections = set()
+        if hasattr(self.context, 'connections'):
+            existing_connections.update(getattr(self.context, 'connections', []))
+        if hasattr(self.context, 'related_notes'):
+            existing_connections.update(getattr(self.context, 'related_notes', []))
+>>>>>>> fixing_linting_and_tests
 
         # Search for similar items
         brains = catalog(
@@ -184,10 +230,14 @@ class KnowledgeGraphService(Service):
         similarities = []
 
         for brain in brains:
+<<<<<<< HEAD
             if (
                 api.content.get_uuid(self.context) == brain.UID
                 or brain.UID in existing_connections
             ):
+=======
+            if api.content.get_uuid(self.context) == brain.UID or brain.UID in existing_connections:
+>>>>>>> fixing_linting_and_tests
                 continue
 
             obj = brain.getObject()
@@ -199,10 +249,20 @@ class KnowledgeGraphService(Service):
                         current_vector, other_vector
                     )
                     if similarity > 0.7:  # Threshold for suggestions
+<<<<<<< HEAD
                         similarities.append({"brain": brain, "similarity": similarity})
 
         # Sort by similarity and take top 10
         similarities.sort(key=lambda x: x["similarity"], reverse=True)
+=======
+                        similarities.append({
+                            'brain': brain,
+                            'similarity': similarity
+                        })
+
+        # Sort by similarity and take top 10
+        similarities.sort(key=lambda x: x['similarity'], reverse=True)
+>>>>>>> fixing_linting_and_tests
 
         for item in similarities[:10]:
             brain = item["brain"]
@@ -215,7 +275,14 @@ class KnowledgeGraphService(Service):
                 "description": brain.Description,
             })
 
+<<<<<<< HEAD
         return {"suggestions": suggestions, "count": len(suggestions)}
+=======
+        return {
+            'suggestions': suggestions,
+            'count': len(suggestions)
+        }
+>>>>>>> fixing_linting_and_tests
 
     def _calculate_similarity(self, vector1, vector2):
         """Calculate cosine similarity between two vectors."""
@@ -251,6 +318,7 @@ class KnowledgeGraphService(Service):
         for node in graph_data["nodes"]:
             node["color"] = type_colors.get(node["type"], "#95a5a6")
             # Size based on number of connections
+<<<<<<< HEAD
             connections = len([
                 e
                 for e in graph_data["edges"]
@@ -270,4 +338,26 @@ class KnowledgeGraphService(Service):
                 "height": 800,
                 "force": {"charge": -300, "linkDistance": 100, "gravity": 0.05},
             },
+=======
+            connections = len([e for e in graph_data['edges']
+                             if e['source'] == node['id'] or e['target'] == node['id']])
+            node['size'] = 10 + (connections * 2)
+
+        # Add edge properties
+        for edge in graph_data['edges']:
+            edge['color'] = '#bdc3c7' if edge['type'] == 'connection' else '#ecf0f1'
+            edge['width'] = 2 if edge['type'] == 'connection' else 1
+
+        return {
+            'graph': graph_data,
+            'visualization': {
+                'width': 1200,
+                'height': 800,
+                'force': {
+                    'charge': -300,
+                    'linkDistance': 100,
+                    'gravity': 0.05
+                }
+            }
+>>>>>>> fixing_linting_and_tests
         }

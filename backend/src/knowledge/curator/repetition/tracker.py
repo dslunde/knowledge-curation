@@ -1,5 +1,9 @@
 """Performance Tracking for Spaced Repetition System."""
 
+<<<<<<< HEAD
+=======
+from datetime import datetime, timedelta
+>>>>>>> fixing_linting_and_tests
 from collections import defaultdict
 from datetime import datetime
 from datetime import timedelta
@@ -16,7 +20,13 @@ class PerformanceTracker:
 
     @classmethod
     def calculate_performance_metrics(
+<<<<<<< HEAD
         cls, review_history: list[dict], time_period: int | None = None
+=======
+        cls,
+        review_history: list[dict],
+        time_period: int | None = None
+>>>>>>> fixing_linting_and_tests
     ) -> dict[str, any]:
         """
         Calculate comprehensive performance metrics.
@@ -51,7 +61,11 @@ class PerformanceTracker:
         successful_reviews = sum(1 for q in qualities if q >= 3)
 
         # Time-based metrics
+<<<<<<< HEAD
         time_spent = sum(r.get("time_spent", 60) for r in filtered_history)
+=======
+        time_spent = sum(r.get('time_spent', 60) for r in filtered_history)
+>>>>>>> fixing_linting_and_tests
 
         # Calculate streaks
         current_streak, longest_streak = cls._calculate_streaks(filtered_history)
@@ -116,7 +130,11 @@ class PerformanceTracker:
             return 0, 0
 
         # Sort by date
+<<<<<<< HEAD
         sorted_history = sorted(history, key=lambda x: x["date"])
+=======
+        sorted_history = sorted(history, key=lambda x: x['date'])
+>>>>>>> fixing_linting_and_tests
 
         current_streak = 0
         longest_streak = 0
@@ -139,11 +157,15 @@ class PerformanceTracker:
     def _calculate_learning_velocity(cls, history: list[dict]) -> dict[str, float]:
         """Calculate how fast the user is learning new material."""
         if not history:
+<<<<<<< HEAD
             return {
                 "items_per_week": 0,
                 "mastery_rate": 0,
                 "average_interval_growth": 0,
             }
+=======
+            return {'items_per_week': 0, 'mastery_rate': 0, 'average_interval_growth': 0}
+>>>>>>> fixing_linting_and_tests
 
         # Group by item
         items_data = defaultdict(list)
@@ -156,7 +178,11 @@ class PerformanceTracker:
         total_items = len(items_data)
         interval_growths = []
 
+<<<<<<< HEAD
         for _item_id, reviews in items_data.items():
+=======
+        for item_id, reviews in items_data.items():
+>>>>>>> fixing_linting_and_tests
             if reviews:
                 # Check if mastered
                 latest_interval = reviews[-1].get("interval", 0)
@@ -211,8 +237,13 @@ class PerformanceTracker:
 
         for item_id, reviews in items_data.items():
             if reviews:
+<<<<<<< HEAD
                 latest_ef = reviews[-1].get("ease_factor", 2.5)
                 qualities = [r["quality"] for r in reviews]
+=======
+                latest_ef = reviews[-1].get('ease_factor', 2.5)
+                qualities = [r['quality'] for r in reviews]
+>>>>>>> fixing_linting_and_tests
 
                 # Categorize by difficulty
                 if latest_ef < 1.5:
@@ -222,7 +253,11 @@ class PerformanceTracker:
                 elif latest_ef < 2.3:
                     difficulty_groups["medium"].append(item_id)
                 else:
+<<<<<<< HEAD
                     difficulty_groups["easy"].append(item_id)
+=======
+                    difficulty_groups['easy'].append(item_id)
+>>>>>>> fixing_linting_and_tests
 
                 # Check for struggling pattern
                 if len(reviews) >= 3:
@@ -251,10 +286,17 @@ class PerformanceTracker:
         for review in history:
             review_time = datetime.fromisoformat(review["date"])
             hour = review_time.hour
+<<<<<<< HEAD
             day = review_time.strftime("%A")
 
             hour_performance[hour].append(review["quality"])
             day_performance[day].append(review["quality"])
+=======
+            day = review_time.strftime('%A')
+
+            hour_performance[hour].append(review['quality'])
+            day_performance[day].append(review['quality'])
+>>>>>>> fixing_linting_and_tests
 
         # Calculate averages
         best_hours = []
@@ -266,7 +308,11 @@ class PerformanceTracker:
                     "reviews": len(qualities),
                 })
 
+<<<<<<< HEAD
         best_hours.sort(key=lambda x: x["average_quality"], reverse=True)
+=======
+        best_hours.sort(key=lambda x: x['average_quality'], reverse=True)
+>>>>>>> fixing_linting_and_tests
 
         best_days = []
         for day, qualities in day_performance.items():
@@ -277,7 +323,11 @@ class PerformanceTracker:
                     "reviews": len(qualities),
                 })
 
+<<<<<<< HEAD
         best_days.sort(key=lambda x: x["average_quality"], reverse=True)
+=======
+        best_days.sort(key=lambda x: x['average_quality'], reverse=True)
+>>>>>>> fixing_linting_and_tests
 
         return {
             "best_hours": best_hours[:3],
@@ -316,7 +366,11 @@ class PerformanceTracker:
             return {}
 
         # Sort by date
+<<<<<<< HEAD
         sorted_history = sorted(history, key=lambda x: x["date"])
+=======
+        sorted_history = sorted(history, key=lambda x: x['date'])
+>>>>>>> fixing_linting_and_tests
 
         # Calculate moving averages
         window_size = 10
@@ -383,7 +437,11 @@ class PerformanceTracker:
                     "description": f"Completed {milestone} reviews",
                 })
 
+<<<<<<< HEAD
         return sorted(milestones, key=lambda x: x["date"])
+=======
+        return sorted(milestones, key=lambda x: x['date'])
+>>>>>>> fixing_linting_and_tests
 
     @classmethod
     def _calculate_quality_distribution(cls, qualities: list[int]) -> dict[int, float]:
@@ -396,11 +454,24 @@ class PerformanceTracker:
             distribution[q] += 1
 
         total = len(qualities)
+<<<<<<< HEAD
         return {i: round(distribution[i] / total * 100, 1) for i in range(6)}
 
     @classmethod
     def generate_performance_report(
         cls, user_data: dict, time_period: int = 30
+=======
+        return {
+            i: round(distribution[i] / total * 100, 1)
+            for i in range(6)
+        }
+
+    @classmethod
+    def generate_performance_report(
+        cls,
+        user_data: dict,
+        time_period: int = 30
+>>>>>>> fixing_linting_and_tests
     ) -> dict[str, any]:
         """
         Generate a comprehensive performance report.
@@ -446,6 +517,7 @@ class PerformanceTracker:
         """Generate insights from metrics."""
         insights = []
 
+<<<<<<< HEAD
         summary = metrics["summary"]
         if summary["success_rate"] > 90:
             insights.append("Excellent performance! Your success rate is above 90%.")
@@ -460,6 +532,18 @@ class PerformanceTracker:
             insights.append(
                 f"Great job! You're on a {streaks['current']}-day success streak."
             )
+=======
+        summary = metrics['summary']
+        if summary['success_rate'] > 90:
+            insights.append("Excellent performance! Your success rate is above 90%.")
+        elif summary['success_rate'] < 70:
+            insights.append("Your success rate is below 70%. Consider reviewing items more frequently.")
+
+        # Streak insights
+        streaks = metrics['streaks']
+        if streaks['current'] >= 7:
+            insights.append(f"Great job! You're on a {streaks['current']}-day success streak.")
+>>>>>>> fixing_linting_and_tests
 
         # Time pattern insights
         time_patterns = metrics.get("time_patterns", {})
@@ -474,10 +558,15 @@ class PerformanceTracker:
         progress = metrics.get("progress", {})
         if progress.get("trend") == "improving":
             insights.append("Your performance is improving over time!")
+<<<<<<< HEAD
         elif progress.get("trend") == "declining":
             insights.append(
                 "Your performance has been declining. Consider adjusting your review schedule."
             )
+=======
+        elif progress.get('trend') == 'declining':
+            insights.append("Your performance has been declining. Consider adjusting your review schedule.")
+>>>>>>> fixing_linting_and_tests
 
         return insights
 
@@ -486,7 +575,11 @@ class PerformanceTracker:
         """Generate actionable recommendations."""
         recommendations = []
 
+<<<<<<< HEAD
         summary = metrics["summary"]
+=======
+        summary = metrics['summary']
+>>>>>>> fixing_linting_and_tests
 
         # Time-based recommendations
         if summary["average_time_per_review"] > 120:
@@ -525,13 +618,18 @@ class PerformanceTracker:
     @classmethod
     def _calculate_performance_grade(cls, metrics: dict) -> str:
         """Calculate overall performance grade."""
+<<<<<<< HEAD
         summary = metrics["summary"]
+=======
+        summary = metrics['summary']
+>>>>>>> fixing_linting_and_tests
 
         # Weighted scoring
         success_weight = 0.4
         consistency_weight = 0.3
         mastery_weight = 0.3
 
+<<<<<<< HEAD
         success_score = summary["success_rate"] / 100
         consistency_score = (
             metrics.get("time_patterns", {}).get("consistency_score", 0) / 100
@@ -545,6 +643,17 @@ class PerformanceTracker:
             + consistency_score * consistency_weight
             + mastery_score * mastery_weight
         )
+=======
+        success_score = summary['success_rate'] / 100
+        consistency_score = metrics.get('time_patterns', {}).get('consistency_score', 0) / 100
+        mastery_score = metrics.get('learning_velocity', {}).get('mastery_rate', 0) / 100
+
+        total_score = (
+            success_score * success_weight +
+            consistency_score * consistency_weight +
+            mastery_score * mastery_weight
+        )
+>>>>>>> fixing_linting_and_tests
 
         if total_score >= 0.9:
             return "A+"
@@ -555,4 +664,8 @@ class PerformanceTracker:
         elif total_score >= 0.6:
             return "C"
         else:
+<<<<<<< HEAD
             return "D"
+=======
+            return 'D'
+>>>>>>> fixing_linting_and_tests

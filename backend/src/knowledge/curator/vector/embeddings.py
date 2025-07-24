@@ -1,7 +1,10 @@
 """Embedding generation utilities using sentence-transformers."""
 
 from sentence_transformers import SentenceTransformer
+<<<<<<< HEAD
 
+=======
+>>>>>>> fixing_linting_and_tests
 import logging
 import numpy as np
 
@@ -53,7 +56,11 @@ class EmbeddingGenerator:
         try:
             # Truncate text if needed
             if len(text) > self.max_sequence_length * 4:  # Rough character estimate
+<<<<<<< HEAD
                 text = text[: self.max_sequence_length * 4]
+=======
+                text = text[:self.max_sequence_length * 4]
+>>>>>>> fixing_linting_and_tests
 
             embedding = self.model.encode(text, convert_to_numpy=True)
             return embedding.tolist()
@@ -62,9 +69,14 @@ class EmbeddingGenerator:
             logger.error(f"Failed to generate embedding: {e}")
             return [0.0] * self.embedding_dimension
 
+<<<<<<< HEAD
     def generate_embeddings(
         self, texts: list[str], batch_size: int = 32, show_progress: bool = False
     ) -> list[list[float]]:
+=======
+    def generate_embeddings(self, texts: list[str], batch_size: int = 32,
+                          show_progress: bool = False) -> list[list[float]]:
+>>>>>>> fixing_linting_and_tests
         """Generate embeddings for multiple texts in batches."""
         if not texts:
             return []
@@ -198,9 +210,14 @@ class EmbeddingGenerator:
             logger.error(f"Failed to prepare content text: {e}")
             return ""
 
+<<<<<<< HEAD
     def calculate_similarity(
         self, embedding1: list[float], embedding2: list[float]
     ) -> float:
+=======
+    def calculate_similarity(self, embedding1: list[float],
+                           embedding2: list[float]) -> float:
+>>>>>>> fixing_linting_and_tests
         """Calculate cosine similarity between two embeddings."""
         try:
             # Convert to numpy arrays

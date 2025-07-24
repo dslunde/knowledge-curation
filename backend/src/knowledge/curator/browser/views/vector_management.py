@@ -43,11 +43,19 @@ class VectorManagementView(BrowserView):
                 )
 
         except Exception as e:
+<<<<<<< HEAD
             IStatusMessage(self.request).addStatusMessage(f"Error: {e!s}", type="error")
 
         return self.request.response.redirect(
             self.context.absolute_url() + "/@@vector-management"
         )
+=======
+            IStatusMessage(self.request).addStatusMessage(
+                f"Error: {e!s}", type="error"
+            )
+
+        return self.request.response.redirect(self.context.absolute_url() + "/@@vector-management")
+>>>>>>> fixing_linting_and_tests
 
     def rebuild_index(self):
         """Rebuild the vector index."""
@@ -72,6 +80,7 @@ class VectorManagementView(BrowserView):
             else:
                 IStatusMessage(self.request).addStatusMessage(
                     f"Index rebuild failed: {result.get('error', 'Unknown error')}",
+<<<<<<< HEAD
                     type="error",
                 )
 
@@ -81,6 +90,17 @@ class VectorManagementView(BrowserView):
         return self.request.response.redirect(
             self.context.absolute_url() + "/@@vector-management"
         )
+=======
+                    type="error"
+                )
+
+        except Exception as e:
+            IStatusMessage(self.request).addStatusMessage(
+                f"Error: {e!s}", type="error"
+            )
+
+        return self.request.response.redirect(self.context.absolute_url() + "/@@vector-management")
+>>>>>>> fixing_linting_and_tests
 
     def health_check(self):
         """Perform health check."""

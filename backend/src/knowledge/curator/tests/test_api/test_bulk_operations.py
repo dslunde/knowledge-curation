@@ -1,5 +1,12 @@
 """Tests for Bulk Operations API."""
 
+<<<<<<< HEAD
+=======
+import unittest
+from plone import api
+from plone.app.testing import setRoles, TEST_USER_ID
+from plone.restapi.testing import RelativeSession
+>>>>>>> fixing_linting_and_tests
 from knowledge.curator.testing import PLONE_APP_KNOWLEDGE_FUNCTIONAL_TESTING
 from plone import api
 from plone.app.testing import setRoles
@@ -70,10 +77,17 @@ class TestBulkOperationsAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertEqual(data["operation"], "workflow_transition")
         self.assertEqual(data["transition"], "publish")
         self.assertIn("results", data)
         self.assertIn("summary", data)
+=======
+        self.assertEqual(data['operation'], 'workflow_transition')
+        self.assertEqual(data['transition'], 'publish')
+        self.assertIn('results', data)
+        self.assertIn('summary', data)
+>>>>>>> fixing_linting_and_tests
 
         # Check summary
         summary = data["summary"]
@@ -97,8 +111,13 @@ class TestBulkOperationsAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertEqual(data["operation"], "bulk_tag")
         self.assertEqual(data["mode"], "add")
+=======
+        self.assertEqual(data['operation'], 'bulk_tag')
+        self.assertEqual(data['mode'], 'add')
+>>>>>>> fixing_linting_and_tests
 
         # Verify tags were added
         for result in data["results"]["successful"]:
@@ -167,8 +186,13 @@ class TestBulkOperationsAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertEqual(data["operation"], "bulk_delete")
         self.assertEqual(data["summary"]["successful"], 3)
+=======
+        self.assertEqual(data['operation'], 'bulk_delete')
+        self.assertEqual(data['summary']['successful'], 3)
+>>>>>>> fixing_linting_and_tests
 
         # Verify items were deleted
         catalog = api.portal.get_tool("portal_catalog")
@@ -179,7 +203,11 @@ class TestBulkOperationsAPI(unittest.TestCase):
     def test_bulk_move(self):
         """Test bulk move operation."""
         uids = [note.UID() for note in self.notes[:2]]
+<<<<<<< HEAD
         target_path = "/".join(self.target_folder.getPhysicalPath())
+=======
+        target_path = '/'.join(self.target_folder.getPhysicalPath())
+>>>>>>> fixing_linting_and_tests
 
         response = self.api_session.post(
             "/@knowledge-bulk/move", json={"uids": uids, "target_path": target_path}
@@ -188,8 +216,13 @@ class TestBulkOperationsAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertEqual(data["operation"], "bulk_move")
         self.assertEqual(data["summary"]["successful"], 2)
+=======
+        self.assertEqual(data['operation'], 'bulk_move')
+        self.assertEqual(data['summary']['successful'], 2)
+>>>>>>> fixing_linting_and_tests
 
         # Verify items were moved
         for result in data["results"]["successful"]:
@@ -221,8 +254,13 @@ class TestBulkOperationsAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertEqual(data["operation"], "bulk_update")
         self.assertEqual(data["summary"]["successful"], 3)
+=======
+        self.assertEqual(data['operation'], 'bulk_update')
+        self.assertEqual(data['summary']['successful'], 3)
+>>>>>>> fixing_linting_and_tests
 
         # Verify updates
         catalog = api.portal.get_tool("portal_catalog")
@@ -248,8 +286,13 @@ class TestBulkOperationsAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertEqual(data["operation"], "bulk_connect")
         self.assertEqual(data["connection_type"], "bidirectional")
+=======
+        self.assertEqual(data['operation'], 'bulk_connect')
+        self.assertEqual(data['connection_type'], 'bidirectional')
+>>>>>>> fixing_linting_and_tests
 
         # Verify connections were created
         self.assertGreater(data["summary"]["successful"], 0)
@@ -297,8 +340,13 @@ class TestBulkOperationsAPI(unittest.TestCase):
 
         # Create new session with limited user
         limited_session = RelativeSession(self.portal_url)
+<<<<<<< HEAD
         limited_session.headers.update({"Accept": "application/json"})
         limited_session.auth = ("limited", "secret")
+=======
+        limited_session.headers.update({'Accept': 'application/json'})
+        limited_session.auth = ('limited', 'secret')
+>>>>>>> fixing_linting_and_tests
 
         uids = [self.notes[0].UID()]
 
@@ -327,4 +375,8 @@ class TestBulkOperationsAPI(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         data = response.json()
+<<<<<<< HEAD
         self.assertIn("error", data)
+=======
+        self.assertIn('error', data)
+>>>>>>> fixing_linting_and_tests

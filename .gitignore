@@ -4,4 +4,8 @@ node_modules
 /public
 *.mo
 
+<<<<<<< HEAD
 .env*
+=======
+.env.development
+>>>>>>> fixing_linting_and_tests

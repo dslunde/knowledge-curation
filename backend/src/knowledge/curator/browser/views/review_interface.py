@@ -10,21 +10,37 @@ from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope.interface import alsoProvides
 
+<<<<<<< HEAD
 import json
+=======
+from knowledge.curator.repetition import (
+    ForgettingCurve, PerformanceTracker
+)
+from knowledge.curator.repetition.utilities import ReviewUtilities
+>>>>>>> fixing_linting_and_tests
 
 
 class ReviewQueueView(BrowserView):
     """Review queue interface."""
 
+<<<<<<< HEAD
     template = ViewPageTemplateFile("templates/review_queue.pt")
+=======
+    template = ViewPageTemplateFile('templates/review_queue.pt')
+>>>>>>> fixing_linting_and_tests
 
     def __call__(self):
         return self.template()
 
     def get_review_items(self):
         """Get items due for review."""
+<<<<<<< HEAD
         limit = int(self.request.get("limit", 20))
         portal_types = self.request.get("types", "ResearchNote,BookmarkPlus").split(",")
+=======
+        limit = int(self.request.get('limit', 20))
+        portal_types = self.request.get('types', 'ResearchNote,BookmarkPlus').split(',')
+>>>>>>> fixing_linting_and_tests
 
         items = ReviewUtilities.get_items_due_for_review(
             portal_types=portal_types, limit=limit
@@ -33,6 +49,7 @@ class ReviewQueueView(BrowserView):
         # Add session metadata
         user = api.user.get_current()
         member = api.user.get(user.getId())
+<<<<<<< HEAD
         settings = member.getProperty(
             "sr_settings", {"daily_review_limit": 20, "review_order": "urgency"}
         )
@@ -40,6 +57,16 @@ class ReviewQueueView(BrowserView):
         # Get today's review count
         today_count = self._get_today_review_count()
         remaining = settings.get("daily_review_limit", 20) - today_count
+=======
+        settings = member.getProperty('sr_settings', {
+            'daily_review_limit': 20,
+            'review_order': 'urgency'
+        })
+
+        # Get today's review count
+        today_count = self._get_today_review_count()
+        remaining = settings.get('daily_review_limit', 20) - today_count
+>>>>>>> fixing_linting_and_tests
 
         return {
             "items": items[:remaining] if remaining > 0 else [],
@@ -91,13 +118,21 @@ class ReviewQueueView(BrowserView):
 class ReviewCardView(BrowserView):
     """Individual review card interface."""
 
+<<<<<<< HEAD
     template = ViewPageTemplateFile("templates/review_card.pt")
+=======
+    template = ViewPageTemplateFile('templates/review_card.pt')
+>>>>>>> fixing_linting_and_tests
 
     def __call__(self):
         # Disable CSRF for AJAX calls
         alsoProvides(self.request, IDisableCSRFProtection)
 
+<<<<<<< HEAD
         uid = self.request.get("uid")
+=======
+        uid = self.request.get('uid')
+>>>>>>> fixing_linting_and_tests
         if not uid:
             return self.request.response.redirect(self.context.absolute_url())
 
@@ -109,7 +144,11 @@ class ReviewCardView(BrowserView):
         if not uid:
             return None
 
+<<<<<<< HEAD
         catalog = api.portal.get_tool("portal_catalog")
+=======
+        catalog = api.portal.get_tool('portal_catalog')
+>>>>>>> fixing_linting_and_tests
         brains = catalog(UID=uid)
 
         if not brains:
@@ -160,7 +199,11 @@ class ReviewCardView(BrowserView):
                     "full_content": obj.body.output if hasattr(obj, "body") else "",
                 }
 
+<<<<<<< HEAD
         elif obj.portal_type == "BookmarkPlus":
+=======
+        elif obj.portal_type == 'BookmarkPlus':
+>>>>>>> fixing_linting_and_tests
             # For bookmarks, test on key concepts
             if hasattr(obj, "key_concepts") and obj.key_concepts:
                 return {
@@ -189,6 +232,7 @@ class ReviewCardView(BrowserView):
         elif interval < 90:
             return "Mature"
         else:
+<<<<<<< HEAD
             return "Mastered"
 
     def submit_review(self):
@@ -196,11 +240,24 @@ class ReviewCardView(BrowserView):
         uid = self.request.form.get("uid")
         quality = int(self.request.form.get("quality", 0))
         time_spent = int(self.request.form.get("time_spent", 60))
+=======
+            return 'Mastered'
+
+    def submit_review(self):
+        """Handle review submission."""
+        uid = self.request.form.get('uid')
+        quality = int(self.request.form.get('quality', 0))
+        time_spent = int(self.request.form.get('time_spent', 60))
+>>>>>>> fixing_linting_and_tests
 
         try:
             result = ReviewUtilities.handle_review_response(uid, quality, time_spent)
 
+<<<<<<< HEAD
             self.request.response.setHeader("Content-Type", "application/json")
+=======
+            self.request.response.setHeader('Content-Type', 'application/json')
+>>>>>>> fixing_linting_and_tests
             return json.dumps({
                 "success": True,
                 "result": result,
@@ -209,18 +266,36 @@ class ReviewCardView(BrowserView):
 
         except Exception as e:
             self.request.response.setStatus(400)
+<<<<<<< HEAD
             self.request.response.setHeader("Content-Type", "application/json")
             return json.dumps({"success": False, "error": str(e)})
+=======
+            self.request.response.setHeader('Content-Type', 'application/json')
+            return json.dumps({
+                'success': False,
+                'error': str(e)
+            })
+>>>>>>> fixing_linting_and_tests
 
     def _get_next_item(self, current_uid):
         """Get next item in queue."""
         items = ReviewUtilities.get_items_due_for_review(limit=10)
 
         # Filter out current item
+<<<<<<< HEAD
         items = [i for i in items if i["uid"] != current_uid]
 
         if items:
             return {"uid": items[0]["uid"], "title": items[0]["title"]}
+=======
+        items = [i for i in items if i['uid'] != current_uid]
+
+        if items:
+            return {
+                'uid': items[0]['uid'],
+                'title': items[0]['title']
+            }
+>>>>>>> fixing_linting_and_tests
 
         return None
 
@@ -228,20 +303,34 @@ class ReviewCardView(BrowserView):
 class ReviewPerformanceView(BrowserView):
     """Performance visualization dashboard."""
 
+<<<<<<< HEAD
     template = ViewPageTemplateFile("templates/review_performance.pt")
+=======
+    template = ViewPageTemplateFile('templates/review_performance.pt')
+>>>>>>> fixing_linting_and_tests
 
     def __call__(self):
         return self.template()
 
     def get_performance_data(self):
         """Get performance metrics and visualizations."""
+<<<<<<< HEAD
         days = int(self.request.get("days", 30))
+=======
+        days = int(self.request.get('days', 30))
+>>>>>>> fixing_linting_and_tests
 
         # Get user's review history
         review_history = self._get_user_review_history()
 
         # Calculate metrics
+<<<<<<< HEAD
         metrics = PerformanceTracker.calculate_performance_metrics(review_history, days)
+=======
+        metrics = PerformanceTracker.calculate_performance_metrics(
+            review_history, days
+        )
+>>>>>>> fixing_linting_and_tests
 
         # Get forgetting curves for current items
         items = ReviewUtilities.get_items_due_for_review(limit=10)
@@ -254,7 +343,14 @@ class ReviewPerformanceView(BrowserView):
                 ease_factor=sr_data["ease_factor"],
                 repetitions=sr_data["repetitions"],
             )
+<<<<<<< HEAD
             forgetting_curves.append({"title": item["title"], "data": curve_data})
+=======
+            forgetting_curves.append({
+                'title': item['title'],
+                'data': curve_data
+            })
+>>>>>>> fixing_linting_and_tests
 
         # Get workload forecast
         all_items = self._get_all_user_items()
@@ -335,11 +431,17 @@ class ReviewPerformanceView(BrowserView):
             if (datetime.now() - datetime.fromisoformat(r["date"])).days <= 7
         ]
 
+<<<<<<< HEAD
         recent_metrics = (
             PerformanceTracker.calculate_performance_metrics(recent_history, 7)
             if recent_history
             else None
         )
+=======
+        recent_metrics = PerformanceTracker.calculate_performance_metrics(
+            recent_history, 7
+        ) if recent_history else None
+>>>>>>> fixing_linting_and_tests
 
         # All-time performance
         all_time_metrics = PerformanceTracker.calculate_performance_metrics(
@@ -356,7 +458,11 @@ class ReviewPerformanceView(BrowserView):
 class ReviewStatisticsView(BrowserView):
     """Detailed statistics dashboard."""
 
+<<<<<<< HEAD
     template = ViewPageTemplateFile("templates/review_statistics.pt")
+=======
+    template = ViewPageTemplateFile('templates/review_statistics.pt')
+>>>>>>> fixing_linting_and_tests
 
     def __call__(self):
         return self.template()
@@ -406,7 +512,11 @@ class ReviewStatisticsView(BrowserView):
         """Export statistics as JSON."""
         stats = self.get_statistics()
 
+<<<<<<< HEAD
         self.request.response.setHeader("Content-Type", "application/json")
+=======
+        self.request.response.setHeader('Content-Type', 'application/json')
+>>>>>>> fixing_linting_and_tests
         self.request.response.setHeader(
             "Content-Disposition",
             f'attachment; filename="sr_statistics_{datetime.now().strftime("%Y%m%d")}.json"',

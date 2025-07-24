@@ -1,6 +1,7 @@
 """Vector database collection management utilities."""
 
 from datetime import datetime
+<<<<<<< HEAD
 from knowledge.curator.vector.adapter import QdrantAdapter
 from knowledge.curator.vector.config import get_vector_config
 from knowledge.curator.vector.embeddings import EmbeddingGenerator
@@ -11,6 +12,11 @@ from typing import Any
 import json
 import logging
 
+=======
+from typing import Any
+import logging
+import json
+>>>>>>> fixing_linting_and_tests
 
 logger = logging.getLogger("knowledge.curator.vector")
 
@@ -43,12 +49,17 @@ class VectorCollectionManager:
             logger.error(f"Failed to initialize database: {e}")
             return False
 
+<<<<<<< HEAD
     def rebuild_index(
         self,
         content_types: list[str] | None = None,
         batch_size: int = 100,
         clear_first: bool = True,
     ) -> dict[str, Any]:
+=======
+    def rebuild_index(self, content_types: list[str] | None = None,
+                     batch_size: int = 100, clear_first: bool = True) -> dict[str, Any]:
+>>>>>>> fixing_linting_and_tests
         """Rebuild the entire vector index."""
         try:
             start_time = datetime.now()
@@ -59,12 +70,16 @@ class VectorCollectionManager:
 
             # Get all relevant content
             if content_types is None:
+<<<<<<< HEAD
                 content_types = [
                     "BookmarkPlus",
                     "ResearchNote",
                     "LearningGoal",
                     "ProjectLog",
                 ]
+=======
+                content_types = ["BookmarkPlus", "ResearchNote", "LearningGoal", "ProjectLog"]
+>>>>>>> fixing_linting_and_tests
 
             query = {
                 "portal_type": content_types,
@@ -109,11 +124,18 @@ class VectorCollectionManager:
                     # Process batch when full
                     if len(batch_documents) >= batch_size:
                         embeddings = self.embeddings.generate_embeddings(
+<<<<<<< HEAD
                             batch_texts, batch_size=32
                         )
                         self.adapter.add_vectors(
                             batch_documents, embeddings, batch_size
                         )
+=======
+                            batch_texts,
+                            batch_size=32
+                        )
+                        self.adapter.add_vectors(batch_documents, embeddings, batch_size)
+>>>>>>> fixing_linting_and_tests
 
                         processed += len(batch_documents)
                         logger.info(f"Processed {processed}/{total_items} items")
@@ -150,7 +172,14 @@ class VectorCollectionManager:
 
         except Exception as e:
             logger.error(f"Index rebuild failed: {e}")
+<<<<<<< HEAD
             return {"success": False, "error": str(e)}
+=======
+            return {
+                "success": False,
+                "error": str(e)
+            }
+>>>>>>> fixing_linting_and_tests
 
     def update_content_vector(self, content_object) -> bool:
         """Update vector for a single content object."""
@@ -173,7 +202,15 @@ class VectorCollectionManager:
             embedding = self.embeddings.generate_embedding(text)
 
             # Update vector
+<<<<<<< HEAD
             return self.adapter.update_vector(content_object.UID(), embedding, doc)
+=======
+            return self.adapter.update_vector(
+                content_object.UID(),
+                embedding,
+                doc
+            )
+>>>>>>> fixing_linting_and_tests
 
         except Exception as e:
             logger.error(f"Failed to update content vector: {e}")
@@ -313,7 +350,11 @@ class VectorCollectionManager:
                 "points": all_points,
             }
 
+<<<<<<< HEAD
             with open(backup_path, "w") as f:
+=======
+            with open(backup_path, 'w') as f:
+>>>>>>> fixing_linting_and_tests
                 json.dump(backup_data, f)
 
             logger.info(f"Backed up {len(all_points)} vectors to {backup_path}")
@@ -346,7 +387,11 @@ class VectorCollectionManager:
             batch_size = 100
 
             for i in range(0, len(points), batch_size):
+<<<<<<< HEAD
                 batch = points[i : i + batch_size]
+=======
+                batch = points[i:i + batch_size]
+>>>>>>> fixing_linting_and_tests
 
                 documents = []
                 embeddings = []

@@ -1,7 +1,14 @@
 """Tests for Search API."""
 
+<<<<<<< HEAD
 from datetime import datetime
 from datetime import timedelta
+=======
+import unittest
+from plone import api
+from plone.app.testing import setRoles, TEST_USER_ID
+from plone.restapi.testing import RelativeSession
+>>>>>>> fixing_linting_and_tests
 from knowledge.curator.testing import PLONE_APP_KNOWLEDGE_FUNCTIONAL_TESTING
 from plone import api
 from plone.app.testing import setRoles
@@ -96,10 +103,17 @@ class TestSearchAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertIn("items", data)
         self.assertIn("items_total", data)
         self.assertIn("query", data)
         self.assertEqual(data["search_type"], "semantic")
+=======
+        self.assertIn('items', data)
+        self.assertIn('items_total', data)
+        self.assertIn('query', data)
+        self.assertEqual(data['search_type'], 'semantic')
+>>>>>>> fixing_linting_and_tests
 
     def test_fulltext_search(self):
         """Test fulltext search."""
@@ -111,8 +125,13 @@ class TestSearchAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertIn("items", data)
         self.assertEqual(data["search_type"], "fulltext")
+=======
+        self.assertIn('items', data)
+        self.assertEqual(data['search_type'], 'fulltext')
+>>>>>>> fixing_linting_and_tests
 
         # Should find Python-related content
         titles = [item["title"] for item in data["items"]]
@@ -134,9 +153,15 @@ class TestSearchAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertIn("items", data)
         self.assertEqual(data["source_uid"], self.note1.UID())
         self.assertEqual(data["search_type"], "similarity")
+=======
+        self.assertIn('items', data)
+        self.assertEqual(data['source_uid'], self.note1.UID())
+        self.assertEqual(data['search_type'], 'similarity')
+>>>>>>> fixing_linting_and_tests
 
         # Should find similar items (note2 is similar to note1)
         if data["items"]:
@@ -183,13 +208,24 @@ class TestSearchAPI(unittest.TestCase):
 
     def test_semantic_search_get(self):
         """Test semantic search via GET."""
+<<<<<<< HEAD
         response = self.api_session.get("/@knowledge-search/semantic?q=python&limit=5")
+=======
+        response = self.api_session.get(
+            '/@knowledge-search/semantic?q=python&limit=5'
+        )
+>>>>>>> fixing_linting_and_tests
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertIn("items", data)
         self.assertEqual(data["query"], "python")
+=======
+        self.assertIn('items', data)
+        self.assertEqual(data['query'], 'python')
+>>>>>>> fixing_linting_and_tests
 
     def test_find_similar_get(self):
         """Test find similar via GET on specific item."""
@@ -200,8 +236,13 @@ class TestSearchAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertIn("items", data)
         self.assertEqual(data["source_uid"], self.note1.UID())
+=======
+        self.assertIn('items', data)
+        self.assertEqual(data['source_uid'], self.note1.UID())
+>>>>>>> fixing_linting_and_tests
 
     def test_search_invalid_type(self):
         """Test search with invalid type."""
@@ -272,4 +313,8 @@ class TestSearchAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
+<<<<<<< HEAD
         self.assertLessEqual(len(data["items"]), 2)
+=======
+        self.assertLessEqual(len(data['items']), 2)
+>>>>>>> fixing_linting_and_tests

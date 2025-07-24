@@ -4,9 +4,13 @@ The SuperMemo 2 (SM-2) algorithm is a spaced repetition algorithm that determine
 optimal intervals between repetitions based on the quality of recall.
 """
 
+<<<<<<< HEAD
 from datetime import datetime
 from datetime import timedelta
 
+=======
+from datetime import datetime, timedelta
+>>>>>>> fixing_linting_and_tests
 import math
 
 
@@ -36,7 +40,11 @@ class SM2Algorithm:
         repetitions: int = 0,
         ease_factor: float = DEFAULT_EASE_FACTOR,
         interval: int = 1,
+<<<<<<< HEAD
         **kwargs,
+=======
+        **kwargs
+>>>>>>> fixing_linting_and_tests
     ) -> dict[str, any]:
         """
         Calculate the next review parameters based on the SM-2 algorithm.
@@ -204,7 +212,14 @@ class SM2Algorithm:
         max_items = available_time // average_time_per_item
 
         # Sort by urgency (lowest retention probability first)
+<<<<<<< HEAD
         sorted_items = sorted(items, key=lambda x: x.get("retention_probability", 0))
+=======
+        sorted_items = sorted(
+            items,
+            key=lambda x: x.get('retention_probability', 0)
+        )
+>>>>>>> fixing_linting_and_tests
 
         return sorted_items[:max_items]
 
@@ -270,7 +285,11 @@ class SM2Algorithm:
 
             # Update for next iteration
             params = result
+<<<<<<< HEAD
             current_date = result["next_review_date"]
+=======
+            current_date = result['next_review_date']
+>>>>>>> fixing_linting_and_tests
 
             # Stop if interval exceeds remaining days
             if result["interval"] > (days - (current_date - datetime.now()).days):

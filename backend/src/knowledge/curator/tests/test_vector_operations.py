@@ -12,6 +12,10 @@ from unittest.mock import Mock
 from unittest.mock import patch
 
 import unittest
+<<<<<<< HEAD
+=======
+from unittest.mock import Mock, patch
+>>>>>>> fixing_linting_and_tests
 
 
 class TestEmbeddingGenerator(unittest.TestCase):
@@ -111,7 +115,11 @@ class TestQdrantAdapter(unittest.TestCase):
         # Mock the Qdrant client to avoid needing actual Qdrant server
         self.mock_client = Mock()
 
+<<<<<<< HEAD
     @patch("knowledge.curator.vector.adapter.QdrantClient")
+=======
+    @patch('knowledge.curator.vector.adapter.QdrantClient')
+>>>>>>> fixing_linting_and_tests
     def test_adapter_initialization(self, mock_client_class):
         """Test adapter initialization."""
         mock_client_class.return_value = self.mock_client
@@ -124,7 +132,11 @@ class TestQdrantAdapter(unittest.TestCase):
         self.assertEqual(adapter.collection_name, "plone_knowledge")
         self.assertEqual(adapter.vector_size, 384)
 
+<<<<<<< HEAD
     @patch("knowledge.curator.vector.adapter.QdrantClient")
+=======
+    @patch('knowledge.curator.vector.adapter.QdrantClient')
+>>>>>>> fixing_linting_and_tests
     def test_initialize_collection(self, mock_client_class):
         """Test collection initialization."""
         mock_client_class.return_value = self.mock_client
@@ -140,7 +152,11 @@ class TestQdrantAdapter(unittest.TestCase):
         self.mock_client.create_collection.assert_called_once()
         self.assertEqual(adapter.vector_size, 768)
 
+<<<<<<< HEAD
     @patch("knowledge.curator.vector.adapter.QdrantClient")
+=======
+    @patch('knowledge.curator.vector.adapter.QdrantClient')
+>>>>>>> fixing_linting_and_tests
     def test_add_vectors(self, mock_client_class):
         """Test adding vectors to collection."""
         mock_client_class.return_value = self.mock_client
@@ -179,8 +195,13 @@ class TestVectorCollectionManager(unittest.TestCase):
         self.portal = self.layer["portal"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
+<<<<<<< HEAD
     @patch("knowledge.curator.vector.management.QdrantAdapter")
     @patch("knowledge.curator.vector.management.EmbeddingGenerator")
+=======
+    @patch('knowledge.curator.vector.management.QdrantAdapter')
+    @patch('knowledge.curator.vector.management.EmbeddingGenerator')
+>>>>>>> fixing_linting_and_tests
     def test_update_content_vector(self, mock_embeddings_class, mock_adapter_class):
         """Test updating vector for content."""
         # Create mocks
@@ -210,8 +231,13 @@ class TestVectorCollectionManager(unittest.TestCase):
         mock_embeddings.generate_embedding.assert_called_once_with("Test content")
         mock_adapter.update_vector.assert_called_once()
 
+<<<<<<< HEAD
     @patch("knowledge.curator.vector.management.QdrantAdapter")
     @patch("knowledge.curator.vector.management.EmbeddingGenerator")
+=======
+    @patch('knowledge.curator.vector.management.QdrantAdapter')
+    @patch('knowledge.curator.vector.management.EmbeddingGenerator')
+>>>>>>> fixing_linting_and_tests
     def test_health_check(self, mock_embeddings_class, mock_adapter_class):
         """Test health check functionality."""
         # Create mocks
@@ -249,8 +275,13 @@ class TestSimilaritySearch(unittest.TestCase):
         self.portal = self.layer["portal"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
+<<<<<<< HEAD
     @patch("knowledge.curator.vector.search.QdrantAdapter")
     @patch("knowledge.curator.vector.search.EmbeddingGenerator")
+=======
+    @patch('knowledge.curator.vector.search.QdrantAdapter')
+    @patch('knowledge.curator.vector.search.EmbeddingGenerator')
+>>>>>>> fixing_linting_and_tests
     def test_search_by_text(self, mock_embeddings_class, mock_adapter_class):
         """Test text-based similarity search."""
         # Create mocks
@@ -288,8 +319,13 @@ class TestSimilaritySearch(unittest.TestCase):
         mock_embeddings.generate_embedding.assert_called_once_with("test query")
         mock_adapter.search_similar.assert_called_once()
 
+<<<<<<< HEAD
     @patch("knowledge.curator.vector.search.QdrantAdapter")
     @patch("knowledge.curator.vector.search.EmbeddingGenerator")
+=======
+    @patch('knowledge.curator.vector.search.QdrantAdapter')
+    @patch('knowledge.curator.vector.search.EmbeddingGenerator')
+>>>>>>> fixing_linting_and_tests
     def test_find_similar_content(self, mock_embeddings_class, mock_adapter_class):
         """Test finding similar content."""
         # Create mocks
@@ -306,7 +342,11 @@ class TestSimilaritySearch(unittest.TestCase):
             UID="source-uid",
         )
 
+<<<<<<< HEAD
         api.content.create(
+=======
+        bookmark2 = api.content.create(
+>>>>>>> fixing_linting_and_tests
             container=self.portal,
             type="BookmarkPlus",
             title="Similar Bookmark",
