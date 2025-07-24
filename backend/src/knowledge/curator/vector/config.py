@@ -3,7 +3,7 @@
 import os
 
 from plone import api
-from zope.component.interfaces import ComponentLookupError
+from zope.component import ComponentLookupError
 
 
 def get_vector_config():

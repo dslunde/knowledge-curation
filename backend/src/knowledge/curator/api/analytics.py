@@ -7,7 +7,7 @@ from plone.restapi.services import Service
 from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse
 import math
-from zope.security import Unauthorized
+from zope.security.interfaces import Unauthorized
 
 
 @implementer(IPublishTraverse)

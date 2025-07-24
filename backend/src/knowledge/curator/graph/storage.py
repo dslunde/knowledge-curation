@@ -12,8 +12,8 @@ from zope.annotation.interfaces import IAnnotations
 from typing import Any
 import json
 
-from plone.app.relationfield.interfaces import IRelatedItems
-from zope.security import Unauthorized
+from z3c.relationfield.interfaces import IRelationList
+from zope.security.interfaces import Unauthorized
 from plone import api
 
 
@@ -230,7 +230,7 @@ class GraphStorage:
 
     def _sync_related_items(self, graph, obj, uid):
         """Sync 'relatedItems' field from plone.app.relationfield."""
-        if IRelatedItems.providedBy(obj):
+        if IRelationList.providedBy(obj):
             for rel in getattr(obj, "relatedItems", []):
                 if hasattr(rel, "to_object"):
                     target = rel.to_object
