@@ -321,21 +321,6 @@ class SpacedRepetitionService(Service):
             obj = brain.getObject()
             sr_data = self._get_sr_data(obj)
 
-<<<<<<< HEAD
-            if sr_data.get("repetitions", 0) > 0:
-                stats["items_in_system"] += 1
-
-                if sr_data.get("interval", 0) > 21:
-                    stats["mature_items"] += 1
-
-                # Process history
-                for entry in sr_data.get("history", []):
-                    entry_date = datetime.fromisoformat(entry["date"])
-
-                    if entry_date >= start_date:
-                        stats["total_reviews"] += 1
-                        quality = entry["quality"]
-=======
             if sr_data.get('repetitions', 0) > 0:
                 stats['items_in_system'] += 1
 
@@ -349,22 +334,14 @@ class SpacedRepetitionService(Service):
                     if entry_date >= start_date:
                         stats['total_reviews'] += 1
                         quality = entry['quality']
->>>>>>> fixing_linting_and_tests
 
                         if quality >= 3:
                             stats["successful_reviews"] += 1
                         else:
-<<<<<<< HEAD
-                            stats["failed_reviews"] += 1
-
-                        total_quality += quality
-                        total_time += entry.get("time_spent", 0)
-=======
                             stats['failed_reviews'] += 1
 
                         total_quality += quality
                         total_time += entry.get('time_spent', 0)
->>>>>>> fixing_linting_and_tests
 
                         # Daily aggregation
                         date_key = entry_date.date().isoformat()
@@ -375,17 +352,6 @@ class SpacedRepetitionService(Service):
                                 "time_spent": 0,
                             }
 
-<<<<<<< HEAD
-                        stats["daily_stats"][date_key]["reviews"] += 1
-                        if quality >= 3:
-                            stats["daily_stats"][date_key]["successful"] += 1
-                        stats["daily_stats"][date_key]["time_spent"] += entry.get(
-                            "time_spent", 0
-                        )
-
-                        # Quality distribution
-                        stats["quality_distribution"][quality] += 1
-=======
                         stats['daily_stats'][date_key]['reviews'] += 1
                         if quality >= 3:
                             stats['daily_stats'][date_key]['successful'] += 1
@@ -393,7 +359,6 @@ class SpacedRepetitionService(Service):
 
                         # Quality distribution
                         stats['quality_distribution'][quality] += 1
->>>>>>> fixing_linting_and_tests
 
         # Calculate averages
         if stats["total_reviews"] > 0:
@@ -403,11 +368,7 @@ class SpacedRepetitionService(Service):
                 stats["successful_reviews"] / stats["total_reviews"] * 100, 1
             )
         else:
-<<<<<<< HEAD
-            stats["success_rate"] = 0
-=======
             stats['success_rate'] = 0
->>>>>>> fixing_linting_and_tests
 
         # Convert daily stats to list
         daily_list = []
@@ -422,18 +383,12 @@ class SpacedRepetitionService(Service):
                 "time_spent": data["time_spent"],
             })
 
-<<<<<<< HEAD
-        stats["daily_stats"] = daily_list
-
-        return {"period_days": days, "statistics": stats}
-=======
         stats['daily_stats'] = daily_list
 
         return {
             'period_days': days,
             'statistics': stats
         }
->>>>>>> fixing_linting_and_tests
 
     def get_settings(self):
         """Get user's spaced repetition settings."""
@@ -445,11 +400,7 @@ class SpacedRepetitionService(Service):
         member = api.user.get(user.getId())
 
         # Get or create settings
-<<<<<<< HEAD
-        settings = member.getProperty("sr_settings", {})
-=======
         settings = member.getProperty('sr_settings', {})
->>>>>>> fixing_linting_and_tests
 
         if not settings:
             # Default settings
@@ -473,41 +424,6 @@ class SpacedRepetitionService(Service):
 
         data = json.loads(self.request.get("BODY", "{}"))
 
-<<<<<<< HEAD
-=======
-        data = json.loads(self.request.get('BODY', '{}'))
-
->>>>>>> fixing_linting_and_tests
-        # Validate settings
-        allowed_keys = {
-            "daily_review_limit",
-            "new_items_per_day",
-            "review_order",
-            "minimum_ease_factor",
-            "initial_intervals",
-            "notification_enabled",
-            "notification_time",
-        }
-
-        settings = {k: v for k, v in data.items() if k in allowed_keys}
-
-        # Apply constraints
-<<<<<<< HEAD
-        if "daily_review_limit" in settings:
-            settings["daily_review_limit"] = max(
-                1, min(100, int(settings["daily_review_limit"]))
-            )
-
-        if "new_items_per_day" in settings:
-            settings["new_items_per_day"] = max(
-                0, min(50, int(settings["new_items_per_day"]))
-            )
-
-        if "minimum_ease_factor" in settings:
-            settings["minimum_ease_factor"] = max(
-                1.0, min(3.0, float(settings["minimum_ease_factor"]))
-            )
-=======
         if 'daily_review_limit' in settings:
             settings['daily_review_limit'] = max(1, min(100, int(settings['daily_review_limit'])))
 
@@ -516,23 +432,16 @@ class SpacedRepetitionService(Service):
 
         if 'minimum_ease_factor' in settings:
             settings['minimum_ease_factor'] = max(1.0, min(3.0, float(settings['minimum_ease_factor'])))
->>>>>>> fixing_linting_and_tests
 
         # Save settings
         user = api.user.get_current()
         member = api.user.get(user.getId())
-<<<<<<< HEAD
-        member.setMemberProperties(mapping={"sr_settings": settings})
-
-        return {"success": True, "settings": settings}
-=======
         member.setMemberProperties(mapping={'sr_settings': settings})
 
         return {
             'success': True,
             'settings': settings
         }
->>>>>>> fixing_linting_and_tests
 
     def _get_sr_data(self, obj):
         """Get spaced repetition data for an object."""
@@ -549,24 +458,15 @@ class SpacedRepetitionService(Service):
         if not sr_data.get("next_review"):
             return True  # New item
 
-<<<<<<< HEAD
-        return sr_data["next_review"] <= now
-=======
         return sr_data['next_review'] <= now
->>>>>>> fixing_linting_and_tests
 
     def _calculate_retention(self, sr_data, now):
         """Calculate retention score based on forgetting curve."""
         if not sr_data.get("last_review"):
             return 0.0
 
-<<<<<<< HEAD
-        days_since = (now - sr_data["last_review"]).days
-        interval = sr_data.get("interval", 1)
-=======
         days_since = (now - sr_data['last_review']).days
         interval = sr_data.get('interval', 1)
->>>>>>> fixing_linting_and_tests
 
         # Forgetting curve: R = e^(-t/S)
         retention = math.exp(-days_since / (interval * 5))
@@ -580,14 +480,8 @@ class SpacedRepetitionService(Service):
             obj = brain.getObject()
             sr_data = self._get_sr_data(obj)
 
-<<<<<<< HEAD
-            if sr_data.get("next_review"):
-                if next_date is None or sr_data["next_review"] < next_date:
-                    next_date = sr_data["next_review"]
-=======
             if sr_data.get('next_review'):
                 if next_date is None or sr_data['next_review'] < next_date:
                     next_date = sr_data['next_review']
->>>>>>> fixing_linting_and_tests
 
         return next_date.isoformat() if next_date else None

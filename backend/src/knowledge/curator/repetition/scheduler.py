@@ -1,9 +1,6 @@
 """Review Scheduling Engine for Spaced Repetition."""
 
 from datetime import datetime
-<<<<<<< HEAD
-
-=======
 >>>>>>> fixing_linting_and_tests
 import random
 
@@ -24,7 +21,6 @@ class ReviewScheduler:
     ORDER_OLDEST = 'oldest'
     ORDER_DIFFICULTY = 'difficulty'
     ORDER_INTERLEAVED = 'interleaved'
->>>>>>> fixing_linting_and_tests
 
     # Session defaults
     DEFAULT_SESSION_DURATION = 20  # minutes
@@ -33,14 +29,10 @@ class ReviewScheduler:
 
     @classmethod
     def get_review_queue(
-<<<<<<< HEAD
-        cls, items: list[dict], settings: dict, current_time: datetime | None = None
-=======
         cls,
         items: list[dict],
         settings: dict,
         current_time: datetime | None = None
->>>>>>> fixing_linting_and_tests
     ) -> list[dict]:
         """
         Get prioritized review queue based on settings.
@@ -79,26 +71,17 @@ class ReviewScheduler:
         return limited_items
 
     @classmethod
-<<<<<<< HEAD
-    def _filter_due_items(cls, items: list[dict], current_time: datetime) -> list[dict]:
-=======
     def _filter_due_items(
         cls,
         items: list[dict],
         current_time: datetime
     ) -> list[dict]:
->>>>>>> fixing_linting_and_tests
         """Filter items that are due for review."""
         due_items = []
 
         for item in items:
-<<<<<<< HEAD
-            sr_data = item.get("sr_data", {})
-            next_review = sr_data.get("next_review")
-=======
             sr_data = item.get('sr_data', {})
             next_review = sr_data.get('next_review')
->>>>>>> fixing_linting_and_tests
 
             if next_review:
                 if isinstance(next_review, str):
@@ -117,13 +100,6 @@ class ReviewScheduler:
         return due_items
 
     @classmethod
-<<<<<<< HEAD
-    def _apply_order_strategy(cls, items: list[dict], strategy: str) -> list[dict]:
-        """Apply ordering strategy to review items."""
-        if strategy == cls.ORDER_URGENCY:
-            # Sort by urgency score (highest first)
-            return sorted(items, key=lambda x: x.get("urgency_score", 0), reverse=True)
-=======
     def _apply_order_strategy(
         cls,
         items: list[dict],
@@ -133,7 +109,6 @@ class ReviewScheduler:
         if strategy == cls.ORDER_URGENCY:
             # Sort by urgency score (highest first)
             return sorted(items, key=lambda x: x.get('urgency_score', 0), reverse=True)
->>>>>>> fixing_linting_and_tests
 
         elif strategy == cls.ORDER_RANDOM:
             # Random shuffle
@@ -162,17 +137,8 @@ class ReviewScheduler:
 
         elif strategy == cls.ORDER_INTERLEAVED:
             # Interleave new and mature items
-<<<<<<< HEAD
-            new_items = [
-                i for i in items if i.get("sr_data", {}).get("repetitions", 0) < 3
-            ]
-            mature_items = [
-                i for i in items if i.get("sr_data", {}).get("repetitions", 0) >= 3
-            ]
-=======
             new_items = [i for i in items if i.get('sr_data', {}).get('repetitions', 0) < 3]
             mature_items = [i for i in items if i.get('sr_data', {}).get('repetitions', 0) >= 3]
->>>>>>> fixing_linting_and_tests
 
             # Shuffle both groups
             random.shuffle(new_items)
@@ -197,11 +163,7 @@ class ReviewScheduler:
         """Estimate review time in seconds based on item properties."""
         base_time = 60  # Base 60 seconds per item
 
-<<<<<<< HEAD
-        sr_data = item.get("sr_data", {})
-=======
         sr_data = item.get('sr_data', {})
->>>>>>> fixing_linting_and_tests
 
         # Adjust based on ease factor (harder items take longer)
         ease_factor = sr_data.get("ease_factor", 2.5)
@@ -235,14 +197,10 @@ class ReviewScheduler:
 
     @classmethod
     def create_learning_session(
-<<<<<<< HEAD
-        cls, items: list[dict], settings: dict, session_type: str = "mixed"
-=======
         cls,
         items: list[dict],
         settings: dict,
         session_type: str = 'mixed'
->>>>>>> fixing_linting_and_tests
     ) -> dict:
         """
         Create a structured learning session.
@@ -255,13 +213,7 @@ class ReviewScheduler:
         Returns:
             Session plan with items and metadata
         """
-<<<<<<< HEAD
-        session_duration = settings.get(
-            "session_duration", cls.DEFAULT_SESSION_DURATION
-        )
-=======
         session_duration = settings.get('session_duration', cls.DEFAULT_SESSION_DURATION)
->>>>>>> fixing_linting_and_tests
 
         # Filter items by session type
         if session_type == "new_only":
@@ -322,12 +274,8 @@ class ReviewScheduler:
     def _plan_breaks(cls, items: list[dict], settings: dict) -> list[dict]:
         """Plan break points in the session."""
         breaks = []
-<<<<<<< HEAD
-        break_duration = settings.get("break_duration", cls.DEFAULT_BREAK_DURATION)
-=======
         break_interval = settings.get('break_interval', cls.DEFAULT_BREAK_INTERVAL)
         break_duration = settings.get('break_duration', cls.DEFAULT_BREAK_DURATION)
->>>>>>> fixing_linting_and_tests
 
         for i, item in enumerate(items):
             if item["review_metadata"]["break_after"]:
@@ -350,24 +298,16 @@ class ReviewScheduler:
             "Practice deep breathing",
             "Look at something 20 feet away for 20 seconds",
         ]
-<<<<<<< HEAD
-        return activities[0]  # Use deterministic selection for reproducibility
-=======
         return random.choice(activities)
->>>>>>> fixing_linting_and_tests
 
     @classmethod
     def _calculate_difficulty_distribution(cls, items: list[dict]) -> dict[str, int]:
         """Calculate distribution of item difficulties."""
-<<<<<<< HEAD
-        distribution = {"easy": 0, "medium": 0, "hard": 0}
-=======
         distribution = {
             'easy': 0,
             'medium': 0,
             'hard': 0
         }
->>>>>>> fixing_linting_and_tests
 
         for item in items:
             ease_factor = item.get("sr_data", {}).get("ease_factor", 2.5)
@@ -376,23 +316,15 @@ class ReviewScheduler:
             elif ease_factor >= 2.0:
                 distribution["medium"] += 1
             else:
-<<<<<<< HEAD
-                distribution["hard"] += 1
-=======
                 distribution['hard'] += 1
->>>>>>> fixing_linting_and_tests
 
         return distribution
 
     @classmethod
     def optimize_review_time(
-<<<<<<< HEAD
-        cls, user_preferences: dict, historical_performance: list[dict]
-=======
         cls,
         user_preferences: dict,
         historical_performance: list[dict]
->>>>>>> fixing_linting_and_tests
     ) -> dict[str, any]:
         """
         Optimize review times based on user performance patterns.
@@ -419,15 +351,9 @@ class ReviewScheduler:
                         "reviews": [],
                     }
 
-<<<<<<< HEAD
-                performance_by_hour[hour]["total"] += 1
-                performance_by_hour[hour]["sum_quality"] += review["quality"]
-                performance_by_hour[hour]["reviews"].append(review["quality"])
-=======
                 performance_by_hour[hour]['total'] += 1
                 performance_by_hour[hour]['sum_quality'] += review['quality']
                 performance_by_hour[hour]['reviews'].append(review['quality'])
->>>>>>> fixing_linting_and_tests
 
         # Calculate average quality by hour
         best_hours = []
@@ -441,11 +367,7 @@ class ReviewScheduler:
                 })
 
         # Sort by average quality
-<<<<<<< HEAD
-        best_hours.sort(key=lambda x: x["average_quality"], reverse=True)
-=======
         best_hours.sort(key=lambda x: x['average_quality'], reverse=True)
->>>>>>> fixing_linting_and_tests
 
         # Generate recommendations
         recommendations = {
@@ -482,30 +404,13 @@ class ReviewScheduler:
         return recommendations
 
     @classmethod
-<<<<<<< HEAD
-    def _calculate_optimal_session_length(
-        cls, historical_performance: list[dict]
-    ) -> int:
-=======
     def _calculate_optimal_session_length(cls, historical_performance: list[dict]) -> int:
->>>>>>> fixing_linting_and_tests
         """Calculate optimal session length based on performance degradation."""
         # Group reviews by session (assuming sessions are within 2 hours)
         sessions = []
         current_session = []
         last_time = None
 
-<<<<<<< HEAD
-        for review in sorted(historical_performance, key=lambda x: x.get("date", "")):
-            if "date" not in review:
-                continue
-
-            review_time = datetime.fromisoformat(review["date"])
-
-            if (
-                last_time and (review_time - last_time).total_seconds() > 7200
-            ):  # 2 hours
-=======
         for review in sorted(historical_performance, key=lambda x: x.get('date', '')):
             if 'date' not in review:
                 continue
@@ -513,7 +418,6 @@ class ReviewScheduler:
             review_time = datetime.fromisoformat(review['date'])
 
             if last_time and (review_time - last_time).total_seconds() > 7200:  # 2 hours
->>>>>>> fixing_linting_and_tests
                 if current_session:
                     sessions.append(current_session)
                 current_session = []
@@ -544,24 +448,6 @@ class ReviewScheduler:
 
     @classmethod
     def _create_weekly_schedule(
-<<<<<<< HEAD
-        cls, best_hours: list[dict], user_preferences: dict
-    ) -> list[dict]:
-        """Create a weekly review schedule."""
-        schedule = []
-        days = [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-            "Sunday",
-        ]
-
-        # Get user's available days
-        available_days = user_preferences.get("available_days", days)
-=======
         cls,
         best_hours: list[dict],
         user_preferences: dict
@@ -572,7 +458,6 @@ class ReviewScheduler:
 
         # Get user's available days
         available_days = user_preferences.get('available_days', days)
->>>>>>> fixing_linting_and_tests
 
         for day in days:
             if day in available_days and best_hours:
@@ -590,13 +475,9 @@ class ReviewScheduler:
 
     @classmethod
     def get_adaptive_intervals(
-<<<<<<< HEAD
-        cls, item: dict, user_performance: dict
-=======
         cls,
         item: dict,
         user_performance: dict
->>>>>>> fixing_linting_and_tests
     ) -> dict[str, int]:
         """
         Calculate adaptive intervals based on user's overall performance.
@@ -608,19 +489,11 @@ class ReviewScheduler:
         Returns:
             Adjusted interval recommendations
         """
-<<<<<<< HEAD
-        sr_data = item.get("sr_data", {})
-        base_interval = sr_data.get("interval", 1)
-
-        # Get user's average success rate
-        success_rate = user_performance.get("success_rate", 0.8)
-=======
         sr_data = item.get('sr_data', {})
         base_interval = sr_data.get('interval', 1)
 
         # Get user's average success rate
         success_rate = user_performance.get('success_rate', 0.8)
->>>>>>> fixing_linting_and_tests
 
         # Adjust interval based on success rate
         if success_rate < 0.7:

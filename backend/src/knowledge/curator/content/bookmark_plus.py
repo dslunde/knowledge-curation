@@ -25,11 +25,7 @@ class BookmarkPlus(Item):
         from zope.annotation.interfaces import IAnnotations
 
         annotations = IAnnotations(self)
-<<<<<<< HEAD
-        annotations["bookmark_read_date"] = datetime.now().isoformat()
-=======
         annotations['bookmark_read_date'] = datetime.now().isoformat()
->>>>>>> fixing_linting_and_tests
 
     def mark_as_reading(self):
         """Mark the bookmark as currently reading."""
@@ -38,33 +34,21 @@ class BookmarkPlus(Item):
         from zope.annotation.interfaces import IAnnotations
 
         annotations = IAnnotations(self)
-<<<<<<< HEAD
-        annotations["bookmark_reading_started"] = datetime.now().isoformat()
-=======
         annotations['bookmark_reading_started'] = datetime.now().isoformat()
->>>>>>> fixing_linting_and_tests
 
     def get_read_date(self):
         """Get the date when bookmark was marked as read."""
         from zope.annotation.interfaces import IAnnotations
 
         annotations = IAnnotations(self)
-<<<<<<< HEAD
-        return annotations.get("bookmark_read_date", None)
-=======
         return annotations.get('bookmark_read_date', None)
->>>>>>> fixing_linting_and_tests
 
     def get_reading_started_date(self):
         """Get the date when started reading."""
         from zope.annotation.interfaces import IAnnotations
 
         annotations = IAnnotations(self)
-<<<<<<< HEAD
-        return annotations.get("bookmark_reading_started", None)
-=======
         return annotations.get('bookmark_reading_started', None)
->>>>>>> fixing_linting_and_tests
 
     def add_tag(self, tag):
         """Add a tag to the bookmark."""
@@ -88,12 +72,8 @@ class BookmarkPlus(Item):
 
     def is_high_priority(self):
         """Check if bookmark is high priority (unread and high/critical importance)."""
-<<<<<<< HEAD
-        return self.read_status == "unread" and self.importance in ["high", "critical"]
-=======
         return (self.read_status == 'unread' and
                 self.importance in ['high', 'critical'])
->>>>>>> fixing_linting_and_tests
 
     def get_summary_text(self):
         """Get text for generating embeddings/summaries."""
@@ -103,8 +83,4 @@ class BookmarkPlus(Item):
             parts.append(self.description)
         if self.notes and self.notes.raw:
             parts.append(self.notes.raw)
-<<<<<<< HEAD
-        return " ".join(parts)
-=======
         return ' '.join(parts)
->>>>>>> fixing_linting_and_tests

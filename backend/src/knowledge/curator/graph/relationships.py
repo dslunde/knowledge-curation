@@ -198,20 +198,12 @@ class RelationshipMetadata:
     @classmethod
     def is_bidirectional(cls, relationship_type: RelationshipType) -> bool:
         """Check if relationship is bidirectional."""
-<<<<<<< HEAD
-        return cls.get_metadata(relationship_type)["bidirectional"]
-=======
         return cls.get_metadata(relationship_type)['bidirectional']
->>>>>>> fixing_linting_and_tests
 
     @classmethod
     def is_transitive(cls, relationship_type: RelationshipType) -> bool:
         """Check if relationship is transitive."""
-<<<<<<< HEAD
-        return cls.get_metadata(relationship_type)["transitive"]
-=======
         return cls.get_metadata(relationship_type)['transitive']
->>>>>>> fixing_linting_and_tests
 
     @classmethod
     def get_reverse_name(cls, relationship_type: RelationshipType) -> str:
@@ -279,14 +271,8 @@ class RelationshipManager:
 
         self.custom_relationships[name] = metadata
 
-<<<<<<< HEAD
-    def validate_relationship(
-        self, source_type: str, target_type: str, relationship_type: str
-    ) -> bool:
-=======
     def validate_relationship(self, source_type: str, target_type: str,
                             relationship_type: str) -> bool:
->>>>>>> fixing_linting_and_tests
         """Validate if a relationship is allowed between node types.
 
         Args:
@@ -306,13 +292,7 @@ class RelationshipManager:
         allowed_pairs = self.relationship_constraints[relationship_type]
         return (source_type, target_type) in allowed_pairs
 
-<<<<<<< HEAD
-    def get_allowed_relationships(
-        self, source_type: str, target_type: str
-    ) -> list[str]:
-=======
     def get_allowed_relationships(self, source_type: str, target_type: str) -> list[str]:
->>>>>>> fixing_linting_and_tests
         """Get allowed relationship types between two node types.
 
         Args:
@@ -340,14 +320,8 @@ class RelationshipManager:
 
         return allowed
 
-<<<<<<< HEAD
-    def suggest_relationship_type(
-        self, source_type: str, target_type: str, context: dict | None = None
-    ) -> list[tuple[str, float]]:
-=======
     def suggest_relationship_type(self, source_type: str, target_type: str,
                                  context: dict | None = None) -> list[tuple[str, float]]:
->>>>>>> fixing_linting_and_tests
         """Suggest appropriate relationship types with confidence scores.
 
         Args:
@@ -406,19 +380,8 @@ class RelationshipManager:
 
         return suggestions
 
-<<<<<<< HEAD
-    def create_bidirectional_relationship(
-        self,
-        graph,
-        source_uid: str,
-        target_uid: str,
-        relationship_type: RelationshipType,
-        weight: float = 1.0,
-    ):
-=======
     def create_bidirectional_relationship(self, graph, source_uid: str, target_uid: str,
                                         relationship_type: RelationshipType, weight: float = 1.0):
->>>>>>> fixing_linting_and_tests
         """Create a bidirectional relationship if applicable.
 
         Args:
@@ -439,13 +402,7 @@ class RelationshipManager:
             reverse_edge = Edge(target_uid, source_uid, relationship_type.value, weight)
             graph.add_edge(reverse_edge)
 
-<<<<<<< HEAD
-    def infer_transitive_relationships(
-        self, graph, relationship_type: RelationshipType
-    ) -> list[tuple[str, str]]:
-=======
     def infer_transitive_relationships(self, graph, relationship_type: RelationshipType) -> list[tuple[str, str]]:
->>>>>>> fixing_linting_and_tests
         """Infer transitive relationships in the graph.
 
         Args:

@@ -23,19 +23,11 @@ class TestSM2Algorithm(unittest.TestCase):
             quality=5, repetitions=0, ease_factor=2.5, interval=1
         )
 
-<<<<<<< HEAD
-        self.assertEqual(result["quality"], 5)
-        self.assertEqual(result["repetitions"], 1)
-        self.assertEqual(result["interval"], 1)  # First interval
-        self.assertGreater(result["ease_factor"], 2.5)  # Should increase
-        self.assertIsInstance(result["next_review_date"], datetime)
-=======
         self.assertEqual(result['quality'], 5)
         self.assertEqual(result['repetitions'], 1)
         self.assertEqual(result['interval'], 1)  # First interval
         self.assertGreater(result['ease_factor'], 2.5)  # Should increase
         self.assertIsInstance(result['next_review_date'], datetime)
->>>>>>> fixing_linting_and_tests
 
     def test_calculate_next_review_failed_response(self):
         """Test calculation for failed response."""
@@ -43,27 +35,16 @@ class TestSM2Algorithm(unittest.TestCase):
             quality=2, repetitions=5, ease_factor=2.3, interval=10
         )
 
-<<<<<<< HEAD
-        self.assertEqual(result["quality"], 2)
-        self.assertEqual(result["repetitions"], 0)  # Reset to 0
-        self.assertEqual(result["interval"], 1)  # Reset to 1
-        self.assertEqual(result["ease_factor"], 2.3)  # Unchanged for failures
-=======
         self.assertEqual(result['quality'], 2)
         self.assertEqual(result['repetitions'], 0)  # Reset to 0
         self.assertEqual(result['interval'], 1)  # Reset to 1
         self.assertEqual(result['ease_factor'], 2.3)  # Unchanged for failures
->>>>>>> fixing_linting_and_tests
 
     def test_calculate_next_review_progression(self):
         """Test interval progression."""
         # First review
         result1 = SM2Algorithm.calculate_next_review(quality=4, repetitions=0)
-<<<<<<< HEAD
-        self.assertEqual(result1["interval"], 1)
-=======
         self.assertEqual(result1['interval'], 1)
->>>>>>> fixing_linting_and_tests
 
         # Second review
         result2 = SM2Algorithm.calculate_next_review(
@@ -72,11 +53,7 @@ class TestSM2Algorithm(unittest.TestCase):
             ease_factor=result1["ease_factor"],
             interval=result1["interval"],
         )
-<<<<<<< HEAD
-        self.assertEqual(result2["interval"], 6)  # Second interval
-=======
         self.assertEqual(result2['interval'], 6)  # Second interval
->>>>>>> fixing_linting_and_tests
 
         # Third review
         result3 = SM2Algorithm.calculate_next_review(
@@ -85,29 +62,17 @@ class TestSM2Algorithm(unittest.TestCase):
             ease_factor=result2["ease_factor"],
             interval=result2["interval"],
         )
-<<<<<<< HEAD
-        self.assertGreater(result3["interval"], 6)  # Should be ~15 days
-=======
         self.assertGreater(result3['interval'], 6)  # Should be ~15 days
->>>>>>> fixing_linting_and_tests
 
     def test_ease_factor_bounds(self):
         """Test ease factor stays within bounds."""
         # Very poor performance
         result_poor = SM2Algorithm.calculate_next_review(quality=3, ease_factor=1.5)
-<<<<<<< HEAD
-        self.assertGreaterEqual(result_poor["ease_factor"], 1.3)
-
-        # Perfect performance
-        result_perfect = SM2Algorithm.calculate_next_review(quality=5, ease_factor=2.4)
-        self.assertLessEqual(result_perfect["ease_factor"], 2.5)
-=======
         self.assertGreaterEqual(result_poor['ease_factor'], 1.3)
 
         # Perfect performance
         result_perfect = SM2Algorithm.calculate_next_review(quality=5, ease_factor=2.4)
         self.assertLessEqual(result_perfect['ease_factor'], 2.5)
->>>>>>> fixing_linting_and_tests
 
     def test_quality_validation(self):
         """Test quality parameter validation."""
@@ -157,15 +122,6 @@ class TestForgettingCurve(unittest.TestCase):
         data = ForgettingCurve.get_forgetting_curve_data(10, 2.5, 3, 20)
 
         self.assertEqual(len(data), 21)  # 0-20 days
-<<<<<<< HEAD
-        self.assertEqual(data[0]["day"], 0)
-        self.assertEqual(data[0]["retention"], 1.0)
-        self.assertEqual(data[0]["percentage"], 100.0)
-
-        # Check decreasing retention
-        for i in range(1, len(data)):
-            self.assertLess(data[i]["retention"], data[i - 1]["retention"])
-=======
         self.assertEqual(data[0]['day'], 0)
         self.assertEqual(data[0]['retention'], 1.0)
         self.assertEqual(data[0]['percentage'], 100.0)
@@ -173,7 +129,6 @@ class TestForgettingCurve(unittest.TestCase):
         # Check decreasing retention
         for i in range(1, len(data)):
             self.assertLess(data[i]['retention'], data[i-1]['retention'])
->>>>>>> fixing_linting_and_tests
 
     def test_find_optimal_review_day(self):
         """Test optimal review day calculation."""
@@ -212,13 +167,8 @@ class TestForgettingCurve(unittest.TestCase):
         alerts = ForgettingCurve.get_retention_alerts(items, 0.8)
 
         self.assertEqual(len(alerts), 1)  # Only first item
-<<<<<<< HEAD
-        self.assertEqual(alerts[0]["item"]["uid"], "1")
-        self.assertIn(alerts[0]["risk_level"], ["high", "critical"])
-=======
         self.assertEqual(alerts[0]['item']['uid'], '1')
         self.assertIn(alerts[0]['risk_level'], ['high', 'critical'])
->>>>>>> fixing_linting_and_tests
 
     def test_analyze_learning_efficiency(self):
         """Test learning efficiency analysis."""
@@ -242,19 +192,11 @@ class TestForgettingCurve(unittest.TestCase):
 
         analysis = ForgettingCurve.analyze_learning_efficiency(history)
 
-<<<<<<< HEAD
-        self.assertIn("efficiency_score", analysis)
-        self.assertIn("average_retention", analysis)
-        self.assertIn("success_rate", analysis)
-        self.assertIn("recommendations", analysis)
-        self.assertGreater(analysis["efficiency_score"], 0)
-=======
         self.assertIn('efficiency_score', analysis)
         self.assertIn('average_retention', analysis)
         self.assertIn('success_rate', analysis)
         self.assertIn('recommendations', analysis)
         self.assertGreater(analysis['efficiency_score'], 0)
->>>>>>> fixing_linting_and_tests
 
 
 class TestReviewScheduler(unittest.TestCase):
@@ -277,21 +219,12 @@ class TestReviewScheduler(unittest.TestCase):
             },
         ]
 
-<<<<<<< HEAD
-        settings = {"daily_review_limit": 10, "review_order": "urgency"}
-        queue = ReviewScheduler.get_review_queue(items, settings)
-
-        self.assertEqual(len(queue), 2)  # Only due items
-        self.assertEqual(queue[0]["uid"], "1")  # Most overdue first
-        self.assertEqual(queue[1]["uid"], "3")
-=======
         settings = {'daily_review_limit': 10, 'review_order': 'urgency'}
         queue = ReviewScheduler.get_review_queue(items, settings)
 
         self.assertEqual(len(queue), 2)  # Only due items
         self.assertEqual(queue[0]['uid'], '1')  # Most overdue first
         self.assertEqual(queue[1]['uid'], '3')
->>>>>>> fixing_linting_and_tests
 
     def test_review_order_strategies(self):
         """Test different ordering strategies."""
@@ -319,22 +252,11 @@ class TestReviewScheduler(unittest.TestCase):
         # Test urgency order
         settings = {"daily_review_limit": 10, "review_order": "urgency"}
         queue = ReviewScheduler.get_review_queue(items, settings)
-<<<<<<< HEAD
-        self.assertEqual(queue[0]["uid"], "2")  # More overdue
-=======
         self.assertEqual(queue[0]['uid'], '2')  # More overdue
->>>>>>> fixing_linting_and_tests
 
         # Test difficulty order
         settings["review_order"] = "difficulty"
         queue = ReviewScheduler.get_review_queue(items, settings)
-<<<<<<< HEAD
-        self.assertEqual(queue[0]["uid"], "1")  # Lower ease factor
-
-    def test_create_learning_session(self):
-        """Test learning session creation."""
-        items = [{"uid": str(i), "sr_data": {"repetitions": i % 3}} for i in range(10)]
-=======
         self.assertEqual(queue[0]['uid'], '1')  # Lower ease factor
 
     def test_create_learning_session(self):
@@ -343,7 +265,6 @@ class TestReviewScheduler(unittest.TestCase):
             {'uid': str(i), 'sr_data': {'repetitions': i % 3}}
             for i in range(10)
         ]
->>>>>>> fixing_linting_and_tests
 
         settings = {
             "session_duration": 20,
@@ -352,15 +273,6 @@ class TestReviewScheduler(unittest.TestCase):
             "break_interval": 5,
         }
 
-<<<<<<< HEAD
-        session = ReviewScheduler.create_learning_session(items, settings, "mixed")
-
-        self.assertIn("id", session)
-        self.assertIn("items", session)
-        self.assertIn("breaks", session)
-        self.assertIn("metadata", session)
-        self.assertEqual(session["type"], "mixed")
-=======
         session = ReviewScheduler.create_learning_session(items, settings, 'mixed')
 
         self.assertIn('id', session)
@@ -368,7 +280,6 @@ class TestReviewScheduler(unittest.TestCase):
         self.assertIn('breaks', session)
         self.assertIn('metadata', session)
         self.assertEqual(session['type'], 'mixed')
->>>>>>> fixing_linting_and_tests
 
     def test_optimize_review_time(self):
         """Test review time optimization."""
@@ -385,15 +296,9 @@ class TestReviewScheduler(unittest.TestCase):
 
         result = ReviewScheduler.optimize_review_time(preferences, history)
 
-<<<<<<< HEAD
-        self.assertIn("best_review_times", result)
-        self.assertIn("optimal_session_length", result)
-        self.assertIn("suggested_schedule", result)
-=======
         self.assertIn('best_review_times', result)
         self.assertIn('optimal_session_length', result)
         self.assertIn('suggested_schedule', result)
->>>>>>> fixing_linting_and_tests
 
 
 class TestPerformanceTracker(unittest.TestCase):
@@ -414,19 +319,6 @@ class TestPerformanceTracker(unittest.TestCase):
 
         metrics = PerformanceTracker.calculate_performance_metrics(history)
 
-<<<<<<< HEAD
-        self.assertIn("summary", metrics)
-        self.assertIn("streaks", metrics)
-        self.assertIn("learning_velocity", metrics)
-        self.assertIn("difficulty_analysis", metrics)
-        self.assertIn("time_patterns", metrics)
-        self.assertIn("progress", metrics)
-
-        # Check summary calculations
-        self.assertEqual(metrics["summary"]["total_reviews"], 10)
-        self.assertGreater(metrics["summary"]["success_rate"], 0)
-        self.assertGreater(metrics["summary"]["average_quality"], 0)
-=======
         self.assertIn('summary', metrics)
         self.assertIn('streaks', metrics)
         self.assertIn('learning_velocity', metrics)
@@ -438,7 +330,6 @@ class TestPerformanceTracker(unittest.TestCase):
         self.assertEqual(metrics['summary']['total_reviews'], 10)
         self.assertGreater(metrics['summary']['success_rate'], 0)
         self.assertGreater(metrics['summary']['average_quality'], 0)
->>>>>>> fixing_linting_and_tests
 
     def test_calculate_streaks(self):
         """Test streak calculation."""
@@ -455,13 +346,8 @@ class TestPerformanceTracker(unittest.TestCase):
 
         metrics = PerformanceTracker.calculate_performance_metrics(history)
 
-<<<<<<< HEAD
-        self.assertEqual(metrics["streaks"]["current"], 2)
-        self.assertEqual(metrics["streaks"]["longest"], 2)
-=======
         self.assertEqual(metrics['streaks']['current'], 2)
         self.assertEqual(metrics['streaks']['longest'], 2)
->>>>>>> fixing_linting_and_tests
 
     def test_generate_performance_report(self):
         """Test performance report generation."""
@@ -488,21 +374,12 @@ class TestPerformanceTracker(unittest.TestCase):
 
         report = PerformanceTracker.generate_performance_report(user_data, 30)
 
-<<<<<<< HEAD
-        self.assertIn("metrics", report)
-        self.assertIn("insights", report)
-        self.assertIn("recommendations", report)
-        self.assertIn("performance_grade", report)
-        self.assertIsInstance(report["insights"], list)
-        self.assertIsInstance(report["recommendations"], list)
-=======
         self.assertIn('metrics', report)
         self.assertIn('insights', report)
         self.assertIn('recommendations', report)
         self.assertIn('performance_grade', report)
         self.assertIsInstance(report['insights'], list)
         self.assertIsInstance(report['recommendations'], list)
->>>>>>> fixing_linting_and_tests
 
 
 class TestSpacedRepetitionIntegration(unittest.TestCase):
@@ -511,13 +388,8 @@ class TestSpacedRepetitionIntegration(unittest.TestCase):
     layer = PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
 
     def setUp(self):
-<<<<<<< HEAD
-        self.portal = self.layer["portal"]
-        setRoles(self.portal, TEST_USER_ID, ["Manager"])
-=======
         self.portal = self.layer['portal']
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
->>>>>>> fixing_linting_and_tests
 
         # Create test content
         self.research_note = api.content.create(
@@ -531,15 +403,9 @@ class TestSpacedRepetitionIntegration(unittest.TestCase):
     def test_spaced_repetition_behavior(self):
         """Test spaced repetition behavior on content."""
         # Check behavior is available
-<<<<<<< HEAD
-        self.assertTrue(hasattr(self.research_note, "sr_enabled"))
-        self.assertTrue(hasattr(self.research_note, "ease_factor"))
-        self.assertTrue(hasattr(self.research_note, "update_review"))
-=======
         self.assertTrue(hasattr(self.research_note, 'sr_enabled'))
         self.assertTrue(hasattr(self.research_note, 'ease_factor'))
         self.assertTrue(hasattr(self.research_note, 'update_review'))
->>>>>>> fixing_linting_and_tests
 
         # Test initial values
         self.assertTrue(self.research_note.sr_enabled)
@@ -561,11 +427,7 @@ class TestSpacedRepetitionIntegration(unittest.TestCase):
 
         # Check review history
         self.assertEqual(len(self.research_note.review_history), 1)
-<<<<<<< HEAD
-        self.assertEqual(self.research_note.review_history[0]["quality"], 4)
-=======
         self.assertEqual(self.research_note.review_history[0]['quality'], 4)
->>>>>>> fixing_linting_and_tests
 
     def test_review_stats(self):
         """Test review statistics."""
@@ -576,25 +438,6 @@ class TestSpacedRepetitionIntegration(unittest.TestCase):
 
         stats = self.research_note.get_review_stats()
 
-<<<<<<< HEAD
-        self.assertEqual(stats["total_reviews"], 3)
-        self.assertEqual(stats["current_streak"], 3)
-        self.assertEqual(stats["success_rate"], 100.0)
-        self.assertGreater(stats["average_quality"], 3)
-
-    def test_mastery_levels(self):
-        """Test mastery level calculation."""
-        self.assertEqual(self.research_note.get_mastery_level(), "not_started")
-
-        self.research_note.interval = 5
-        self.assertEqual(self.research_note.get_mastery_level(), "learning")
-
-        self.research_note.interval = 15
-        self.assertEqual(self.research_note.get_mastery_level(), "young")
-
-        self.research_note.interval = 30
-        self.assertEqual(self.research_note.get_mastery_level(), "mature")
-=======
         self.assertEqual(stats['total_reviews'], 3)
         self.assertEqual(stats['current_streak'], 3)
         self.assertEqual(stats['success_rate'], 100.0)
@@ -612,7 +455,6 @@ class TestSpacedRepetitionIntegration(unittest.TestCase):
 
         self.research_note.interval = 30
         self.assertEqual(self.research_note.get_mastery_level(), 'mature')
->>>>>>> fixing_linting_and_tests
 
         self.research_note.interval = 100
         self.assertEqual(self.research_note.get_mastery_level(), "mastered")

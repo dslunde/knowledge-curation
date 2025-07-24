@@ -12,114 +12,7 @@ from unittest.mock import Mock
 from unittest.mock import patch
 
 import unittest
-<<<<<<< HEAD
-=======
-from unittest.mock import Mock, patch
->>>>>>> fixing_linting_and_tests
-
-
-class TestEmbeddingGenerator(unittest.TestCase):
-    """Test embedding generation functionality."""
-
-    layer = PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
-
-    def setUp(self):
-        self.portal = self.layer["portal"]
-        self.generator = EmbeddingGenerator()
-
-    def test_embedding_dimension(self):
-        """Test that embeddings have correct dimension."""
-        text = "This is a test document for embedding generation"
-        embedding = self.generator.generate_embedding(text)
-
-        self.assertEqual(len(embedding), self.generator.embedding_dimension)
-        self.assertIsInstance(embedding, list)
-        self.assertTrue(all(isinstance(x, float) for x in embedding))
-
-    def test_empty_text_handling(self):
-        """Test handling of empty text."""
-        embedding = self.generator.generate_embedding("")
-
-        self.assertEqual(len(embedding), self.generator.embedding_dimension)
-        self.assertTrue(all(x == 0.0 for x in embedding))
-
-    def test_batch_embedding_generation(self):
-        """Test batch embedding generation."""
-        texts = [
-            "First document about machine learning",
-            "Second document about data science",
-            "Third document about artificial intelligence",
-            "",  # Empty text
-            "Fourth document about deep learning",
-        ]
-
-        embeddings = self.generator.generate_embeddings(texts)
-
-        self.assertEqual(len(embeddings), len(texts))
-        for i, embedding in enumerate(embeddings):
-            self.assertEqual(len(embedding), self.generator.embedding_dimension)
-            if i == 3:  # Empty text
-                self.assertTrue(all(x == 0.0 for x in embedding))
-            else:
-                self.assertFalse(all(x == 0.0 for x in embedding))
-
-    def test_content_text_preparation(self):
-        """Test preparing content from Plone objects."""
-        setRoles(self.portal, TEST_USER_ID, ["Manager"])
-
-        # Create test content
-        bookmark = api.content.create(
-            container=self.portal,
-            type="BookmarkPlus",
-            title="Test Bookmark",
-            description="A test bookmark for embeddings",
-            url="https://example.com",
-            tags=["test", "embedding"],
-        )
-
-        text = self.generator.prepare_content_text(bookmark)
-
-        self.assertIn("Test Bookmark", text)
-        self.assertIn("A test bookmark for embeddings", text)
-        self.assertIn("https://example.com", text)
-        self.assertIn("test", text)
-        self.assertIn("embedding", text)
-
-    def test_similarity_calculation(self):
-        """Test cosine similarity calculation."""
-        # Create two similar embeddings
-        text1 = "Machine learning is a subset of artificial intelligence"
-        text2 = "AI and machine learning are related fields"
-        text3 = "The weather is nice today"
-
-        emb1 = self.generator.generate_embedding(text1)
-        emb2 = self.generator.generate_embedding(text2)
-        emb3 = self.generator.generate_embedding(text3)
-
-        # Similar texts should have higher similarity
-        sim_12 = self.generator.calculate_similarity(emb1, emb2)
-        sim_13 = self.generator.calculate_similarity(emb1, emb3)
-
-        self.assertGreater(sim_12, sim_13)
-        self.assertGreater(sim_12, 0.5)  # Similar texts
-        self.assertLess(sim_13, 0.5)  # Dissimilar texts
-
-
-class TestQdrantAdapter(unittest.TestCase):
-    """Test Qdrant adapter functionality."""
-
-    layer = PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
-
-    def setUp(self):
-        self.portal = self.layer["portal"]
-        # Mock the Qdrant client to avoid needing actual Qdrant server
-        self.mock_client = Mock()
-
-<<<<<<< HEAD
-    @patch("knowledge.curator.vector.adapter.QdrantClient")
-=======
     @patch('knowledge.curator.vector.adapter.QdrantClient')
->>>>>>> fixing_linting_and_tests
     def test_adapter_initialization(self, mock_client_class):
         """Test adapter initialization."""
         mock_client_class.return_value = self.mock_client
@@ -132,11 +25,7 @@ class TestQdrantAdapter(unittest.TestCase):
         self.assertEqual(adapter.collection_name, "plone_knowledge")
         self.assertEqual(adapter.vector_size, 384)
 
-<<<<<<< HEAD
-    @patch("knowledge.curator.vector.adapter.QdrantClient")
-=======
     @patch('knowledge.curator.vector.adapter.QdrantClient')
->>>>>>> fixing_linting_and_tests
     def test_initialize_collection(self, mock_client_class):
         """Test collection initialization."""
         mock_client_class.return_value = self.mock_client
@@ -152,11 +41,7 @@ class TestQdrantAdapter(unittest.TestCase):
         self.mock_client.create_collection.assert_called_once()
         self.assertEqual(adapter.vector_size, 768)
 
-<<<<<<< HEAD
-    @patch("knowledge.curator.vector.adapter.QdrantClient")
-=======
     @patch('knowledge.curator.vector.adapter.QdrantClient')
->>>>>>> fixing_linting_and_tests
     def test_add_vectors(self, mock_client_class):
         """Test adding vectors to collection."""
         mock_client_class.return_value = self.mock_client
@@ -195,13 +80,8 @@ class TestVectorCollectionManager(unittest.TestCase):
         self.portal = self.layer["portal"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
-<<<<<<< HEAD
-    @patch("knowledge.curator.vector.management.QdrantAdapter")
-    @patch("knowledge.curator.vector.management.EmbeddingGenerator")
-=======
     @patch('knowledge.curator.vector.management.QdrantAdapter')
     @patch('knowledge.curator.vector.management.EmbeddingGenerator')
->>>>>>> fixing_linting_and_tests
     def test_update_content_vector(self, mock_embeddings_class, mock_adapter_class):
         """Test updating vector for content."""
         # Create mocks
@@ -231,13 +111,8 @@ class TestVectorCollectionManager(unittest.TestCase):
         mock_embeddings.generate_embedding.assert_called_once_with("Test content")
         mock_adapter.update_vector.assert_called_once()
 
-<<<<<<< HEAD
-    @patch("knowledge.curator.vector.management.QdrantAdapter")
-    @patch("knowledge.curator.vector.management.EmbeddingGenerator")
-=======
     @patch('knowledge.curator.vector.management.QdrantAdapter')
     @patch('knowledge.curator.vector.management.EmbeddingGenerator')
->>>>>>> fixing_linting_and_tests
     def test_health_check(self, mock_embeddings_class, mock_adapter_class):
         """Test health check functionality."""
         # Create mocks
@@ -275,13 +150,8 @@ class TestSimilaritySearch(unittest.TestCase):
         self.portal = self.layer["portal"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
-<<<<<<< HEAD
-    @patch("knowledge.curator.vector.search.QdrantAdapter")
-    @patch("knowledge.curator.vector.search.EmbeddingGenerator")
-=======
     @patch('knowledge.curator.vector.search.QdrantAdapter')
     @patch('knowledge.curator.vector.search.EmbeddingGenerator')
->>>>>>> fixing_linting_and_tests
     def test_search_by_text(self, mock_embeddings_class, mock_adapter_class):
         """Test text-based similarity search."""
         # Create mocks
@@ -319,13 +189,8 @@ class TestSimilaritySearch(unittest.TestCase):
         mock_embeddings.generate_embedding.assert_called_once_with("test query")
         mock_adapter.search_similar.assert_called_once()
 
-<<<<<<< HEAD
-    @patch("knowledge.curator.vector.search.QdrantAdapter")
-    @patch("knowledge.curator.vector.search.EmbeddingGenerator")
-=======
     @patch('knowledge.curator.vector.search.QdrantAdapter')
     @patch('knowledge.curator.vector.search.EmbeddingGenerator')
->>>>>>> fixing_linting_and_tests
     def test_find_similar_content(self, mock_embeddings_class, mock_adapter_class):
         """Test finding similar content."""
         # Create mocks
@@ -342,11 +207,7 @@ class TestSimilaritySearch(unittest.TestCase):
             UID="source-uid",
         )
 
-<<<<<<< HEAD
-        api.content.create(
-=======
         bookmark2 = api.content.create(
->>>>>>> fixing_linting_and_tests
             container=self.portal,
             type="BookmarkPlus",
             title="Similar Bookmark",

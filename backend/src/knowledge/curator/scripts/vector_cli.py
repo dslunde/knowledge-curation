@@ -1,17 +1,12 @@
 #!/usr/bin/env python
 """Command-line interface for vector database management."""
 
-<<<<<<< HEAD
-=======
 import argparse
 import sys
->>>>>>> fixing_linting_and_tests
 from knowledge.curator.vector.management import VectorCollectionManager
 from knowledge.curator.vector.search import SimilaritySearch
 from zope.component.hooks import setSite
 
-import argparse
-import sys
 import transaction
 
 
@@ -161,23 +156,15 @@ def main():
         description="Vector database management for Plone Knowledge System"
     )
     parser.add_argument(
-<<<<<<< HEAD
-        "--site-id", default="Plone", help="Plone site ID (default: Plone)"
-=======
         "--site-id",
         default="Plone",
         help="Plone site ID (default: Plone)"
->>>>>>> fixing_linting_and_tests
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     # Initialize command
-<<<<<<< HEAD
-    subparsers.add_parser("init", help="Initialize vector database")
-=======
     parser_init = subparsers.add_parser("init", help="Initialize vector database")
->>>>>>> fixing_linting_and_tests
 
     # Rebuild command
     parser_rebuild = subparsers.add_parser("rebuild", help="Rebuild vector index")
@@ -192,17 +179,10 @@ def main():
     )
 
     # Stats command
-<<<<<<< HEAD
-    subparsers.add_parser("stats", help="Show database statistics")
-
-    # Health command
-    subparsers.add_parser("health", help="Check system health")
-=======
     parser_stats = subparsers.add_parser("stats", help="Show database statistics")
 
     # Health command
     parser_health = subparsers.add_parser("health", help="Check system health")
->>>>>>> fixing_linting_and_tests
 
     # Search command
     parser_search = subparsers.add_parser("search", help="Search for similar content")
@@ -240,11 +220,7 @@ def main():
     app = zope_app()
 
     try:
-<<<<<<< HEAD
-        initialize_plone(app, args.site_id)
-=======
         site = initialize_plone(app, args.site_id)
->>>>>>> fixing_linting_and_tests
 
         # Create manager/search instance
         if args.command == "search":

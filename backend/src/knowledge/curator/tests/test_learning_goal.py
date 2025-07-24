@@ -1,8 +1,5 @@
 """Tests for Learning Goal content type."""
 
-<<<<<<< HEAD
-from datetime import date
-=======
 import unittest
 from datetime import date
 from plone import api
@@ -10,7 +7,6 @@ from plone.app.testing import TEST_USER_ID, setRoles
 from plone.dexterity.interfaces import IDexterityFTI
 from zope.component import createObject, queryUtility
 
->>>>>>> fixing_linting_and_tests
 from knowledge.curator.interfaces import ILearningGoal
 from knowledge.curator.testing import PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING
 from plone import api
@@ -50,12 +46,8 @@ class LearningGoalIntegrationTest(unittest.TestCase):
         factory = fti.factory
         obj = createObject(factory)
         self.assertTrue(
-<<<<<<< HEAD
-            ILearningGoal.providedBy(obj), f"ILearningGoal not provided by {obj}"
-=======
             ILearningGoal.providedBy(obj),
             f'ILearningGoal not provided by {obj}'
->>>>>>> fixing_linting_and_tests
         )
 
     def test_ct_learning_goal_adding(self):
@@ -70,12 +62,8 @@ class LearningGoalIntegrationTest(unittest.TestCase):
             priority="high",
         )
         self.assertTrue(
-<<<<<<< HEAD
-            ILearningGoal.providedBy(obj), f"ILearningGoal not provided by {obj.id}"
-=======
             ILearningGoal.providedBy(obj),
             f'ILearningGoal not provided by {obj.id}'
->>>>>>> fixing_linting_and_tests
         )
         # Check fields
         self.assertEqual(obj.title, "Learn Python")
@@ -94,24 +82,14 @@ class LearningGoalIntegrationTest(unittest.TestCase):
         m1 = obj.add_milestone(
             "Learn basics", "Complete Python tutorial", target_date=date(2024, 12, 31)
         )
-<<<<<<< HEAD
-        self.assertEqual(m1["title"], "Learn basics")
-        self.assertFalse(m1["completed"])
-=======
         self.assertEqual(m1['title'], 'Learn basics')
         self.assertFalse(m1['completed'])
->>>>>>> fixing_linting_and_tests
 
         # Test updating milestone
         obj.update_milestone(m1["id"], completed=True)
         updated = obj.milestones[0]
-<<<<<<< HEAD
-        self.assertTrue(updated["completed"])
-        self.assertIsNotNone(updated["completed_date"])
-=======
         self.assertTrue(updated['completed'])
         self.assertIsNotNone(updated['completed_date'])
->>>>>>> fixing_linting_and_tests
 
         # Test progress calculation
         obj.add_milestone("Advanced topics", "Learn advanced Python")
@@ -145,22 +123,13 @@ class LearningGoalIntegrationTest(unittest.TestCase):
         )
 
         # Test adding related notes
-<<<<<<< HEAD
-        obj.add_related_note("note-uid-1")
-        self.assertIn("note-uid-1", obj.related_notes)
-=======
         obj.add_related_note('note-uid-1')
         self.assertIn('note-uid-1', obj.related_notes)
->>>>>>> fixing_linting_and_tests
 
         # Test duplicate prevention
         obj.add_related_note("note-uid-1")
         self.assertEqual(len(obj.related_notes), 1)
 
         # Test removing
-<<<<<<< HEAD
-        obj.remove_related_note("note-uid-1")
-=======
         obj.remove_related_note('note-uid-1')
->>>>>>> fixing_linting_and_tests
         self.assertEqual(len(obj.related_notes), 0)

@@ -6,28 +6,7 @@ from knowledge.curator.repetition import ForgettingCurve
 from knowledge.curator.repetition import PerformanceTracker
 from knowledge.curator.repetition import ReviewScheduler
 from plone import api
-<<<<<<< HEAD
-=======
-from datetime import datetime, timedelta
-from knowledge.curator.repetition import (
-    ForgettingCurve, ReviewScheduler, PerformanceTracker
-)
->>>>>>> fixing_linting_and_tests
-
-
-class ReviewUtilities:
-    """Utilities for managing spaced repetition reviews."""
-
-    @classmethod
-    def get_items_due_for_review(
-        cls,
-        user_id: str | None = None,
-        portal_types: list[str] | None = None,
-<<<<<<< HEAD
-        limit: int | None = None,
-=======
         limit: int | None = None
->>>>>>> fixing_linting_and_tests
     ) -> list[dict]:
         """
         Get items due for review.
@@ -45,14 +24,6 @@ class ReviewUtilities:
             user_id = user.getId()
 
         if portal_types is None:
-<<<<<<< HEAD
-            portal_types = ["ResearchNote", "BookmarkPlus", "LearningGoal"]
-
-        catalog = api.portal.get_tool("portal_catalog")
-
-        # Query for user's items
-        brains = catalog(Creator=user_id, portal_type=portal_types)
-=======
             portal_types = ['ResearchNote', 'BookmarkPlus', 'LearningGoal']
 
         catalog = api.portal.get_tool('portal_catalog')
@@ -62,7 +33,6 @@ class ReviewUtilities:
             Creator=user_id,
             portal_type=portal_types
         )
->>>>>>> fixing_linting_and_tests
 
         due_items = []
         now = datetime.now()
@@ -123,11 +93,7 @@ class ReviewUtilities:
                 continue
 
         # Sort by urgency (highest first)
-<<<<<<< HEAD
-        due_items.sort(key=lambda x: x["urgency_score"], reverse=True)
-=======
         due_items.sort(key=lambda x: x['urgency_score'], reverse=True)
->>>>>>> fixing_linting_and_tests
 
         # Apply limit if specified
         if limit:
@@ -171,13 +137,6 @@ class ReviewUtilities:
         elif interval < 90:
             return "mature"
         else:
-<<<<<<< HEAD
-            return "mastered"
-
-    @classmethod
-    def calculate_optimal_review_times(
-        cls, items: list[dict], target_retention: float = 0.9
-=======
             return 'mastered'
 
     @classmethod
@@ -185,7 +144,6 @@ class ReviewUtilities:
         cls,
         items: list[dict],
         target_retention: float = 0.9
->>>>>>> fixing_linting_and_tests
     ) -> list[dict]:
         """
         Calculate optimal review times for items.
@@ -200,11 +158,7 @@ class ReviewUtilities:
         results = []
 
         for item in items:
-<<<<<<< HEAD
-            sr_data = item.get("sr_data", {})
-=======
             sr_data = item.get('sr_data', {})
->>>>>>> fixing_linting_and_tests
 
             optimal_days = ForgettingCurve.find_optimal_review_day(
                 interval=sr_data.get("interval", 1),
@@ -213,13 +167,8 @@ class ReviewUtilities:
                 target_retention=target_retention,
             )
 
-<<<<<<< HEAD
-            if sr_data.get("last_review"):
-                last_review = datetime.fromisoformat(sr_data["last_review"])
-=======
             if sr_data.get('last_review'):
                 last_review = datetime.fromisoformat(sr_data['last_review'])
->>>>>>> fixing_linting_and_tests
                 optimal_date = last_review + timedelta(days=optimal_days)
             else:
                 optimal_date = datetime.now()
@@ -235,14 +184,10 @@ class ReviewUtilities:
 
     @classmethod
     def handle_review_response(
-<<<<<<< HEAD
-        cls, uid: str, quality: int, time_spent: int | None = None
-=======
         cls,
         uid: str,
         quality: int,
         time_spent: int | None = None
->>>>>>> fixing_linting_and_tests
     ) -> dict:
         """
         Handle a review response and update the item.
@@ -287,13 +232,9 @@ class ReviewUtilities:
 
     @classmethod
     def get_adaptive_schedule(
-<<<<<<< HEAD
-        cls, user_id: str | None = None, days_ahead: int = 30
-=======
         cls,
         user_id: str | None = None,
         days_ahead: int = 30
->>>>>>> fixing_linting_and_tests
     ) -> dict:
         """
         Get adaptive review schedule based on performance.
@@ -397,29 +338,20 @@ class ReviewUtilities:
 
     @classmethod
     def _generate_schedule_recommendations(
-<<<<<<< HEAD
-        cls, performance: dict, workload: list[dict], optimal_times: dict
-=======
         cls,
         performance: dict,
         workload: list[dict],
         optimal_times: dict
->>>>>>> fixing_linting_and_tests
     ) -> list[str]:
         """Generate schedule recommendations."""
         recommendations = []
 
         # Check for overload days
-<<<<<<< HEAD
-        avg_daily = sum(day["count"] for day in workload[:30]) / 30
-        overload_days = [day for day in workload[:7] if day["count"] > avg_daily * 1.5]
-=======
         avg_daily = sum(day['count'] for day in workload[:30]) / 30
         overload_days = [
             day for day in workload[:7]
             if day['count'] > avg_daily * 1.5
         ]
->>>>>>> fixing_linting_and_tests
 
         if overload_days:
             recommendations.append(
@@ -446,13 +378,9 @@ class ReviewUtilities:
 
     @classmethod
     def get_items_at_risk(
-<<<<<<< HEAD
-        cls, user_id: str | None = None, retention_threshold: float = 0.8
-=======
         cls,
         user_id: str | None = None,
         retention_threshold: float = 0.8
->>>>>>> fixing_linting_and_tests
     ) -> list[dict]:
         """
         Get items at risk of being forgotten.
@@ -474,11 +402,7 @@ class ReviewUtilities:
         ]
 
         # Sort by retention (lowest first)
-<<<<<<< HEAD
-        at_risk.sort(key=lambda x: x["sr_data"]["retention_score"])
-=======
         at_risk.sort(key=lambda x: x['sr_data']['retention_score'])
->>>>>>> fixing_linting_and_tests
 
         # Add risk level
         for item in at_risk:
@@ -490,24 +414,16 @@ class ReviewUtilities:
             elif retention < 0.8:
                 item["risk_level"] = "medium"
             else:
-<<<<<<< HEAD
-                item["risk_level"] = "low"
-=======
                 item['risk_level'] = 'low'
->>>>>>> fixing_linting_and_tests
 
         return at_risk
 
     @classmethod
-<<<<<<< HEAD
-    def bulk_reschedule(cls, uids: list[str], strategy: str = "optimal") -> dict:
-=======
     def bulk_reschedule(
         cls,
         uids: list[str],
         strategy: str = 'optimal'
     ) -> dict:
->>>>>>> fixing_linting_and_tests
         """
         Bulk reschedule items.
 
@@ -518,11 +434,6 @@ class ReviewUtilities:
         Returns:
             Results of rescheduling
         """
-<<<<<<< HEAD
-        results = {"success": [], "failed": [], "total": len(uids)}
-
-        catalog = api.portal.get_tool("portal_catalog")
-=======
         results = {
             'success': [],
             'failed': [],
@@ -530,7 +441,6 @@ class ReviewUtilities:
         }
 
         catalog = api.portal.get_tool('portal_catalog')
->>>>>>> fixing_linting_and_tests
 
         for uid in uids:
             try:
@@ -541,13 +451,6 @@ class ReviewUtilities:
 
                 obj = brains[0].getObject()
 
-<<<<<<< HEAD
-                if not api.user.has_permission("Modify portal content", obj=obj):
-                    results["failed"].append({"uid": uid, "error": "Permission denied"})
-                    continue
-
-                if strategy == "optimal":
-=======
                 if not api.user.has_permission('Modify portal content', obj=obj):
                     results['failed'].append({
                         'uid': uid,
@@ -556,7 +459,6 @@ class ReviewUtilities:
                     continue
 
                 if strategy == 'optimal':
->>>>>>> fixing_linting_and_tests
                     # Calculate optimal interval
                     optimal_days = ForgettingCurve.find_optimal_review_day(
                         interval=obj.interval or 1,
@@ -565,37 +467,17 @@ class ReviewUtilities:
                     )
                     obj.next_review = datetime.now() + timedelta(days=optimal_days)
 
-<<<<<<< HEAD
-                elif strategy == "reset":
-                    # Reset to beginning
-                    obj.reset_repetition()
-
-                elif strategy == "postpone":
-=======
                 elif strategy == 'reset':
                     # Reset to beginning
                     obj.reset_repetition()
 
                 elif strategy == 'postpone':
->>>>>>> fixing_linting_and_tests
                     # Postpone by current interval
                     days = obj.interval or 1
                     obj.next_review = datetime.now() + timedelta(days=days)
 
                 obj.reindexObject()
 
-<<<<<<< HEAD
-                results["success"].append({
-                    "uid": uid,
-                    "title": obj.Title(),
-                    "new_review_date": obj.next_review.isoformat()
-                    if obj.next_review
-                    else None,
-                })
-
-            except Exception as e:
-                results["failed"].append({"uid": uid, "error": str(e)})
-=======
                 results['success'].append({
                     'uid': uid,
                     'title': obj.Title(),
@@ -607,6 +489,5 @@ class ReviewUtilities:
                     'uid': uid,
                     'error': str(e)
                 })
->>>>>>> fixing_linting_and_tests
 
         return results

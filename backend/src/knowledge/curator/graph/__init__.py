@@ -12,17 +12,6 @@ from .traversal import GraphTraversal
 
 
 __all__ = [
-<<<<<<< HEAD
-    "Edge",
-    "Graph",
-    "GraphAlgorithms",
-    "GraphOperations",
-    "GraphStorage",
-    "GraphTraversal",
-    "Node",
-    "RelationshipManager",
-    "RelationshipType",
-=======
     'Edge',
     'Graph',
     'GraphAlgorithms',
@@ -32,5 +21,4 @@ __all__ = [
     'Node',
     'RelationshipManager',
     'RelationshipType',
->>>>>>> fixing_linting_and_tests
 ]

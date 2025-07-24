@@ -1,103 +1,10 @@
 """Tests for Knowledge Graph API."""
 
-<<<<<<< HEAD
-=======
-import unittest
-from plone import api
-from plone.app.testing import setRoles, TEST_USER_ID
-from plone.restapi.testing import RelativeSession
->>>>>>> fixing_linting_and_tests
-from knowledge.curator.testing import PLONE_APP_KNOWLEDGE_FUNCTIONAL_TESTING
-from plone import api
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
-from plone.restapi.testing import RelativeSession
-
-import unittest
-
-
-class TestKnowledgeGraphAPI(unittest.TestCase):
-    """Test Knowledge Graph API endpoints."""
-
-    layer = PLONE_APP_KNOWLEDGE_FUNCTIONAL_TESTING
-
-    def setUp(self):
-        self.app = self.layer["app"]
-        self.portal = self.layer["portal"]
-        self.portal_url = self.portal.absolute_url()
-        setRoles(self.portal, TEST_USER_ID, ["Manager"])
-
-        self.api_session = RelativeSession(self.portal_url)
-        self.api_session.headers.update({"Accept": "application/json"})
-        self.api_session.auth = (TEST_USER_ID, "secret")
-
-        # Create test content
-        self.folder = api.content.create(
-            container=self.portal,
-            type="Folder",
-            id="knowledge-base",
-            title="Knowledge Base",
-        )
-
-        self.note1 = api.content.create(
-            container=self.folder,
-            type="ResearchNote",
-            title="Machine Learning Basics",
-            description="Introduction to ML concepts",
-            tags=["machine-learning", "AI", "basics"],
-        )
-
-        self.note2 = api.content.create(
-            container=self.folder,
-            type="ResearchNote",
-            title="Deep Learning Fundamentals",
-            description="Understanding neural networks",
-            tags=["deep-learning", "AI", "neural-networks"],
-        )
-
-        self.goal = api.content.create(
-            container=self.folder,
-            type="LearningGoal",
-            title="Master Machine Learning",
-            description="Complete ML course and projects",
-            priority="high",
-            progress=25,
-        )
-
-        # Create connections
-        self.note1.connections = [self.note2.UID()]
-        self.goal.related_notes = [self.note1.UID(), self.note2.UID()]
-
-        import transaction
-
-        transaction.commit()
-
-    def test_get_knowledge_graph(self):
-        """Test getting the complete knowledge graph."""
-<<<<<<< HEAD
-        response = self.api_session.get("/@knowledge-graph")
-=======
         response = self.api_session.get('/@knowledge-graph')
->>>>>>> fixing_linting_and_tests
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-<<<<<<< HEAD
-        self.assertIn("nodes", data)
-        self.assertIn("edges", data)
-        self.assertIn("count", data)
-
-        # Check nodes
-        self.assertEqual(len(data["nodes"]), 3)
-        node_titles = [node["title"] for node in data["nodes"]]
-        self.assertIn("Machine Learning Basics", node_titles)
-        self.assertIn("Deep Learning Fundamentals", node_titles)
-        self.assertIn("Master Machine Learning", node_titles)
-
-        # Check edges
-        self.assertGreater(len(data["edges"]), 0)
-=======
         self.assertIn('nodes', data)
         self.assertIn('edges', data)
         self.assertIn('count', data)
@@ -111,7 +18,6 @@ class TestKnowledgeGraphAPI(unittest.TestCase):
 
         # Check edges
         self.assertGreater(len(data['edges']), 0)
->>>>>>> fixing_linting_and_tests
 
         # Verify node structure
         node = data["nodes"][0]
@@ -130,13 +36,8 @@ class TestKnowledgeGraphAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-<<<<<<< HEAD
-        self.assertIn("connections", data)
-        self.assertIn("count", data)
-=======
         self.assertIn('connections', data)
         self.assertIn('count', data)
->>>>>>> fixing_linting_and_tests
 
         # Check connections
         connections = data["connections"]
@@ -172,13 +73,8 @@ class TestKnowledgeGraphAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-<<<<<<< HEAD
-        self.assertIn("suggestions", data)
-        self.assertIn("count", data)
-=======
         self.assertIn('suggestions', data)
         self.assertIn('count', data)
->>>>>>> fixing_linting_and_tests
 
         # Suggestions should be ordered by similarity
         if data["suggestions"]:
@@ -186,25 +82,11 @@ class TestKnowledgeGraphAPI(unittest.TestCase):
 
     def test_visualize_graph(self):
         """Test graph visualization endpoint."""
-<<<<<<< HEAD
-        response = self.api_session.get("/@knowledge-graph/visualize")
-=======
         response = self.api_session.get('/@knowledge-graph/visualize')
->>>>>>> fixing_linting_and_tests
 
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-<<<<<<< HEAD
-        self.assertIn("graph", data)
-        self.assertIn("visualization", data)
-
-        # Check visualization config
-        viz = data["visualization"]
-        self.assertIn("width", viz)
-        self.assertIn("height", viz)
-        self.assertIn("force", viz)
-=======
         self.assertIn('graph', data)
         self.assertIn('visualization', data)
 
@@ -213,7 +95,6 @@ class TestKnowledgeGraphAPI(unittest.TestCase):
         self.assertIn('width', viz)
         self.assertIn('height', viz)
         self.assertIn('force', viz)
->>>>>>> fixing_linting_and_tests
 
         # Check node colors
         nodes = data["graph"]["nodes"]
@@ -226,11 +107,7 @@ class TestKnowledgeGraphAPI(unittest.TestCase):
         # Logout
         self.api_session.auth = None
 
-<<<<<<< HEAD
-        response = self.api_session.get("/@knowledge-graph")
-=======
         response = self.api_session.get('/@knowledge-graph')
->>>>>>> fixing_linting_and_tests
         self.assertEqual(response.status_code, 401)
 
     def test_invalid_endpoint(self):
@@ -255,12 +132,6 @@ class TestKnowledgeGraphAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
 
-<<<<<<< HEAD
-        self.assertEqual(len(data["nodes"]), 0)
-        self.assertEqual(len(data["edges"]), 0)
-        self.assertEqual(data["count"], 0)
-=======
         self.assertEqual(len(data['nodes']), 0)
         self.assertEqual(len(data['edges']), 0)
         self.assertEqual(data['count'], 0)
->>>>>>> fixing_linting_and_tests

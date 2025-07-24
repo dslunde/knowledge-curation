@@ -6,11 +6,7 @@ from plone import api
 from plone.restapi.services import Service
 from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse
-<<<<<<< HEAD
-
-=======
 from datetime import datetime, timedelta
->>>>>>> fixing_linting_and_tests
 import math
 
 
@@ -54,20 +50,10 @@ class AnalyticsService(Service):
 
         # Get user's content
         query = {
-<<<<<<< HEAD
-            "Creator": user.getId(),
-            "portal_type": [
-                "ResearchNote",
-                "LearningGoal",
-                "ProjectLog",
-                "BookmarkPlus",
-            ],
-=======
             'Creator': user.getId(),
             'portal_type': [
                 'ResearchNote', 'LearningGoal', 'ProjectLog', 'BookmarkPlus'
             ]
->>>>>>> fixing_linting_and_tests
         }
 
         brains = catalog(**query)
@@ -86,24 +72,6 @@ class AnalyticsService(Service):
         for brain in brains:
             # Count by type
             portal_type = brain.portal_type
-<<<<<<< HEAD
-            stats["by_type"][portal_type] = stats["by_type"].get(portal_type, 0) + 1
-
-            # Count by state
-            state = brain.review_state
-            stats["by_state"][state] = stats["by_state"].get(state, 0) + 1
-
-            # Count tags
-            for tag in brain.Subject:
-                stats["tags"][tag] = stats["tags"].get(tag, 0) + 1
-
-            # Count connections
-            obj = brain.getObject()
-            if hasattr(obj, "connections"):
-                stats["connections"] += len(getattr(obj, "connections", []))
-            if hasattr(obj, "related_notes"):
-                stats["connections"] += len(getattr(obj, "related_notes", []))
-=======
             stats['by_type'][portal_type] = stats['by_type'].get(portal_type, 0) + 1
 
             # Count by state
@@ -120,7 +88,6 @@ class AnalyticsService(Service):
                 stats['connections'] += len(getattr(obj, 'connections', []))
             if hasattr(obj, 'related_notes'):
                 stats['connections'] += len(getattr(obj, 'related_notes', []))
->>>>>>> fixing_linting_and_tests
 
         # Get recent activity (last 30 days)
         thirty_days_ago = datetime.now() - timedelta(days=30)
@@ -133,18 +100,6 @@ class AnalyticsService(Service):
             sort_limit=10,
         )
 
-<<<<<<< HEAD
-        stats["recent_activity"] = [
-            {
-                "uid": brain.UID,
-                "title": brain.Title,
-                "type": brain.portal_type,
-                "modified": brain.modified.ISO8601(),
-                "url": brain.getURL(),
-            }
-            for brain in recent_brains[:10]
-        ]
-=======
         stats['recent_activity'] = [{
             'uid': brain.UID,
             'title': brain.Title,
@@ -152,7 +107,6 @@ class AnalyticsService(Service):
             'modified': brain.modified.ISO8601(),
             'url': brain.getURL()
         } for brain in recent_brains[:10]]
->>>>>>> fixing_linting_and_tests
 
         # Top tags
         stats["top_tags"] = sorted(
@@ -244,102 +198,11 @@ class AnalyticsService(Service):
             created={"query": start_date, "range": "min"},
         )
 
-<<<<<<< HEAD
-        # Calculate goal statistics
-        goal_stats = {
-            "total": len(goals),
-            "completed": 0,
-            "in_progress": 0,
-            "planned": 0,
-            "average_progress": 0,
-            "by_priority": {"low": 0, "medium": 0, "high": 0},
-        }
-
-        total_progress = 0
-
-        for brain in goals:
-            obj = brain.getObject()
-            progress = getattr(obj, "progress", 0)
-            priority = getattr(obj, "priority", "medium")
-
-            total_progress += progress
-            goal_stats["by_priority"][priority] += 1
-
-            if progress == 100:
-                goal_stats["completed"] += 1
-            elif progress > 0:
-                goal_stats["in_progress"] += 1
-            else:
-                goal_stats["planned"] += 1
-
-        if goals:
-            goal_stats["average_progress"] = total_progress / len(goals)
-
-        # Get research notes statistics
-        notes = catalog(
-            Creator=user.getId(),
-            portal_type="ResearchNote",
-            created={"query": start_date, "range": "min"},
-        )
-
-        note_stats = {
-            "total": len(notes),
-            "with_insights": 0,
-            "with_connections": 0,
-            "average_connections": 0,
-        }
-
-        total_connections = 0
-
-        for brain in notes:
-            obj = brain.getObject()
-
-            if getattr(obj, "key_insights", []):
-                note_stats["with_insights"] += 1
-
-            connections = len(getattr(obj, "connections", []))
-            if connections > 0:
-                note_stats["with_connections"] += 1
-            total_connections += connections
-
-        if notes:
-            note_stats["average_connections"] = total_connections / len(notes)
-
-        # Get bookmark statistics
-        bookmarks = catalog(
-            Creator=user.getId(),
-            portal_type="BookmarkPlus",
-            created={"query": start_date, "range": "min"},
-        )
-
-        bookmark_stats = {
-            "total": len(bookmarks),
-            "by_status": {"unread": 0, "reading": 0, "read": 0},
-            "by_importance": {"low": 0, "medium": 0, "high": 0, "critical": 0},
-        }
-
-        for brain in bookmarks:
-            obj = brain.getObject()
-            status = getattr(obj, "read_status", "unread")
-            importance = getattr(obj, "importance", "medium")
-
-            bookmark_stats["by_status"][status] += 1
-            bookmark_stats["by_importance"][importance] += 1
-
-        return {
-            "period_days": days,
-            "learning_goals": goal_stats,
-            "research_notes": note_stats,
-            "bookmarks": bookmark_stats,
-            "generated_at": datetime.now().isoformat(),
-        }
-=======
         goal_stats = self._calculate_goal_stats(goals)
         content_stats = self._calculate_content_stats(user.getId(), start_date)
 
         # Get spaced repetition stats
         sr_stats = self.get_spaced_repetition_stats()
->>>>>>> fixing_linting_and_tests
 
     def get_forgetting_curve(self):
         """Get forgetting curve data for spaced repetition."""
@@ -369,28 +232,12 @@ class AnalyticsService(Service):
             strength = 1.0  # Default strength
 
             # Adjust strength based on connections and importance
-<<<<<<< HEAD
-            if hasattr(obj, "connections"):
-                strength += len(getattr(obj, "connections", [])) * 0.1
-
-            if hasattr(obj, "importance"):
-                importance_weights = {
-                    "low": 0.5,
-                    "medium": 1.0,
-                    "high": 1.5,
-                    "critical": 2.0,
-                }
-                strength *= importance_weights.get(
-                    getattr(obj, "importance", "medium"), 1.0
-                )
-=======
             if hasattr(obj, 'connections'):
                 strength += len(getattr(obj, 'connections', [])) * 0.1
 
             if hasattr(obj, 'importance'):
                 importance_weights = {'low': 0.5, 'medium': 1.0, 'high': 1.5, 'critical': 2.0}
                 strength *= importance_weights.get(getattr(obj, 'importance', 'medium'), 1.0)
->>>>>>> fixing_linting_and_tests
 
             retention = math.exp(-days_since_review / (strength * 5))  # 5 day half-life
 
@@ -406,11 +253,7 @@ class AnalyticsService(Service):
             })
 
         # Sort by retention score (lowest first - needs review)
-<<<<<<< HEAD
-        curve_data.sort(key=lambda x: x["retention_score"])
-=======
         curve_data.sort(key=lambda x: x['retention_score'])
->>>>>>> fixing_linting_and_tests
 
         # Group by review urgency
         review_groups = {
@@ -429,11 +272,7 @@ class AnalyticsService(Service):
             elif retention < 0.8:
                 review_groups["later"].append(item)
             else:
-<<<<<<< HEAD
-                review_groups["good"].append(item)
-=======
                 review_groups['good'].append(item)
->>>>>>> fixing_linting_and_tests
 
         return {
             "forgetting_curve": curve_data[:50],  # Top 50 items
@@ -456,23 +295,14 @@ class AnalyticsService(Service):
         user = api.user.get_current()
 
         # Time range
-<<<<<<< HEAD
-        days = int(self.request.get("days", 90))
-        interval = self.request.get("interval", "week")  # day, week, month
-=======
         days = int(self.request.get('days', 90))
         interval = self.request.get('interval', 'week')  # day, week, month
->>>>>>> fixing_linting_and_tests
 
         # Calculate intervals
         intervals = []
         end_date = datetime.now()
 
-<<<<<<< HEAD
-        if interval == "day":
-=======
         if interval == 'day':
->>>>>>> fixing_linting_and_tests
             for i in range(days):
                 date = end_date - timedelta(days=i)
                 intervals.append({
@@ -557,15 +387,11 @@ class AnalyticsService(Service):
                 },
             })
 
-<<<<<<< HEAD
-        return {"progress": progress_data, "interval": interval, "days": days}
-=======
         return {
             'progress': progress_data,
             'interval': interval,
             'days': days
         }
->>>>>>> fixing_linting_and_tests
 
     def get_activity(self):
         """Get user activity heatmap data."""
@@ -593,12 +419,6 @@ class AnalyticsService(Service):
             date_str = date.isoformat()
 
             if date_str not in activity_map:
-<<<<<<< HEAD
-                activity_map[date_str] = {"count": 0, "types": []}
-
-            activity_map[date_str]["count"] += 1
-            activity_map[date_str]["types"].append(brain.portal_type)
-=======
                 activity_map[date_str] = {
                     'count': 0,
                     'types': []
@@ -606,7 +426,6 @@ class AnalyticsService(Service):
 
             activity_map[date_str]['count'] += 1
             activity_map[date_str]['types'].append(brain.portal_type)
->>>>>>> fixing_linting_and_tests
 
         # Convert to list format
         activity_data = []
@@ -618,11 +437,7 @@ class AnalyticsService(Service):
                 "types": list(set(data["types"])),
             })
 
-<<<<<<< HEAD
-        activity_data.sort(key=lambda x: x["date"])
-=======
         activity_data.sort(key=lambda x: x['date'])
->>>>>>> fixing_linting_and_tests
 
         return {
             "activity": activity_data,
@@ -641,15 +456,11 @@ class AnalyticsService(Service):
         catalog = api.portal.get_tool("portal_catalog")
         user = api.user.get_current()
 
-<<<<<<< HEAD
-        insights = {"patterns": [], "recommendations": [], "connections": []}
-=======
         insights = {
             'patterns': [],
             'recommendations': [],
             'connections': []
         }
->>>>>>> fixing_linting_and_tests
 
         # Analyze tag patterns
         brains = catalog(
@@ -685,18 +496,12 @@ class AnalyticsService(Service):
             })
 
         # Analyze learning goal completion
-<<<<<<< HEAD
-        goals = catalog(Creator=user.getId(), portal_type="LearningGoal")
-
-        completion_rates = {"low": [], "medium": [], "high": []}
-=======
         goals = catalog(
             Creator=user.getId(),
             portal_type='LearningGoal'
         )
 
         completion_rates = {'low': [], 'medium': [], 'high': []}
->>>>>>> fixing_linting_and_tests
 
         for brain in goals:
             obj = brain.getObject()

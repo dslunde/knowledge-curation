@@ -11,11 +11,7 @@ def add_new_content_types(context):
 
     # Refresh catalog for new content types
     loadMigrationProfile(
-<<<<<<< HEAD
-        context, "profile-knowledge.curator:default", steps=["catalog"]
-=======
         context,
         'profile-knowledge.curator:default',
         steps=['catalog']
->>>>>>> fixing_linting_and_tests
     )

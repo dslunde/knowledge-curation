@@ -1,13 +1,8 @@
 """Core graph data model for knowledge graph."""
 
 from datetime import datetime
-<<<<<<< HEAD
-from enum import Enum
-from typing import Any
-=======
 from typing import Any
 from enum import Enum
->>>>>>> fixing_linting_and_tests
 
 
 class NodeType(Enum):
@@ -39,13 +34,8 @@ class Node:
         self.title = title
         self.node_type = node_type
         self.properties = kwargs
-<<<<<<< HEAD
-        self.created = kwargs.get("created", datetime.now())
-        self.modified = kwargs.get("modified", datetime.now())
-=======
         self.created = kwargs.get('created', datetime.now())
         self.modified = kwargs.get('modified', datetime.now())
->>>>>>> fixing_linting_and_tests
 
     def to_dict(self) -> dict[str, Any]:
         """Convert node to dictionary representation."""
@@ -88,19 +78,8 @@ class Node:
 class Edge:
     """Represents an edge (relationship) in the knowledge graph."""
 
-<<<<<<< HEAD
-    def __init__(
-        self,
-        source_uid: str,
-        target_uid: str,
-        relationship_type: str,
-        weight: float = 1.0,
-        **kwargs,
-    ):
-=======
     def __init__(self, source_uid: str, target_uid: str, relationship_type: str,
                  weight: float = 1.0, **kwargs):
->>>>>>> fixing_linting_and_tests
         """Initialize an edge.
 
         Args:
@@ -115,11 +94,7 @@ class Edge:
         self.relationship_type = relationship_type
         self.weight = weight
         self.properties = kwargs
-<<<<<<< HEAD
-        self.created = kwargs.get("created", datetime.now())
-=======
         self.created = kwargs.get('created', datetime.now())
->>>>>>> fixing_linting_and_tests
 
     def to_dict(self) -> dict[str, Any]:
         """Convert edge to dictionary representation."""
@@ -135,28 +110,14 @@ class Edge:
         }
 
     def __repr__(self):
-<<<<<<< HEAD
-        return (
-            f"Edge({self.source_uid} --[{self.relationship_type}]--> {self.target_uid})"
-        )
-=======
         return f"Edge({self.source_uid} --[{self.relationship_type}]--> {self.target_uid})"
->>>>>>> fixing_linting_and_tests
 
     def __eq__(self, other):
         if not isinstance(other, Edge):
             return False
-<<<<<<< HEAD
-        return (
-            self.source_uid == other.source_uid
-            and self.target_uid == other.target_uid
-            and self.relationship_type == other.relationship_type
-        )
-=======
         return (self.source_uid == other.source_uid and
                 self.target_uid == other.target_uid and
                 self.relationship_type == other.relationship_type)
->>>>>>> fixing_linting_and_tests
 
     def __hash__(self):
         return hash((self.source_uid, self.target_uid, self.relationship_type))
@@ -246,13 +207,7 @@ class Graph:
 
         return True
 
-<<<<<<< HEAD
-    def remove_edge(
-        self, source_uid: str, target_uid: str, relationship_type: str
-    ) -> bool:
-=======
     def remove_edge(self, source_uid: str, target_uid: str, relationship_type: str) -> bool:
->>>>>>> fixing_linting_and_tests
         """Remove an edge from the graph.
 
         Args:
@@ -274,12 +229,7 @@ class Graph:
 
         # Update adjacency lists if no other edges exist between nodes
         has_other_edges = any(
-<<<<<<< HEAD
-            e
-            for e in self.edges
-=======
             e for e in self.edges
->>>>>>> fixing_linting_and_tests
             if e.source_uid == source_uid and e.target_uid == target_uid
         )
         if not has_other_edges:
@@ -292,23 +242,11 @@ class Graph:
         """Get a node by its UID."""
         return self.nodes.get(uid)
 
-<<<<<<< HEAD
-    def get_edge(
-        self, source_uid: str, target_uid: str, relationship_type: str
-    ) -> Edge | None:
-        """Get an edge by its endpoints and type."""
-        return self.edge_index.get((source_uid, target_uid, relationship_type))
-
-    def get_neighbors(
-        self, uid: str, relationship_type: str | None = None
-    ) -> list[str]:
-=======
     def get_edge(self, source_uid: str, target_uid: str, relationship_type: str) -> Edge | None:
         """Get an edge by its endpoints and type."""
         return self.edge_index.get((source_uid, target_uid, relationship_type))
 
     def get_neighbors(self, uid: str, relationship_type: str | None = None) -> list[str]:
->>>>>>> fixing_linting_and_tests
         """Get neighboring nodes.
 
         Args:
@@ -332,13 +270,7 @@ class Graph:
 
         return neighbors
 
-<<<<<<< HEAD
-    def get_incoming_neighbors(
-        self, uid: str, relationship_type: str | None = None
-    ) -> list[str]:
-=======
     def get_incoming_neighbors(self, uid: str, relationship_type: str | None = None) -> list[str]:
->>>>>>> fixing_linting_and_tests
         """Get nodes that point to this node.
 
         Args:
@@ -362,13 +294,7 @@ class Graph:
 
         return neighbors
 
-<<<<<<< HEAD
-    def get_edges_from_node(
-        self, uid: str, relationship_type: str | None = None
-    ) -> list[Edge]:
-=======
     def get_edges_from_node(self, uid: str, relationship_type: str | None = None) -> list[Edge]:
->>>>>>> fixing_linting_and_tests
         """Get all edges originating from a node.
 
         Args:
@@ -388,13 +314,7 @@ class Graph:
                     edges.append(edge)
         return edges
 
-<<<<<<< HEAD
-    def get_edges_to_node(
-        self, uid: str, relationship_type: str | None = None
-    ) -> list[Edge]:
-=======
     def get_edges_to_node(self, uid: str, relationship_type: str | None = None) -> list[Edge]:
->>>>>>> fixing_linting_and_tests
         """Get all edges pointing to a node.
 
         Args:
@@ -414,11 +334,7 @@ class Graph:
                     edges.append(edge)
         return edges
 
-<<<<<<< HEAD
-    def get_subgraph(self, node_uids: list[str]) -> "Graph":
-=======
     def get_subgraph(self, node_uids: list[str]) -> 'Graph':
->>>>>>> fixing_linting_and_tests
         """Get a subgraph containing only specified nodes.
 
         Args:

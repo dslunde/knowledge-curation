@@ -48,11 +48,7 @@ class LearningGoal(Container):
         if not self.milestones:
             return 0
 
-<<<<<<< HEAD
-        completed = sum(1 for m in self.milestones if m.get("completed", False))
-=======
         completed = sum(1 for m in self.milestones if m.get('completed', False))
->>>>>>> fixing_linting_and_tests
         total = len(self.milestones)
 
         if total == 0:

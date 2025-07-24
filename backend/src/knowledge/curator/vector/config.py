@@ -14,20 +14,6 @@ def get_vector_config():
         "qdrant_port": int(os.environ.get("QDRANT_PORT", "6333")),
         "qdrant_api_key": os.environ.get("QDRANT_API_KEY"),
         "qdrant_https": os.environ.get("QDRANT_HTTPS", "false").lower() == "true",
-<<<<<<< HEAD
-        # Embedding model settings
-        "embedding_model": os.environ.get(
-            "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
-        ),
-        # Search settings
-        "default_search_limit": int(os.environ.get("VECTOR_SEARCH_LIMIT", "10")),
-        "default_score_threshold": float(
-            os.environ.get("VECTOR_SCORE_THRESHOLD", "0.5")
-        ),
-        # Batch processing settings
-        "batch_size": int(os.environ.get("VECTOR_BATCH_SIZE", "100")),
-        "embedding_batch_size": int(os.environ.get("EMBEDDING_BATCH_SIZE", "32")),
-=======
 
         # Embedding model settings
         "embedding_model": os.environ.get(
@@ -43,7 +29,6 @@ def get_vector_config():
         "batch_size": int(os.environ.get("VECTOR_BATCH_SIZE", "100")),
         "embedding_batch_size": int(os.environ.get("EMBEDDING_BATCH_SIZE", "32")),
 
->>>>>>> fixing_linting_and_tests
         # Feature flags
         "auto_index_on_create": os.environ.get(
             "VECTOR_AUTO_INDEX_CREATE", "true"
@@ -95,16 +80,12 @@ def get_vector_config():
 
 
 # Configuration constants
-<<<<<<< HEAD
-SUPPORTED_CONTENT_TYPES = ["BookmarkPlus", "ResearchNote", "LearningGoal", "ProjectLog"]
-=======
 SUPPORTED_CONTENT_TYPES = [
     "BookmarkPlus",
     "ResearchNote",
     "LearningGoal",
     "ProjectLog"
 ]
->>>>>>> fixing_linting_and_tests
 
 INDEXED_WORKFLOW_STATES = ["private", "process", "reviewed", "published"]
 
@@ -123,11 +104,6 @@ EMBEDDING_MODELS = {
     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2": {
         "dimension": 384,
         "max_seq_length": 128,
-<<<<<<< HEAD
-        "description": "Multilingual support",
-    },
-=======
         "description": "Multilingual support"
     }
->>>>>>> fixing_linting_and_tests
 }

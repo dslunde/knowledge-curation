@@ -33,19 +33,11 @@ class KnowledgeGraphView(BrowserView):
         max_edges = node_count * (node_count - 1) if node_count > 1 else 0
         density = edge_count / max_edges if max_edges > 0 else 0
 
-<<<<<<< HEAD
-        stats["density"] = round(density, 4)
-
-        # Get central nodes
-        central_nodes = algorithms.find_central_concepts(top_n=5)
-        stats["central_nodes"] = []
-=======
         stats['density'] = round(density, 4)
 
         # Get central nodes
         central_nodes = algorithms.find_central_concepts(top_n=5)
         stats['central_nodes'] = []
->>>>>>> fixing_linting_and_tests
 
         for uid, score in central_nodes:
             node = graph.get_node(uid)
@@ -61,11 +53,7 @@ class KnowledgeGraphView(BrowserView):
 
         # Find knowledge gaps
         gaps = algorithms.find_knowledge_gaps(min_importance=0.3)
-<<<<<<< HEAD
-        stats["knowledge_gaps"] = []
-=======
         stats['knowledge_gaps'] = []
->>>>>>> fixing_linting_and_tests
 
         for uid1, uid2, importance in gaps[:5]:
             node1 = graph.get_node(uid1)
@@ -83,23 +71,13 @@ class KnowledgeGraphView(BrowserView):
         for _uid, cluster_id in clusters.items():
             cluster_sizes[cluster_id] = cluster_sizes.get(cluster_id, 0) + 1
 
-<<<<<<< HEAD
-        stats["clusters"] = {
-            "count": len(cluster_sizes),
-            "sizes": sorted(cluster_sizes.values(), reverse=True),
-=======
         stats['clusters'] = {
             'count': len(cluster_sizes),
             'sizes': sorted(cluster_sizes.values(), reverse=True)
->>>>>>> fixing_linting_and_tests
         }
 
         return stats
 
     def can_edit_graph(self):
         """Check if user can edit the graph."""
-<<<<<<< HEAD
-        return api.user.has_permission("Modify portal content", obj=self.context)
-=======
         return api.user.has_permission('Modify portal content', obj=self.context)
->>>>>>> fixing_linting_and_tests

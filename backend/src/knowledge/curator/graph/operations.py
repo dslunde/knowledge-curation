@@ -1,16 +1,6 @@
 """Graph operations for adding, removing, and modifying graph elements."""
 
-<<<<<<< HEAD
-from .model import Edge
-from .model import Graph
-from .model import Node
-from .model import NodeType
-from .relationships import RelationshipManager
-from .relationships import RelationshipMetadata
-from .relationships import RelationshipType
-=======
 from typing import Any
->>>>>>> fixing_linting_and_tests
 from datetime import datetime
 from typing import Any
 
@@ -28,13 +18,7 @@ class GraphOperations:
         self.relationship_manager = RelationshipManager()
         self.operation_history: list[dict[str, Any]] = []
 
-<<<<<<< HEAD
-    def add_content_node(
-        self, uid: str, title: str, content_type: str, **properties
-    ) -> bool:
-=======
     def add_content_node(self, uid: str, title: str, content_type: str, **properties) -> bool:
->>>>>>> fixing_linting_and_tests
         """Add a content node to the graph.
 
         Args:
@@ -59,11 +43,7 @@ class GraphOperations:
 
         success = self.graph.add_node(node)
         if success:
-<<<<<<< HEAD
-            self._log_operation("add_node", {"node": node.to_dict()})
-=======
             self._log_operation('add_node', {'node': node.to_dict()})
->>>>>>> fixing_linting_and_tests
 
         return success
 
@@ -82,11 +62,7 @@ class GraphOperations:
 
         node = Node(uid, concept_name, NodeType.CONCEPT, **properties)
         self.graph.add_node(node)
-<<<<<<< HEAD
-        self._log_operation("add_concept", {"node": node.to_dict()})
-=======
         self._log_operation('add_concept', {'node': node.to_dict()})
->>>>>>> fixing_linting_and_tests
 
         return uid
 
@@ -104,20 +80,6 @@ class GraphOperations:
 
         node = Node(uid, tag_name, NodeType.TAG)
         self.graph.add_node(node)
-<<<<<<< HEAD
-        self._log_operation("add_tag", {"node": node.to_dict()})
-
-        return uid
-
-    def create_relationship(
-        self,
-        source_uid: str,
-        target_uid: str,
-        relationship_type: RelationshipType,
-        weight: float = 1.0,
-        **properties,
-    ) -> bool:
-=======
         self._log_operation('add_tag', {'node': node.to_dict()})
 
         return uid
@@ -125,7 +87,6 @@ class GraphOperations:
     def create_relationship(self, source_uid: str, target_uid: str,
                           relationship_type: RelationshipType,
                           weight: float = 1.0, **properties) -> bool:
->>>>>>> fixing_linting_and_tests
         """Create a relationship between two nodes.
 
         Args:
@@ -146,21 +107,8 @@ class GraphOperations:
             return False
 
         # Validate relationship is allowed
-<<<<<<< HEAD
-        source_type = (
-            source.node_type.value
-            if isinstance(source.node_type, NodeType)
-            else source.node_type
-        )
-        target_type = (
-            target.node_type.value
-            if isinstance(target.node_type, NodeType)
-            else target.node_type
-        )
-=======
         source_type = source.node_type.value if isinstance(source.node_type, NodeType) else source.node_type
         target_type = target.node_type.value if isinstance(target.node_type, NodeType) else target.node_type
->>>>>>> fixing_linting_and_tests
 
         if not self.relationship_manager.validate_relationship(
             source_type, target_type, relationship_type.value
@@ -174,11 +122,7 @@ class GraphOperations:
         success = self.graph.add_edge(edge)
 
         if success:
-<<<<<<< HEAD
-            self._log_operation("create_relationship", {"edge": edge.to_dict()})
-=======
             self._log_operation('create_relationship', {'edge': edge.to_dict()})
->>>>>>> fixing_linting_and_tests
 
             # Handle bidirectional relationships
             if RelationshipMetadata.is_bidirectional(relationship_type):
@@ -193,14 +137,8 @@ class GraphOperations:
 
         return success
 
-<<<<<<< HEAD
-    def remove_relationship(
-        self, source_uid: str, target_uid: str, relationship_type: RelationshipType
-    ) -> bool:
-=======
     def remove_relationship(self, source_uid: str, target_uid: str,
                           relationship_type: RelationshipType) -> bool:
->>>>>>> fixing_linting_and_tests
         """Remove a relationship between two nodes.
 
         Args:
@@ -211,21 +149,6 @@ class GraphOperations:
         Returns:
             True if relationship was removed successfully
         """
-<<<<<<< HEAD
-        success = self.graph.remove_edge(
-            source_uid, target_uid, relationship_type.value
-        )
-
-        if success:
-            self._log_operation(
-                "remove_relationship",
-                {
-                    "source": source_uid,
-                    "target": target_uid,
-                    "type": relationship_type.value,
-                },
-            )
-=======
         success = self.graph.remove_edge(source_uid, target_uid, relationship_type.value)
 
         if success:
@@ -234,7 +157,6 @@ class GraphOperations:
                 'target': target_uid,
                 'type': relationship_type.value
             })
->>>>>>> fixing_linting_and_tests
 
             # Handle bidirectional relationships
             if RelationshipMetadata.is_bidirectional(relationship_type):
@@ -261,22 +183,11 @@ class GraphOperations:
         for key, value in properties.items():
             node.update_property(key, value)
 
-<<<<<<< HEAD
-        self._log_operation(
-            "update_node",
-            {
-                "uid": uid,
-                "old_properties": old_properties,
-                "new_properties": node.properties,
-            },
-        )
-=======
         self._log_operation('update_node', {
             'uid': uid,
             'old_properties': old_properties,
             'new_properties': node.properties
         })
->>>>>>> fixing_linting_and_tests
 
         return True
 
@@ -304,16 +215,8 @@ class GraphOperations:
         for edge in outgoing_edges:
             if edge.target_uid != primary_uid:  # Avoid self-loops
                 new_edge = Edge(
-<<<<<<< HEAD
-                    primary_uid,
-                    edge.target_uid,
-                    edge.relationship_type,
-                    edge.weight,
-                    **edge.properties,
-=======
                     primary_uid, edge.target_uid, edge.relationship_type,
                     edge.weight, **edge.properties
->>>>>>> fixing_linting_and_tests
                 )
                 self.graph.add_edge(new_edge)
 
@@ -337,25 +240,6 @@ class GraphOperations:
         # Remove secondary node
         self.graph.remove_node(secondary_uid)
 
-<<<<<<< HEAD
-        self._log_operation(
-            "merge_nodes",
-            {
-                "primary": primary_uid,
-                "secondary": secondary_uid,
-                "redirected_edges": len(outgoing_edges) + len(incoming_edges),
-            },
-        )
-
-        return True
-
-    def clone_subgraph(
-        self,
-        root_uid: str,
-        max_depth: int = 2,
-        relationship_types: list[RelationshipType] | None = None,
-    ) -> Graph:
-=======
         self._log_operation('merge_nodes', {
             'primary': primary_uid,
             'secondary': secondary_uid,
@@ -366,7 +250,6 @@ class GraphOperations:
 
     def clone_subgraph(self, root_uid: str, max_depth: int = 2,
                       relationship_types: list[RelationshipType] | None = None) -> Graph:
->>>>>>> fixing_linting_and_tests
         """Clone a subgraph starting from a root node.
 
         Args:
@@ -401,15 +284,8 @@ class GraphOperations:
                         if relationship_types:
                             edges = self.graph.get_edges_from_node(current_uid)
                             for edge in edges:
-<<<<<<< HEAD
-                                if edge.target_uid == neighbor_uid and any(
-                                    edge.relationship_type == rt.value
-                                    for rt in relationship_types
-                                ):
-=======
                                 if (edge.target_uid == neighbor_uid and
                                     any(edge.relationship_type == rt.value for rt in relationship_types)):
->>>>>>> fixing_linting_and_tests
                                     nodes_to_process.append((neighbor_uid, depth + 1))
                                     break
                         else:
@@ -418,13 +294,7 @@ class GraphOperations:
         # Create subgraph
         return self.graph.get_subgraph(list(nodes_to_include))
 
-<<<<<<< HEAD
-    def batch_add_relationships(
-        self, relationships: list[tuple[str, str, RelationshipType, float]]
-    ) -> int:
-=======
     def batch_add_relationships(self, relationships: list[tuple[str, str, RelationshipType, float]]) -> int:
->>>>>>> fixing_linting_and_tests
         """Add multiple relationships in batch.
 
         Args:
@@ -439,16 +309,10 @@ class GraphOperations:
             if self.create_relationship(source_uid, target_uid, rel_type, weight):
                 added += 1
 
-<<<<<<< HEAD
-        self._log_operation(
-            "batch_add_relationships", {"attempted": len(relationships), "added": added}
-        )
-=======
         self._log_operation('batch_add_relationships', {
             'attempted': len(relationships),
             'added': added
         })
->>>>>>> fixing_linting_and_tests
 
         return added
 
@@ -480,21 +344,11 @@ class GraphOperations:
         for uid in orphans:
             self.graph.remove_node(uid)
 
-<<<<<<< HEAD
-        self._log_operation("prune_orphans", {"removed": len(orphans)})
-
-        return len(orphans)
-
-    def suggest_connections(
-        self, uid: str, limit: int = 10
-    ) -> list[tuple[str, RelationshipType, float]]:
-=======
         self._log_operation('prune_orphans', {'removed': len(orphans)})
 
         return len(orphans)
 
     def suggest_connections(self, uid: str, limit: int = 10) -> list[tuple[str, RelationshipType, float]]:
->>>>>>> fixing_linting_and_tests
         """Suggest potential connections for a node.
 
         Args:
@@ -509,15 +363,7 @@ class GraphOperations:
             return []
 
         suggestions = []
-<<<<<<< HEAD
-        node_type = (
-            node.node_type.value
-            if isinstance(node.node_type, NodeType)
-            else node.node_type
-        )
-=======
         node_type = node.node_type.value if isinstance(node.node_type, NodeType) else node.node_type
->>>>>>> fixing_linting_and_tests
 
         # Get existing connections to exclude
         existing_targets = set()
@@ -530,18 +376,8 @@ class GraphOperations:
         # Check neighbors of neighbors
         for neighbor_uid in self.graph.get_neighbors(uid):
             for second_neighbor_uid in self.graph.get_neighbors(neighbor_uid):
-<<<<<<< HEAD
-                if (
-                    second_neighbor_uid != uid
-                    and second_neighbor_uid not in existing_targets
-                ):
-                    connection_counts[second_neighbor_uid] = (
-                        connection_counts.get(second_neighbor_uid, 0) + 1
-                    )
-=======
                 if second_neighbor_uid != uid and second_neighbor_uid not in existing_targets:
                     connection_counts[second_neighbor_uid] = connection_counts.get(second_neighbor_uid, 0) + 1
->>>>>>> fixing_linting_and_tests
 
         # Score candidates
         for candidate_uid, shared_connections in connection_counts.items():
@@ -549,15 +385,7 @@ class GraphOperations:
             if not candidate:
                 continue
 
-<<<<<<< HEAD
-            candidate_type = (
-                candidate.node_type.value
-                if isinstance(candidate.node_type, NodeType)
-                else candidate.node_type
-            )
-=======
             candidate_type = candidate.node_type.value if isinstance(candidate.node_type, NodeType) else candidate.node_type
->>>>>>> fixing_linting_and_tests
 
             # Get suggested relationship types
             rel_suggestions = self.relationship_manager.suggest_relationship_type(

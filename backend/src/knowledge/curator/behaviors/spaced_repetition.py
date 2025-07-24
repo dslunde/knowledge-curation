@@ -9,14 +9,9 @@ from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
 from zope import schema
 from zope.component import adapter
-<<<<<<< HEAD
-from zope.interface import implementer
-from zope.interface import provider
-=======
 from persistent.list import PersistentList
 from datetime import datetime
 from knowledge.curator.repetition import SM2Algorithm, ForgettingCurve
->>>>>>> fixing_linting_and_tests
 
 
 @provider(IFormFieldProvider)
@@ -46,11 +41,7 @@ class ISpacedRepetition(model.Schema):
         required=False,
     )
 
-<<<<<<< HEAD
-    directives.mode(ease_factor="display")
-=======
     directives.mode(ease_factor='display')
->>>>>>> fixing_linting_and_tests
     ease_factor = schema.Float(
         title="Ease Factor",
         description="Difficulty factor (1.3-2.5, lower is harder)",
@@ -60,11 +51,7 @@ class ISpacedRepetition(model.Schema):
         required=False,
     )
 
-<<<<<<< HEAD
-    directives.mode(interval="display")
-=======
     directives.mode(interval='display')
->>>>>>> fixing_linting_and_tests
     interval = schema.Int(
         title="Current Interval",
         description="Days until next review",
@@ -72,11 +59,7 @@ class ISpacedRepetition(model.Schema):
         required=False,
     )
 
-<<<<<<< HEAD
-    directives.mode(repetitions="display")
-=======
     directives.mode(repetitions='display')
->>>>>>> fixing_linting_and_tests
     repetitions = schema.Int(
         title="Successful Repetitions",
         description="Number of successful reviews",
@@ -84,29 +67,17 @@ class ISpacedRepetition(model.Schema):
         required=False,
     )
 
-<<<<<<< HEAD
-    directives.mode(last_review="display")
-=======
     directives.mode(last_review='display')
->>>>>>> fixing_linting_and_tests
     last_review = schema.Datetime(
         title="Last Review", description="Date of last review", required=False
     )
 
-<<<<<<< HEAD
-    directives.mode(next_review="display")
-=======
     directives.mode(next_review='display')
->>>>>>> fixing_linting_and_tests
     next_review = schema.Datetime(
         title="Next Review", description="Scheduled next review date", required=False
     )
 
-<<<<<<< HEAD
-    directives.mode(total_reviews="display")
-=======
     directives.mode(total_reviews='display')
->>>>>>> fixing_linting_and_tests
     total_reviews = schema.Int(
         title="Total Reviews",
         description="Total number of reviews",
@@ -114,11 +85,7 @@ class ISpacedRepetition(model.Schema):
         required=False,
     )
 
-<<<<<<< HEAD
-    directives.mode(average_quality="display")
-=======
     directives.mode(average_quality='display')
->>>>>>> fixing_linting_and_tests
     average_quality = schema.Float(
         title="Average Quality",
         description="Average review quality (0-5)",
@@ -126,11 +93,7 @@ class ISpacedRepetition(model.Schema):
         required=False,
     )
 
-<<<<<<< HEAD
-    directives.mode(retention_score="display")
-=======
     directives.mode(retention_score='display')
->>>>>>> fixing_linting_and_tests
     retention_score = schema.Float(
         title="Current Retention",
         description="Estimated retention probability",
@@ -151,11 +114,7 @@ class SpacedRepetition:
 
     @property
     def sr_enabled(self):
-<<<<<<< HEAD
-        return getattr(self.context, "sr_enabled", True)
-=======
         return getattr(self.context, 'sr_enabled', True)
->>>>>>> fixing_linting_and_tests
 
     @sr_enabled.setter
     def sr_enabled(self, value):
@@ -163,11 +122,7 @@ class SpacedRepetition:
 
     @property
     def ease_factor(self):
-<<<<<<< HEAD
-        return getattr(self.context, "ease_factor", 2.5)
-=======
         return getattr(self.context, 'ease_factor', 2.5)
->>>>>>> fixing_linting_and_tests
 
     @ease_factor.setter
     def ease_factor(self, value):
@@ -175,11 +130,7 @@ class SpacedRepetition:
 
     @property
     def interval(self):
-<<<<<<< HEAD
-        return getattr(self.context, "interval", 0)
-=======
         return getattr(self.context, 'interval', 0)
->>>>>>> fixing_linting_and_tests
 
     @interval.setter
     def interval(self, value):
@@ -187,11 +138,7 @@ class SpacedRepetition:
 
     @property
     def repetitions(self):
-<<<<<<< HEAD
-        return getattr(self.context, "repetitions", 0)
-=======
         return getattr(self.context, 'repetitions', 0)
->>>>>>> fixing_linting_and_tests
 
     @repetitions.setter
     def repetitions(self, value):
@@ -199,11 +146,7 @@ class SpacedRepetition:
 
     @property
     def last_review(self):
-<<<<<<< HEAD
-        return getattr(self.context, "last_review", None)
-=======
         return getattr(self.context, 'last_review', None)
->>>>>>> fixing_linting_and_tests
 
     @last_review.setter
     def last_review(self, value):
@@ -211,11 +154,7 @@ class SpacedRepetition:
 
     @property
     def next_review(self):
-<<<<<<< HEAD
-        return getattr(self.context, "next_review", None)
-=======
         return getattr(self.context, 'next_review', None)
->>>>>>> fixing_linting_and_tests
 
     @next_review.setter
     def next_review(self, value):
@@ -223,11 +162,7 @@ class SpacedRepetition:
 
     @property
     def total_reviews(self):
-<<<<<<< HEAD
-        return getattr(self.context, "total_reviews", 0)
-=======
         return getattr(self.context, 'total_reviews', 0)
->>>>>>> fixing_linting_and_tests
 
     @total_reviews.setter
     def total_reviews(self, value):
@@ -235,11 +170,7 @@ class SpacedRepetition:
 
     @property
     def average_quality(self):
-<<<<<<< HEAD
-        return getattr(self.context, "average_quality", 0.0)
-=======
         return getattr(self.context, 'average_quality', 0.0)
->>>>>>> fixing_linting_and_tests
 
     @average_quality.setter
     def average_quality(self, value):
@@ -324,11 +255,7 @@ class SpacedRepetition:
                 "current_streak": 0,
             }
 
-<<<<<<< HEAD
-        qualities = [r["quality"] for r in self.review_history]
-=======
         qualities = [r['quality'] for r in self.review_history]
->>>>>>> fixing_linting_and_tests
         successful = sum(1 for q in qualities if q >= 3)
 
         # Calculate current streak
@@ -374,17 +301,10 @@ class SpacedRepetition:
     def get_urgency_level(self):
         """Get urgency level for review."""
         if not self.is_due_for_review():
-<<<<<<< HEAD
-            return "not_due"
-
-        if not self.next_review:
-            return "new"
-=======
             return 'not_due'
 
         if not self.next_review:
             return 'new'
->>>>>>> fixing_linting_and_tests
 
         days_overdue = (datetime.now() - self.next_review).days
 
@@ -393,11 +313,7 @@ class SpacedRepetition:
         elif days_overdue <= 3:
             return "overdue"
         else:
-<<<<<<< HEAD
-            return "very_overdue"
-=======
             return 'very_overdue'
->>>>>>> fixing_linting_and_tests
 
     def get_mastery_level(self):
         """Get mastery level based on interval."""
@@ -410,8 +326,4 @@ class SpacedRepetition:
         elif self.interval < 90:
             return "mature"
         else:
-<<<<<<< HEAD
-            return "mastered"
-=======
             return 'mastered'
->>>>>>> fixing_linting_and_tests

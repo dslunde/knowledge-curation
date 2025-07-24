@@ -12,15 +12,9 @@ class PriorityVocabulary:
 
     def __call__(self, context):
         terms = [
-<<<<<<< HEAD
-            SimpleTerm(value="low", title="Low"),
-            SimpleTerm(value="medium", title="Medium"),
-            SimpleTerm(value="high", title="High"),
-=======
             SimpleTerm(value='low', title='Low'),
             SimpleTerm(value='medium', title='Medium'),
             SimpleTerm(value='high', title='High'),
->>>>>>> fixing_linting_and_tests
         ]
         return SimpleVocabulary(terms)
 

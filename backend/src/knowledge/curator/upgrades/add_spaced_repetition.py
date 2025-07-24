@@ -11,15 +11,6 @@ logger = logging.getLogger("knowledge.curator")
 def add_spaced_repetition_to_content(context):
     """Add spaced repetition behavior to existing knowledge content."""
 
-<<<<<<< HEAD
-    catalog = api.portal.get_tool("portal_catalog")
-
-    # Content types to update
-    portal_types = ["ResearchNote", "BookmarkPlus", "LearningGoal"]
-
-    # Get portal_types tool
-    types_tool = api.portal.get_tool("portal_types")
-=======
     catalog = api.portal.get_tool('portal_catalog')
 
     # Content types to update
@@ -27,7 +18,6 @@ def add_spaced_repetition_to_content(context):
 
     # Get portal_types tool
     types_tool = api.portal.get_tool('portal_types')
->>>>>>> fixing_linting_and_tests
 
     # Update FTIs to include behavior
     behavior = "knowledge.curator.spaced_repetition"
@@ -57,13 +47,7 @@ def add_spaced_repetition_to_content(context):
         except Exception as e:
             logger.error(f"Error updating {brain.getPath()}: {e!s}")
 
-<<<<<<< HEAD
-    logger.info(
-        f"Updated {updated_count} existing items with spaced repetition support"
-    )
-=======
     logger.info(f"Updated {updated_count} existing items with spaced repetition support")
->>>>>>> fixing_linting_and_tests
     logger.info(f"Updated content types: {', '.join(updated_types)}")
 
     return f"Successfully added spaced repetition to {len(updated_types)} content types and {updated_count} items"

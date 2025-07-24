@@ -66,9 +66,5 @@ PLONE_APP_KNOWLEDGE_ACCEPTANCE_TESTING = FunctionalTesting(
         REMOTE_LIBRARY_BUNDLE_FIXTURE,
         z2.ZSERVER_FIXTURE,
     ),
-<<<<<<< HEAD
-    name="PloneAppKnowledgeLayer:AcceptanceTesting",
-=======
     name='PloneAppKnowledgeLayer:AcceptanceTesting',
->>>>>>> fixing_linting_and_tests
 )

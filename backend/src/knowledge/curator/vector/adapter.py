@@ -1,16 +1,6 @@
 """Qdrant vector database adapter for Plone knowledge system."""
 
 from qdrant_client import QdrantClient
-<<<<<<< HEAD
-from qdrant_client.models import Distance
-from qdrant_client.models import FieldCondition
-from qdrant_client.models import Filter
-from qdrant_client.models import MatchValue
-from qdrant_client.models import PointStruct
-from qdrant_client.models import VectorParams
-from typing import Any
-
-=======
 from qdrant_client.models import (
     Distance,
     FieldCondition,
@@ -20,7 +10,6 @@ from qdrant_client.models import (
     VectorParams,
 )
 from typing import Any
->>>>>>> fixing_linting_and_tests
 import logging
 import uuid
 
@@ -31,18 +20,8 @@ logger = logging.getLogger("knowledge.curator.vector")
 class QdrantAdapter:
     """Adapter for Qdrant vector database operations."""
 
-<<<<<<< HEAD
-    def __init__(
-        self,
-        host: str = "localhost",
-        port: int = 6333,
-        api_key: str | None = None,
-        https: bool = False,
-    ):
-=======
     def __init__(self, host: str = "localhost", port: int = 6333,
                  api_key: str | None = None, https: bool = False):
->>>>>>> fixing_linting_and_tests
         """Initialize Qdrant client with configuration."""
         self.client = QdrantClient(host=host, port=port, api_key=api_key, https=https)
         self.collection_name = "plone_knowledge"
@@ -74,27 +53,12 @@ class QdrantAdapter:
             logger.error(f"Failed to initialize collection: {e}")
             raise
 
-<<<<<<< HEAD
-    def add_vectors(
-        self,
-        documents: list[dict[str, Any]],
-        embeddings: list[list[float]],
-        batch_size: int = 100,
-    ) -> bool:
-        """Add multiple vectors to the collection in batches."""
-        try:
-            points = []
-            for _i, (doc, embedding) in enumerate(
-                zip(documents, embeddings, strict=False)
-            ):
-=======
     def add_vectors(self, documents: list[dict[str, Any]], embeddings: list[list[float]],
                    batch_size: int = 100) -> bool:
         """Add multiple vectors to the collection in batches."""
         try:
             points = []
             for i, (doc, embedding) in enumerate(zip(documents, embeddings, strict=False)):
->>>>>>> fixing_linting_and_tests
                 point_id = str(uuid.uuid4())
                 payload = {
                     "uid": doc.get("uid"),
@@ -108,17 +72,11 @@ class QdrantAdapter:
                     "knowledge_type": doc.get("knowledge_type"),
                 }
 
-<<<<<<< HEAD
-                points.append(
-                    PointStruct(id=point_id, vector=embedding, payload=payload)
-                )
-=======
                 points.append(PointStruct(
                     id=point_id,
                     vector=embedding,
                     payload=payload
                 ))
->>>>>>> fixing_linting_and_tests
 
                 # Upload in batches
                 if len(points) >= batch_size:
@@ -129,14 +87,10 @@ class QdrantAdapter:
 
             # Upload remaining points
             if points:
-<<<<<<< HEAD
-                self.client.upsert(collection_name=self.collection_name, points=points)
-=======
                 self.client.upsert(
                     collection_name=self.collection_name,
                     points=points
                 )
->>>>>>> fixing_linting_and_tests
 
             logger.info(f"Added {len(documents)} vectors to collection")
             return True
@@ -145,14 +99,8 @@ class QdrantAdapter:
             logger.error(f"Failed to add vectors: {e}")
             return False
 
-<<<<<<< HEAD
-    def update_vector(
-        self, uid: str, embedding: list[float], metadata: dict[str, Any] | None = None
-    ) -> bool:
-=======
     def update_vector(self, uid: str, embedding: list[float],
                      metadata: dict[str, Any] | None = None) -> bool:
->>>>>>> fixing_linting_and_tests
         """Update a single vector by UID."""
         try:
             # Find existing point by UID
@@ -187,19 +135,9 @@ class QdrantAdapter:
             logger.error(f"Failed to update vector: {e}")
             return False
 
-<<<<<<< HEAD
-    def search_similar(
-        self,
-        query_embedding: list[float],
-        limit: int = 10,
-        score_threshold: float = 0.5,
-        filters: dict[str, Any] | None = None,
-    ) -> list[dict[str, Any]]:
-=======
     def search_similar(self, query_embedding: list[float], limit: int = 10,
                       score_threshold: float = 0.5,
                       filters: dict[str, Any] | None = None) -> list[dict[str, Any]]:
->>>>>>> fixing_linting_and_tests
         """Search for similar vectors."""
         try:
             # Build filter conditions
@@ -211,13 +149,7 @@ class QdrantAdapter:
                             FieldCondition(key=key, match=MatchValue(value=value))
                         )
 
-<<<<<<< HEAD
-            search_filter = (
-                Filter(must=filter_conditions) if filter_conditions else None
-            )
-=======
             search_filter = Filter(must=filter_conditions) if filter_conditions else None
->>>>>>> fixing_linting_and_tests
 
             # Perform search
             results = self.client.search(
@@ -242,14 +174,8 @@ class QdrantAdapter:
             logger.error(f"Failed to search similar vectors: {e}")
             return []
 
-<<<<<<< HEAD
-    def find_related_content(
-        self, uid: str, limit: int = 5, score_threshold: float = 0.6
-    ) -> list[dict[str, Any]]:
-=======
     def find_related_content(self, uid: str, limit: int = 5,
                            score_threshold: float = 0.6) -> list[dict[str, Any]]:
->>>>>>> fixing_linting_and_tests
         """Find content related to a specific item by UID."""
         try:
             # Get the vector for the given UID
