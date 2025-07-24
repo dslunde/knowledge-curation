@@ -15,26 +15,25 @@ class GraphAlgorithms:
         """Initialize with a graph instance."""
         self.graph = graph
 
+    def _reconstruct_path(self, start_uid, end_uid, previous):
+        """Reconstruct the shortest path from the previous nodes mapping."""
+        path = []
+        current_uid = end_uid
+        while current_uid in previous:
+            path.append(current_uid)
+            current_uid = previous[current_uid]
+        path.append(start_uid)
+        return list(reversed(path))
+
     def shortest_path(
         self, start_uid: str, end_uid: str, relationship_types: list[str] | None = None
     ) -> list[str] | None:
-        """Find shortest path between two nodes using Dijkstra's algorithm.
-
-        Args:
-            start_uid: Starting node UID
-            end_uid: Ending node UID
-            relationship_types: Optional filter for relationship types
-
-        Returns:
-            List of node UIDs representing the path, or None if no path exists
-        """
+        """Find shortest path between two nodes using Dijkstra's algorithm."""
         if start_uid not in self.graph.nodes or end_uid not in self.graph.nodes:
             return None
-
         if start_uid == end_uid:
             return [start_uid]
 
-        # Dijkstra's algorithm
         distances = {uid: float("inf") for uid in self.graph.nodes}
         distances[start_uid] = 0
         previous = {}
@@ -43,43 +42,24 @@ class GraphAlgorithms:
 
         while pq:
             current_dist, current_uid = heapq.heappop(pq)
-
             if current_uid in visited:
                 continue
-
             visited.add(current_uid)
 
             if current_uid == end_uid:
-                # Reconstruct path
-                path = []
-                while current_uid in previous:
-                    path.append(current_uid)
-                    current_uid = previous[current_uid]
-                path.append(start_uid)
-                return list(reversed(path))
+                return self._reconstruct_path(start_uid, end_uid, previous)
 
-            # Check neighbors
-            edges = self.graph.get_edges_from_node(current_uid)
-            for edge in edges:
-                if (
-                    relationship_types
-                    and edge.relationship_type not in relationship_types
-                ):
+            for edge in self.graph.get_edges_from_node(current_uid):
+                if relationship_types and edge.relationship_type not in relationship_types:
                     continue
 
                 neighbor_uid = edge.target_uid
                 if neighbor_uid not in visited:
-                    # Use inverse of weight as distance
-                    # (higher weight = shorter distance)
-                    distance = current_dist + (
-                        1.0 / edge.weight if edge.weight > 0 else float("inf")
-                    )
-
+                    distance = current_dist + (1.0 / edge.weight if edge.weight > 0 else float("inf"))
                     if distance < distances[neighbor_uid]:
                         distances[neighbor_uid] = distance
                         previous[neighbor_uid] = current_uid
                         heapq.heappush(pq, (distance, neighbor_uid))
-
         return None
 
     def all_paths(
@@ -145,52 +125,48 @@ class GraphAlgorithms:
 
         return centrality
 
+    def _single_source_shortest_path(self, start_uid, nodes):
+        """Calculate single-source shortest paths for betweenness centrality."""
+        S = []
+        P = {uid: [] for uid in nodes}
+        sigma = dict.fromkeys(nodes, 0.0)
+        sigma[start_uid] = 1.0
+        d = dict.fromkeys(nodes, -1)
+        d[start_uid] = 0
+        Q = deque([start_uid])
+
+        while Q:
+            v = Q.popleft()
+            S.append(v)
+            for w in self.graph.get_neighbors(v):
+                if d[w] < 0:
+                    Q.append(w)
+                    d[w] = d[v] + 1
+                if d[w] == d[v] + 1:
+                    sigma[w] += sigma[v]
+                    P[w].append(v)
+        return S, P, sigma
+
+    def _accumulate_centrality(self, centrality, S, P, sigma, start_uid):
+        """Accumulate betweenness centrality from a single source."""
+        delta = dict.fromkeys(S, 0.0)
+        while S:
+            w = S.pop()
+            for v in P[w]:
+                delta[v] += (sigma[v] / sigma[w]) * (1 + delta[w])
+            if w != start_uid:
+                centrality[w] += delta[w]
+        return centrality
+
     def betweenness_centrality(self, normalized: bool = True) -> dict[str, float]:
-        """Calculate betweenness centrality for all nodes.
-
-        Args:
-            normalized: Whether to normalize scores
-
-        Returns:
-            Dictionary mapping node UID to betweenness centrality score
-        """
+        """Calculate betweenness centrality for all nodes."""
         centrality = dict.fromkeys(self.graph.nodes, 0.0)
         nodes = list(self.graph.nodes.keys())
 
-        for _i, start_uid in enumerate(nodes):
-            # Single source shortest paths
-            S = []  # Stack of nodes in order of distance
-            P = {uid: [] for uid in nodes}  # Predecessors
-            sigma = dict.fromkeys(nodes, 0.0)  # Number of shortest paths
-            sigma[start_uid] = 1.0
-            d = dict.fromkeys(nodes, -1)  # Distance
-            d[start_uid] = 0
-            Q = deque([start_uid])
+        for start_uid in nodes:
+            S, P, sigma = self._single_source_shortest_path(start_uid, nodes)
+            centrality = self._accumulate_centrality(centrality, S, P, sigma, start_uid)
 
-            while Q:
-                v = Q.popleft()
-                S.append(v)
-
-                for w in self.graph.get_neighbors(v):
-                    # First time we reach w?
-                    if d[w] < 0:
-                        Q.append(w)
-                        d[w] = d[v] + 1
-                    # Shortest path to w via v?
-                    if d[w] == d[v] + 1:
-                        sigma[w] += sigma[v]
-                        P[w].append(v)
-
-            # Accumulation
-            delta = dict.fromkeys(nodes, 0.0)
-            while S:
-                w = S.pop()
-                for v in P[w]:
-                    delta[v] += (sigma[v] / sigma[w]) * (1 + delta[w])
-                if w != start_uid:
-                    centrality[w] += delta[w]
-
-        # Normalize
         if normalized and len(nodes) > 2:
             scale = 1.0 / ((len(nodes) - 1) * (len(nodes) - 2))
             for uid in centrality:
@@ -318,15 +294,27 @@ class GraphAlgorithms:
 
         return communities
 
+    def _expand_cluster(self, uid):
+        """Expand a cluster to include nodes within 2 hops."""
+        cluster = {uid}
+        for neighbor1 in self.graph.get_neighbors(uid):
+            cluster.add(neighbor1)
+            for neighbor2 in self.graph.get_neighbors(neighbor1):
+                cluster.add(neighbor2)
+        return cluster
+
+    def _calculate_cluster_density(self, cluster):
+        """Calculate the density of a cluster."""
+        edge_count = 0
+        for node1 in cluster:
+            for node2 in cluster:
+                if node1 != node2 and any(e.target_uid == node2 for e in self.graph.get_edges_from_node(node1)):
+                    edge_count += 1
+        max_edges = len(cluster) * (len(cluster) - 1)
+        return edge_count / max_edges if max_edges > 0 else 0
+
     def detect_clusters(self, min_size: int = 3) -> list[set[str]]:
-        """Detect dense clusters of nodes.
-
-        Args:
-            min_size: Minimum cluster size
-
-        Returns:
-            List of node UID sets representing clusters
-        """
+        """Detect dense clusters of nodes."""
         clusters = []
         processed = set()
 
@@ -334,37 +322,12 @@ class GraphAlgorithms:
             if uid in processed:
                 continue
 
-            # Find nodes within 2 hops
-            cluster = {uid}
-
-            # First hop
-            for neighbor1 in self.graph.get_neighbors(uid):
-                cluster.add(neighbor1)
-
-                # Second hop
-                for neighbor2 in self.graph.get_neighbors(neighbor1):
-                    cluster.add(neighbor2)
-
-            # Check density
+            cluster = self._expand_cluster(uid)
             if len(cluster) >= min_size:
-                # Count edges within cluster
-                edge_count = 0
-                for node1 in cluster:
-                    for node2 in cluster:
-                        if node1 != node2:
-                            edges = self.graph.get_edges_from_node(node1)
-                            if any(e.target_uid == node2 for e in edges):
-                                edge_count += 1
-
-                # Calculate density
-                max_edges = len(cluster) * (len(cluster) - 1)
-                density = edge_count / max_edges if max_edges > 0 else 0
-
-                # Keep dense clusters
-                if density > 0.3:  # Threshold for density
+                density = self._calculate_cluster_density(cluster)
+                if density > 0.3:
                     clusters.append(cluster)
                     processed.update(cluster)
-
         return clusters
 
     def find_knowledge_gaps(

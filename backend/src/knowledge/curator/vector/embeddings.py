@@ -108,91 +108,66 @@ class EmbeddingGenerator:
             logger.error(f"Failed to generate embeddings: {e}")
             return [[0.0] * self.embedding_dimension] * len(texts)
 
+    def _prepare_bookmark_plus_text(self, content_object, parts):
+        """Prepare text for BookmarkPlus content type."""
+        if url := getattr(content_object, "url", ""):
+            parts.append(f"URL: {url}")
+        if notes := getattr(content_object, "notes", None):
+            if hasattr(notes, "output"):
+                parts.append(f"Notes: {notes.output}")
+        if tags := getattr(content_object, "tags", []):
+            parts.append(f"Tags: {', '.join(tags)}")
+
+    def _prepare_research_note_text(self, content_object, parts):
+        """Prepare text for ResearchNote content type."""
+        if content := getattr(content_object, "content", None):
+            if hasattr(content, "output"):
+                parts.append(f"Content: {content.output[:2000]}")
+        if key_findings := getattr(content_object, "key_findings", []):
+            parts.append(f"Key Findings: {'; '.join(key_findings)}")
+        if tags := getattr(content_object, "tags", []):
+            parts.append(f"Tags: {', '.join(tags)}")
+
+    def _prepare_learning_goal_text(self, content_object, parts):
+        """Prepare text for LearningGoal content type."""
+        if goal_description := getattr(content_object, "goal_description", None):
+            if hasattr(goal_description, "output"):
+                parts.append(f"Goal: {goal_description.output}")
+        if target_date := getattr(content_object, "target_date", None):
+            parts.append(f"Target Date: {target_date}")
+        if success_criteria := getattr(content_object, "success_criteria", []):
+            parts.append(f"Success Criteria: {'; '.join(success_criteria)}")
+
+    def _prepare_project_log_text(self, content_object, parts):
+        """Prepare text for ProjectLog content type."""
+        if project_status := getattr(content_object, "project_status", ""):
+            parts.append(f"Status: {project_status}")
+        if latest_update := getattr(content_object, "latest_update", None):
+            if hasattr(latest_update, "output"):
+                parts.append(f"Latest Update: {latest_update.output[:1000]}")
+        if next_steps := getattr(content_object, "next_steps", []):
+            parts.append(f"Next Steps: {'; '.join(next_steps[:5])}")
+
     def prepare_content_text(self, content_object) -> str:
         """Prepare text from a Plone content object for embedding."""
         try:
             parts = []
-
-            # Add title
-            title = getattr(content_object, "title", "")
-            if title:
+            if title := getattr(content_object, "title", ""):
                 parts.append(f"Title: {title}")
-
-            # Add description
-            description = getattr(content_object, "description", "")
-            if description:
+            if description := getattr(content_object, "description", ""):
                 parts.append(f"Description: {description}")
 
-            # Add content type specific fields
-            content_type = content_object.portal_type
-
-            if content_type == "BookmarkPlus":
-                # Add URL and notes
-                url = getattr(content_object, "url", "")
-                if url:
-                    parts.append(f"URL: {url}")
-
-                notes = getattr(content_object, "notes", None)
-                if notes and hasattr(notes, "output"):
-                    parts.append(f"Notes: {notes.output}")
-
-                # Add tags
-                tags = getattr(content_object, "tags", [])
-                if tags:
-                    parts.append(f"Tags: {', '.join(tags)}")
-
-            elif content_type == "ResearchNote":
-                # Add content
-                content = getattr(content_object, "content", None)
-                if content and hasattr(content, "output"):
-                    parts.append(f"Content: {content.output[:2000]}")  # Limit length
-
-                # Add key findings
-                key_findings = getattr(content_object, "key_findings", [])
-                if key_findings:
-                    parts.append(f"Key Findings: {'; '.join(key_findings)}")
-
-                # Add tags
-                tags = getattr(content_object, "tags", [])
-                if tags:
-                    parts.append(f"Tags: {', '.join(tags)}")
-
-            elif content_type == "LearningGoal":
-                # Add goal description
-                goal_description = getattr(content_object, "goal_description", None)
-                if goal_description and hasattr(goal_description, "output"):
-                    parts.append(f"Goal: {goal_description.output}")
-
-                # Add target date
-                target_date = getattr(content_object, "target_date", None)
-                if target_date:
-                    parts.append(f"Target Date: {target_date}")
-
-                # Add success criteria
-                success_criteria = getattr(content_object, "success_criteria", [])
-                if success_criteria:
-                    parts.append(f"Success Criteria: {'; '.join(success_criteria)}")
-
-            elif content_type == "ProjectLog":
-                # Add project status
-                project_status = getattr(content_object, "project_status", "")
-                if project_status:
-                    parts.append(f"Status: {project_status}")
-
-                # Add latest update
-                latest_update = getattr(content_object, "latest_update", None)
-                if latest_update and hasattr(latest_update, "output"):
-                    parts.append(f"Latest Update: {latest_update.output[:1000]}")
-
-                # Add next steps
-                next_steps = getattr(content_object, "next_steps", [])
-                if next_steps:
-                    parts.append(f"Next Steps: {'; '.join(next_steps[:5])}")
-
-            # Join all parts
-            text = "\n\n".join(parts)
-            return text
-
+            content_type_handlers = {
+                "BookmarkPlus": self._prepare_bookmark_plus_text,
+                "ResearchNote": self._prepare_research_note_text,
+                "LearningGoal": self._prepare_learning_goal_text,
+                "ProjectLog": self._prepare_project_log_text,
+            }
+            handler = content_type_handlers.get(content_object.portal_type)
+            if handler:
+                handler(content_object, parts)
+            
+            return "\n\n".join(parts)
         except Exception as e:
             logger.error(f"Failed to prepare content text: {e}")
             return ""

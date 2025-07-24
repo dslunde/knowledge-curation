@@ -152,49 +152,43 @@ class BulkWorkflowView(BrowserView):
             return self.handle_bulk_transition()
         return self.index()
 
+    def _find_common_transitions(self, uids, workflow_tool):
+        """Find common transitions for a list of UIDs."""
+        common_transitions = None
+        for uid in uids:
+            try:
+                obj = api.content.get(UID=uid)
+                if not obj:
+                    continue
+                transitions = {t["id"] for t in workflow_tool.getTransitionsFor(obj)}
+                if common_transitions is None:
+                    common_transitions = transitions
+                else:
+                    common_transitions &= transitions
+            except Exception:
+                logger.exception("Error getting transitions for object with UID: %s", uid)
+                continue
+        return common_transitions
+
     def get_available_transitions(self):
         """Get transitions available for all selected items."""
         uids = self.request.get("uids", [])
         if not uids:
             return []
 
-        # Find common transitions
-        common_transitions = None
         workflow_tool = api.portal.get_tool("portal_workflow")
-
-        for uid in uids:
-            try:
-                obj = api.content.get(UID=uid)
-                if not obj:
-                    continue
-
-                transitions = workflow_tool.getTransitionsFor(obj)
-                transition_ids = {t["id"] for t in transitions}
-
-                if common_transitions is None:
-                    common_transitions = transition_ids
-                else:
-                    common_transitions &= transition_ids
-
-            except Exception:
-                logger.exception(
-                    "Error getting transitions for object with UID: %s", uid
-                )
-                continue
+        common_transitions = self._find_common_transitions(uids, workflow_tool)
 
         if not common_transitions:
             return []
 
-        # Get transition info
         result = []
-        for uid in uids[:1]:  # Just need one object to get transition details
-            obj = api.content.get(UID=uid)
+        if uids:
+            obj = api.content.get(UID=uids[0])
             if obj:
                 for t in workflow_tool.getTransitionsFor(obj):
                     if t["id"] in common_transitions:
                         result.append(t)
-                break
-
         return result
 
     def handle_bulk_transition(self):

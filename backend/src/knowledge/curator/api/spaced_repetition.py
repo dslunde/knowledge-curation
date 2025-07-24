@@ -282,37 +282,66 @@ class SpacedRepetitionService(Service):
             },
         }
 
+    def _aggregate_daily_stats(self, entry, stats):
+        """Aggregate performance statistics on a daily basis."""
+        entry_date = datetime.fromisoformat(entry["date"])
+        date_key = entry_date.date().isoformat()
+        quality = entry["quality"]
+
+        if date_key not in stats["daily_stats"]:
+            stats["daily_stats"][date_key] = {
+                "reviews": 0,
+                "successful": 0,
+                "time_spent": 0,
+            }
+        
+        stats["daily_stats"][date_key]["reviews"] += 1
+        if quality >= 3:
+            stats["daily_stats"][date_key]["successful"] += 1
+        stats["daily_stats"][date_key]["time_spent"] += entry.get("time_spent", 0)
+        stats["quality_distribution"][quality] += 1
+
+    def _calculate_average_stats(self, stats, total_quality, total_time):
+        """Calculate average performance statistics."""
+        if stats["total_reviews"] > 0:
+            stats["average_quality"] = round(total_quality / stats["total_reviews"], 2)
+            stats["average_time_spent"] = round(total_time / stats["total_reviews"], 1)
+            stats["success_rate"] = round(
+                stats["successful_reviews"] / stats["total_reviews"] * 100, 1
+            )
+        else:
+            stats["success_rate"] = 0
+        
+        daily_list = []
+        for date, data in sorted(stats["daily_stats"].items()):
+            daily_list.append({
+                "date": date,
+                "reviews": data["reviews"],
+                "successful": data["successful"],
+                "success_rate": round(data["successful"] / data["reviews"] * 100, 1) if data["reviews"] > 0 else 0,
+                "time_spent": data["time_spent"],
+            })
+        stats["daily_stats"] = daily_list
+
     def get_performance_stats(self):
         """Get spaced repetition performance statistics."""
         if not api.user.has_permission("View", obj=self.context):
             self.request.response.setStatus(403)
             return {"error": "Unauthorized"}
 
-        catalog = api.portal.get_tool("portal_catalog")
-        user = api.user.get_current()
-
-        # Time range
         days = int(self.request.get("days", 30))
         start_date = datetime.now() - timedelta(days=days)
+        
+        catalog = api.portal.get_tool("portal_catalog")
+        user = api.user.get_current()
+        brains = catalog(Creator=user.getId(), portal_type=["ResearchNote", "BookmarkPlus"])
 
-        # Get user's items
-        brains = catalog(
-            Creator=user.getId(), portal_type=["ResearchNote", "BookmarkPlus"]
-        )
-
-        # Aggregate statistics
         stats = {
-            "total_reviews": 0,
-            "successful_reviews": 0,
-            "failed_reviews": 0,
-            "average_quality": 0,
-            "average_time_spent": 0,
-            "items_in_system": 0,
-            "mature_items": 0,  # interval > 21 days
-            "daily_stats": {},
-            "quality_distribution": {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+            "total_reviews": 0, "successful_reviews": 0, "failed_reviews": 0,
+            "average_quality": 0, "average_time_spent": 0, "items_in_system": 0,
+            "mature_items": 0, "daily_stats": {},
+            "quality_distribution": {i: 0 for i in range(6)},
         }
-
         total_quality = 0
         total_time = 0
 
@@ -322,70 +351,22 @@ class SpacedRepetitionService(Service):
 
             if sr_data.get("repetitions", 0) > 0:
                 stats["items_in_system"] += 1
+            if sr_data.get("interval", 0) > 21:
+                stats["mature_items"] += 1
 
-                if sr_data.get("interval", 0) > 21:
-                    stats["mature_items"] += 1
-
-                # Process history
-                for entry in sr_data.get("history", []):
-                    entry_date = datetime.fromisoformat(entry["date"])
-
-                    if entry_date >= start_date:
-                        stats["total_reviews"] += 1
-                        quality = entry["quality"]
-
-                        if quality >= 3:
-                            stats["successful_reviews"] += 1
-                        else:
-                            stats["failed_reviews"] += 1
-
-                        total_quality += quality
-                        total_time += entry.get("time_spent", 0)
-
-                        # Daily aggregation
-                        date_key = entry_date.date().isoformat()
-                        if date_key not in stats["daily_stats"]:
-                            stats["daily_stats"][date_key] = {
-                                "reviews": 0,
-                                "successful": 0,
-                                "time_spent": 0,
-                            }
-
-                        stats["daily_stats"][date_key]["reviews"] += 1
-                        if quality >= 3:
-                            stats["daily_stats"][date_key]["successful"] += 1
-                        stats["daily_stats"][date_key]["time_spent"] += entry.get(
-                            "time_spent", 0
-                        )
-
-                        # Quality distribution
-                        stats["quality_distribution"][quality] += 1
-
-        # Calculate averages
-        if stats["total_reviews"] > 0:
-            stats["average_quality"] = round(total_quality / stats["total_reviews"], 2)
-            stats["average_time_spent"] = round(total_time / stats["total_reviews"], 1)
-            stats["success_rate"] = round(
-                stats["successful_reviews"] / stats["total_reviews"] * 100, 1
-            )
-        else:
-            stats["success_rate"] = 0
-
-        # Convert daily stats to list
-        daily_list = []
-        for date, data in sorted(stats["daily_stats"].items()):
-            daily_list.append({
-                "date": date,
-                "reviews": data["reviews"],
-                "successful": data["successful"],
-                "success_rate": round(data["successful"] / data["reviews"] * 100, 1)
-                if data["reviews"] > 0
-                else 0,
-                "time_spent": data["time_spent"],
-            })
-
-        stats["daily_stats"] = daily_list
-
+            for entry in sr_data.get("history", []):
+                if datetime.fromisoformat(entry["date"]) >= start_date:
+                    stats["total_reviews"] += 1
+                    quality = entry["quality"]
+                    if quality >= 3:
+                        stats["successful_reviews"] += 1
+                    else:
+                        stats["failed_reviews"] += 1
+                    total_quality += quality
+                    total_time += entry.get("time_spent", 0)
+                    self._aggregate_daily_stats(entry, stats)
+        
+        self._calculate_average_stats(stats, total_quality, total_time)
         return {"period_days": days, "statistics": stats}
 
     def get_settings(self):

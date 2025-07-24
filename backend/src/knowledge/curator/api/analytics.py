@@ -459,44 +459,22 @@ class AnalyticsService(Service):
             else None,
         }
 
-    def get_insights(self):
-        """Get AI-generated insights from the knowledge base."""
-        if not api.user.has_permission("View", obj=self.context):
-            self.request.response.setStatus(403)
-            return {"error": "Unauthorized"}
-
-        catalog = api.portal.get_tool("portal_catalog")
-        user = api.user.get_current()
-
-        insights = {"patterns": [], "recommendations": [], "connections": []}
-
-        # Analyze tag patterns
-        brains = catalog(
-            Creator=user.getId(),
-            portal_type=["ResearchNote", "LearningGoal", "ProjectLog", "BookmarkPlus"],
-        )
-
+    def _analyze_tag_patterns(self, brains):
+        """Analyze tag co-occurrence and frequency."""
         tag_cooccurrence = {}
-        tag_frequency = {}
+        patterns = []
 
         for brain in brains:
             tags = list(brain.Subject)
-
-            # Count individual tags
-            for tag in tags:
-                tag_frequency[tag] = tag_frequency.get(tag, 0) + 1
-
-            # Count tag co-occurrences
             for i, tag1 in enumerate(tags):
                 for tag2 in tags[i + 1 :]:
                     pair = tuple(sorted([tag1, tag2]))
                     tag_cooccurrence[pair] = tag_cooccurrence.get(pair, 0) + 1
 
-        # Find strong tag relationships
         for pair, count in sorted(
             tag_cooccurrence.items(), key=lambda x: x[1], reverse=True
         )[:5]:
-            insights["patterns"].append({
+            patterns.append({
                 "type": "tag_correlation",
                 "tags": list(pair),
                 "strength": count,
@@ -505,11 +483,12 @@ class AnalyticsService(Service):
                     f"({count} times)"
                 ),
             })
+        return patterns
 
-        # Analyze learning goal completion
-        goals = catalog(Creator=user.getId(), portal_type="LearningGoal")
-
+    def _analyze_goal_completion(self, goals):
+        """Analyze completion rates of learning goals."""
         completion_rates = {"low": [], "medium": [], "high": []}
+        recommendations = []
 
         for brain in goals:
             obj = brain.getObject()
@@ -520,7 +499,7 @@ class AnalyticsService(Service):
         for priority, rates in completion_rates.items():
             if rates:
                 avg_completion = sum(rates) / len(rates)
-                insights["recommendations"].append({
+                recommendations.append({
                     "type": "goal_completion",
                     "priority": priority,
                     "average_completion": round(avg_completion, 1),
@@ -529,8 +508,10 @@ class AnalyticsService(Service):
                         f"{avg_completion:.1f}% average completion"
                     ),
                 })
+        return recommendations
 
-        # Find isolated content
+    def _find_isolated_content(self, brains):
+        """Find content without connections."""
         isolated_items = []
         for brain in brains[:100]:  # Check first 100 items
             obj = brain.getObject()
@@ -543,13 +524,39 @@ class AnalyticsService(Service):
                 })
 
         if isolated_items:
-            insights["patterns"].append({
+            return {
                 "type": "isolated_content",
                 "count": len(isolated_items),
                 "items": isolated_items[:5],
                 "message": (
                     f"Found {len(isolated_items)} research notes without connections"
                 ),
-            })
+            }
+        return None
 
-        return insights
+    def get_insights(self):
+        """Get AI-generated insights from the knowledge base."""
+        if not api.user.has_permission("View", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+
+        catalog = api.portal.get_tool("portal_catalog")
+        user = api.user.get_current()
+        brains = catalog(
+            Creator=user.getId(),
+            portal_type=["ResearchNote", "LearningGoal", "ProjectLog", "BookmarkPlus"],
+        )
+        goals = catalog(Creator=user.getId(), portal_type="LearningGoal")
+
+        patterns = self._analyze_tag_patterns(brains)
+        recommendations = self._analyze_goal_completion(goals)
+        isolated_content = self._find_isolated_content(brains)
+
+        if isolated_content:
+            patterns.append(isolated_content)
+
+        return {
+            "patterns": patterns,
+            "recommendations": recommendations,
+            "connections": [],
+        }

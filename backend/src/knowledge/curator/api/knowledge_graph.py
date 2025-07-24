@@ -155,34 +155,21 @@ class KnowledgeGraphService(Service):
 
         return {"connections": connections, "count": len(connections)}
 
-    def suggest_connections(self):
-        """Suggest potential connections based on similarity."""
-        if not api.user.has_permission("View", obj=self.context):
-            self.request.response.setStatus(403)
-            return {"error": "Unauthorized"}
-
-        if not hasattr(self.context, "embedding_vector"):
-            return {"suggestions": [], "message": "No embedding vector available"}
-
-        suggestions = []
-        catalog = api.portal.get_tool("portal_catalog")
-        current_vector = getattr(self.context, "embedding_vector", [])
-
-        if not current_vector:
-            return {"suggestions": [], "message": "No embedding vector available"}
-
-        # Get existing connections to exclude
-        existing_connections = set()
+    def _get_existing_connections(self):
+        """Get existing connections to exclude from suggestions."""
+        existing = set()
         if hasattr(self.context, "connections"):
-            existing_connections.update(getattr(self.context, "connections", []))
+            existing.update(getattr(self.context, "connections", []))
         if hasattr(self.context, "related_notes"):
-            existing_connections.update(getattr(self.context, "related_notes", []))
+            existing.update(getattr(self.context, "related_notes", []))
+        return existing
 
-        # Search for similar items
+    def _find_similar_items(self, current_vector, existing_connections):
+        """Find similar items based on embedding vector."""
+        catalog = api.portal.get_tool("portal_catalog")
         brains = catalog(
             portal_type=["ResearchNote", "LearningGoal", "ProjectLog", "BookmarkPlus"]
         )
-
         similarities = []
 
         for brain in brains:
@@ -196,26 +183,37 @@ class KnowledgeGraphService(Service):
             if hasattr(obj, "embedding_vector"):
                 other_vector = getattr(obj, "embedding_vector", [])
                 if other_vector:
-                    # Calculate cosine similarity
-                    similarity = self._calculate_similarity(
-                        current_vector, other_vector
-                    )
-                    if similarity > 0.7:  # Threshold for suggestions
+                    similarity = self._calculate_similarity(current_vector, other_vector)
+                    if similarity > 0.7:
                         similarities.append({"brain": brain, "similarity": similarity})
 
-        # Sort by similarity and take top 10
         similarities.sort(key=lambda x: x["similarity"], reverse=True)
+        return similarities[:10]
 
-        for item in similarities[:10]:
-            brain = item["brain"]
-            suggestions.append({
-                "uid": brain.UID,
-                "title": brain.Title,
-                "type": brain.portal_type,
-                "url": brain.getURL(),
+    def suggest_connections(self):
+        """Suggest potential connections based on similarity."""
+        if not api.user.has_permission("View", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+
+        current_vector = getattr(self.context, "embedding_vector", [])
+        if not current_vector:
+            return {"suggestions": [], "message": "No embedding vector available"}
+
+        existing_connections = self._get_existing_connections()
+        similar_items = self._find_similar_items(current_vector, existing_connections)
+
+        suggestions = [
+            {
+                "uid": item["brain"].UID,
+                "title": item["brain"].Title,
+                "type": item["brain"].portal_type,
+                "url": item["brain"].getURL(),
                 "similarity": round(item["similarity"], 3),
-                "description": brain.Description,
-            })
+                "description": item["brain"].Description,
+            }
+            for item in similar_items
+        ]
 
         return {"suggestions": suggestions, "count": len(suggestions)}
 

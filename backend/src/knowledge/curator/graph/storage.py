@@ -208,55 +208,40 @@ class GraphStorage:
         for uid in nodes_to_remove:
             graph.remove_node(uid)
 
-        # Save updated graph
         self.save_graph(graph)
 
-    def _sync_content_relationships(self, graph: Graph, obj, uid: str):
-        """Sync relationships from content object to graph.
-
-        Args:
-            graph: Graph instance
-            obj: Content object
-            uid: Object UID
-        """
-        # Handle standard connections field
+    def _sync_connections(self, graph, obj, uid):
+        """Sync 'connections' and 'related_notes' fields."""
         if hasattr(obj, "connections"):
             for target_uid in getattr(obj, "connections", []):
-                edge = Edge(uid, target_uid, RelationshipType.RELATED_TO.value)
-                graph.add_edge(edge)
-
-        # Handle related_notes field (for LearningGoal)
+                graph.add_edge(Edge(uid, target_uid, RelationshipType.RELATED_TO.value))
         if hasattr(obj, "related_notes"):
             for target_uid in getattr(obj, "related_notes", []):
-                edge = Edge(uid, target_uid, RelationshipType.RELATED_TO.value)
-                graph.add_edge(edge)
+                graph.add_edge(Edge(uid, target_uid, RelationshipType.RELATED_TO.value))
 
-        # Handle tags
+    def _sync_tags(self, graph, obj, uid):
+        """Sync 'tags' field."""
         if hasattr(obj, "tags"):
             for tag in getattr(obj, "tags", []):
                 tag_uid = f"tag_{tag.lower().replace(' ', '_')}"
-
-                # Create tag node if needed
                 if not graph.get_node(tag_uid):
-                    tag_node = Node(tag_uid, tag, NodeType.TAG)
-                    graph.add_node(tag_node)
+                    graph.add_node(Node(tag_uid, tag, NodeType.TAG))
+                graph.add_edge(Edge(uid, tag_uid, RelationshipType.TAGGED_WITH.value))
 
-                # Create tagging relationship
-                edge = Edge(uid, tag_uid, RelationshipType.TAGGED_WITH.value)
-                graph.add_edge(edge)
-
-        # Handle RelatedItems behavior
+    def _sync_related_items(self, graph, obj, uid):
+        """Sync 'relatedItems' field from plone.app.relationfield."""
         if IRelatedItems.providedBy(obj):
             for rel in getattr(obj, "relatedItems", []):
                 if hasattr(rel, "to_object"):
                     target = rel.to_object
                     if target:
-                        edge = Edge(
-                            uid,
-                            api.content.get_uuid(target),
-                            RelationshipType.RELATED_TO.value,
-                        )
-                        graph.add_edge(edge)
+                        graph.add_edge(Edge(uid, api.content.get_uuid(target), RelationshipType.RELATED_TO.value))
+
+    def _sync_content_relationships(self, graph: Graph, obj, uid: str):
+        """Sync relationships from content object to graph."""
+        self._sync_connections(graph, obj, uid)
+        self._sync_tags(graph, obj, uid)
+        self._sync_related_items(graph, obj, uid)
 
     def _rebuild_indexes(self):
         """Rebuild graph indexes for efficient querying."""

@@ -112,6 +112,21 @@ class BulkOperationsService(Service):
             },
         }
 
+    def _apply_tags(self, obj, add_tags, remove_tags, operation_mode):
+        """Apply tagging logic to a single object."""
+        current_tags = list(obj.Subject())
+        if operation_mode == "replace":
+            new_tags = add_tags
+        else:
+            new_tags = set(current_tags)
+            new_tags.update(add_tags)
+            new_tags.difference_update(remove_tags)
+            new_tags = list(new_tags)
+        
+        obj.setSubject(tuple(new_tags))
+        obj.reindexObject(idxs=["Subject"])
+        return new_tags
+
     def bulk_tag(self):
         """Add or remove tags in bulk."""
         data = json.loads(self.request.get("BODY", "{}"))
@@ -129,7 +144,6 @@ class BulkOperationsService(Service):
             return {"error": "No tags specified"}
 
         catalog = api.portal.get_tool("portal_catalog")
-
         results = {"successful": [], "failed": [], "unauthorized": []}
 
         for uid in uids:
@@ -140,31 +154,12 @@ class BulkOperationsService(Service):
 
             obj = brains[0].getObject()
 
-            # Check permissions
             if not api.user.has_permission("Modify portal content", obj=obj):
                 results["unauthorized"].append({"uid": uid, "title": obj.Title()})
                 continue
 
             try:
-                current_tags = list(obj.Subject())
-
-                if operation_mode == "replace":
-                    new_tags = add_tags
-                else:
-                    # Add new tags
-                    new_tags = current_tags.copy()
-                    for tag in add_tags:
-                        if tag not in new_tags:
-                            new_tags.append(tag)
-
-                    # Remove tags
-                    for tag in remove_tags:
-                        if tag in new_tags:
-                            new_tags.remove(tag)
-
-                obj.setSubject(tuple(new_tags))
-                obj.reindexObject(idxs=["Subject"])
-
+                new_tags = self._apply_tags(obj, add_tags, remove_tags, operation_mode)
                 results["successful"].append({
                     "uid": uid,
                     "title": obj.Title(),
@@ -244,6 +239,39 @@ class BulkOperationsService(Service):
             },
         }
 
+    def _validate_move_permissions(self, uids, target, catalog):
+        """Validate all permissions before moving."""
+        unauthorized = []
+        validated_objs = {}
+
+        for uid in uids:
+            brains = catalog(UID=uid)
+            if not brains:
+                # This case is handled in the main loop, but defensive check
+                continue
+
+            obj = brains[0].getObject()
+            validated_objs[uid] = obj
+
+            if not api.user.has_permission("Copy or Move", obj=obj):
+                unauthorized.append({"uid": uid, "title": obj.Title(), "error": "Missing 'Copy or Move' permission"})
+                continue
+            
+            if not api.user.has_permission("Add portal content", obj=target):
+                unauthorized.append({
+                    "uid": uid,
+                    "title": obj.Title(),
+                    "error": "Cannot add to target container",
+                })
+                continue
+        
+        return validated_objs, unauthorized
+
+    def _execute_move(self, obj, target):
+        """Execute the move operation for a single object."""
+        api.content.move(source=obj, target=target)
+        return {"uid": obj.UID(), "title": obj.Title(), "new_path": api.content.get_path(obj)}
+
     def bulk_move(self):
         """Move multiple items to a new location."""
         data = json.loads(self.request.get("BODY", "{}"))
@@ -258,7 +286,6 @@ class BulkOperationsService(Service):
             self.request.response.setStatus(400)
             return {"error": "No target path specified"}
 
-        # Get target container
         try:
             target = api.content.get(path=target_path)
             if not target:
@@ -269,30 +296,42 @@ class BulkOperationsService(Service):
             return {"error": "Invalid target path"}
 
         catalog = api.portal.get_tool("portal_catalog")
+        results = {"successful": [], "failed": []}
 
-        results = {"successful": [], "failed": [], "unauthorized": []}
+        validated_objs, unauthorized = self._validate_move_permissions(uids, target, catalog)
+        results["unauthorized"] = unauthorized
 
+        if unauthorized:
+            uids = [uid for uid in uids if uid not in [item['uid'] for item in unauthorized]]
+        
         for uid in uids:
-            brains = catalog(UID=uid)
-            if not brains:
+            if uid not in validated_objs:
                 results["failed"].append({"uid": uid, "error": "Item not found"})
                 continue
+            
+            obj = validated_objs[uid]
+            try:
+                result = self._execute_move(obj, target)
+                results["successful"].append(result)
+            except Exception as e:
+                results["failed"].append({"uid": uid, "title": obj.Title(), "error": str(e)})
 
-            obj = brains[0].getObject()
+        transaction.commit()
+        
+        return {
+            "operation": "bulk_move",
+            "target_path": target_path,
+            "results": results,
+            "summary": {
+                "total": len(uids) + len(unauthorized),
+                "successful": len(results["successful"]),
+                "failed": len(results["failed"]),
+                "unauthorized": len(results["unauthorized"]),
+            },
+        }
 
-            # Check permissions
-            if not api.user.has_permission("Copy or Move", obj=obj):
-                results["unauthorized"].append({"uid": uid, "title": obj.Title()})
-                continue
-
-            if not api.user.has_permission("Add portal content", obj=target):
-                results["unauthorized"].append({
-                    "uid": uid,
-                    "title": obj.Title(),
-                    "error": "Cannot add to target",
-                })
-                continue
-
+    def bulk_update(self):
+        """Update multiple items with new data."""
         data = json.loads(self.request.get("BODY", "{}"))
         uids = data.get("uids", [])
         updates = data.get("updates", {})
@@ -373,6 +412,22 @@ class BulkOperationsService(Service):
             },
         }
 
+    def _create_connection(self, source_obj, target_obj, connection_type):
+        """Create a connection between two objects."""
+        if hasattr(source_obj, "connections"):
+            connections = list(getattr(source_obj, "connections", []))
+            if target_obj.UID() not in connections:
+                connections.append(target_obj.UID())
+                source_obj.connections = connections
+                source_obj.reindexObject()
+
+        if connection_type == "bidirectional" and hasattr(target_obj, "connections"):
+            target_connections = list(getattr(target_obj, "connections", []))
+            if source_obj.UID() not in target_connections:
+                target_connections.append(source_obj.UID())
+                target_obj.connections = target_connections
+                target_obj.reindexObject()
+
     def bulk_connect(self):
         """Create connections between multiple items."""
         data = json.loads(self.request.get("BODY", "{}"))
@@ -387,7 +442,6 @@ class BulkOperationsService(Service):
             return {"error": "Source and target UIDs required"}
 
         catalog = api.portal.get_tool("portal_catalog")
-
         results = {"successful": [], "failed": [], "unauthorized": []}
 
         for source_uid in source_uids:
@@ -401,7 +455,6 @@ class BulkOperationsService(Service):
 
             source_obj = source_brains[0].getObject()
 
-            # Check permissions
             if not api.user.has_permission("Modify portal content", obj=source_obj):
                 results["unauthorized"].append({
                     "uid": source_uid,
@@ -409,10 +462,9 @@ class BulkOperationsService(Service):
                 })
                 continue
 
-            # Process each target
             for target_uid in target_uids:
                 if source_uid == target_uid:
-                    continue  # Skip self-connections
+                    continue
 
                 target_brains = catalog(UID=target_uid)
                 if not target_brains:
@@ -424,29 +476,8 @@ class BulkOperationsService(Service):
                     continue
 
                 target_obj = target_brains[0].getObject()
-
                 try:
-                    # Add connection to source
-                    if hasattr(source_obj, "connections"):
-                        connections = list(getattr(source_obj, "connections", []))
-                        if target_uid not in connections:
-                            connections.append(target_uid)
-                            source_obj.connections = connections
-                            source_obj.reindexObject()
-
-                    # Add reverse connection if bidirectional
-                    if (
-                        connection_type == "bidirectional"
-                        and hasattr(target_obj, "connections")
-                    ):
-                        target_connections = list(
-                            getattr(target_obj, "connections", [])
-                        )
-                        if source_uid not in target_connections:
-                            target_connections.append(source_uid)
-                            target_obj.connections = target_connections
-                            target_obj.reindexObject()
-
+                    self._create_connection(source_obj, target_obj, connection_type)
                     results["successful"].append({
                         "source_uid": source_uid,
                         "source_title": source_obj.Title(),
@@ -454,7 +485,6 @@ class BulkOperationsService(Service):
                         "target_title": target_obj.Title(),
                         "type": connection_type,
                     })
-
                 except Exception as e:
                     results["failed"].append({
                         "source_uid": source_uid,

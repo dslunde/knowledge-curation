@@ -122,77 +122,70 @@ class VectorManagementService(Service):
         self.params.append(name)
         return self
 
+    def _handle_health_check(self, manager):
+        return manager.health_check()
+
+    def _handle_stats(self, manager):
+        return manager.get_database_stats()
+
+    def _handle_initialize(self, manager):
+        if self.request.method != "POST":
+            self.request.response.setStatus(405)
+            return {"error": "POST method required"}
+        success = manager.initialize_database()
+        return {"success": success}
+
+    def _handle_rebuild(self, manager):
+        if self.request.method != "POST":
+            self.request.response.setStatus(405)
+            return {"error": "POST method required"}
+        data = json.loads(self.request.get("BODY", "{}"))
+        return manager.rebuild_index(
+            content_types=data.get("content_types"),
+            batch_size=data.get("batch_size", 100),
+            clear_first=data.get("clear_first", True),
+        )
+
+    def _handle_update(self, manager):
+        if self.request.method != "POST":
+            self.request.response.setStatus(405)
+            return {"error": "POST method required"}
+        data = json.loads(self.request.get("BODY", "{}"))
+        uid = data.get("uid")
+        if not uid:
+            self.request.response.setStatus(400)
+            return {"error": "UID is required"}
+        brain = api.content.find(UID=uid)
+        if not brain:
+            self.request.response.setStatus(404)
+            return {"error": "Content not found"}
+        obj = brain[0].getObject()
+        success = manager.update_content_vector(obj)
+        return {"success": success, "uid": uid}
+
     def reply(self):
         """Handle management operations."""
-        # Check permissions
         if not api.user.has_permission("Manage portal", obj=self.context):
             self.request.response.setStatus(403)
             return {"error": "Insufficient privileges"}
 
         if not self.params:
-            # Return available operations
-            return {
-                "available_operations": [
-                    "health",
-                    "stats",
-                    "initialize",
-                    "rebuild",
-                    "update",
-                ]
-            }
+            return {"available_operations": ["health", "stats", "initialize", "rebuild", "update"]}
 
         operation = self.params[0]
         manager = VectorCollectionManager()
-
-        if operation == "health":
-            return manager.health_check()
-
-        elif operation == "stats":
-            return manager.get_database_stats()
-
-        elif operation == "initialize":
-            if self.request.method != "POST":
-                self.request.response.setStatus(405)
-                return {"error": "POST method required"}
-
-            success = manager.initialize_database()
-            return {"success": success}
-
-        elif operation == "rebuild":
-            if self.request.method != "POST":
-                self.request.response.setStatus(405)
-                return {"error": "POST method required"}
-
-            data = json.loads(self.request.get("BODY", "{}"))
-            result = manager.rebuild_index(
-                content_types=data.get("content_types"),
-                batch_size=data.get("batch_size", 100),
-                clear_first=data.get("clear_first", True),
-            )
-            return result
-
-        elif operation == "update":
-            if self.request.method != "POST":
-                self.request.response.setStatus(405)
-                return {"error": "POST method required"}
-
-            data = json.loads(self.request.get("BODY", "{}"))
-            uid = data.get("uid")
-
-            if not uid:
-                self.request.response.setStatus(400)
-                return {"error": "UID is required"}
-
-            brain = api.content.find(UID=uid)
-            if not brain:
-                self.request.response.setStatus(404)
-                return {"error": "Content not found"}
-
-            obj = brain[0].getObject()
-            success = manager.update_content_vector(obj)
-
-            return {"success": success, "uid": uid}
-
+        
+        handlers = {
+            "health": self._handle_health_check,
+            "stats": self._handle_stats,
+            "initialize": self._handle_initialize,
+            "rebuild": self._handle_rebuild,
+            "update": self._handle_update,
+        }
+        
+        handler = handlers.get(operation)
+        if handler:
+            return handler(manager)
         else:
             self.request.response.setStatus(404)
             return {"error": f"Unknown operation: {operation}"}

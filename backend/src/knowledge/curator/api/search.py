@@ -49,6 +49,43 @@ class SearchService(Service):
             self.request.response.setStatus(400)
             return {"error": "Invalid search type"}
 
+    def _build_semantic_query(self, portal_types, filters):
+        """Build the catalog query for semantic search."""
+        catalog_query = {"portal_type": portal_types}
+        if filters.get("review_state"):
+            catalog_query["review_state"] = filters["review_state"]
+        if filters.get("tags"):
+            catalog_query["Subject"] = {"query": filters["tags"], "operator": "and"}
+        if filters.get("date_range"):
+            date_query = {}
+            if filters["date_range"].get("start"):
+                date_query["query"] = filters["date_range"]["start"]
+                date_query["range"] = "min"
+            if filters["date_range"].get("end"):
+                date_query.setdefault("query", filters["date_range"]["end"])
+                date_query["range"] = "max" if "range" not in date_query else "minmax"
+            if date_query:
+                catalog_query["created"] = date_query
+        return catalog_query
+
+    def _format_semantic_results(self, results):
+        """Format the results of a semantic search."""
+        return [
+            {
+                "uid": result["brain"].UID,
+                "title": result["brain"].Title,
+                "description": result["brain"].Description,
+                "url": result["brain"].getURL(),
+                "portal_type": result["brain"].portal_type,
+                "review_state": result["brain"].review_state,
+                "created": result["brain"].created.ISO8601(),
+                "modified": result["brain"].modified.ISO8601(),
+                "similarity_score": round(result["similarity"], 3),
+                "tags": result["brain"].Subject,
+            }
+            for result in results
+        ]
+
     def _semantic_search(self, data):
         """Perform semantic search using embeddings."""
         query = data.get("query", "")
@@ -63,75 +100,33 @@ class SearchService(Service):
             self.request.response.setStatus(400)
             return {"error": "Query is required"}
 
-        # Get AI service
         ai_service = queryUtility(IAIService)
         if not ai_service:
-            return self._fulltext_search(data)  # Fallback to fulltext
+            return self._fulltext_search(data)
 
-        # Generate embedding for query
         try:
             query_vector = ai_service.generate_embedding(query)
         except Exception:
-            # Fallback to fulltext search
             return self._fulltext_search(data)
 
         catalog = api.portal.get_tool("portal_catalog")
-
-        # Build query
-        catalog_query = {"portal_type": portal_types}
-
-        # Add filters
-        if filters.get("review_state"):
-            catalog_query["review_state"] = filters["review_state"]
-        if filters.get("tags"):
-            catalog_query["Subject"] = {"query": filters["tags"], "operator": "and"}
-        if filters.get("date_range"):
-            if filters["date_range"].get("start"):
-                catalog_query["created"] = {
-                    "query": filters["date_range"]["start"],
-                    "range": "min",
-                }
-            if filters["date_range"].get("end"):
-                catalog_query["created"] = {
-                    "query": filters["date_range"]["end"],
-                    "range": "max",
-                }
-
+        catalog_query = self._build_semantic_query(portal_types, filters)
         brains = catalog(**catalog_query)
 
-        # Calculate similarities
         results = []
         for brain in brains:
             obj = brain.getObject()
             if hasattr(obj, "embedding_vector"):
                 content_vector = getattr(obj, "embedding_vector", [])
                 if content_vector:
-                    similarity = self._calculate_similarity(
-                        query_vector, content_vector
-                    )
-                    if similarity > 0.5:  # Threshold
+                    similarity = self._calculate_similarity(query_vector, content_vector)
+                    if similarity > 0.5:
                         results.append({"brain": brain, "similarity": similarity})
 
-        # Sort by similarity
         results.sort(key=lambda x: x["similarity"], reverse=True)
         results = results[:limit]
 
-        # Format results
-        items = []
-        for result in results:
-            brain = result["brain"]
-            items.append({
-                "uid": brain.UID,
-                "title": brain.Title,
-                "description": brain.Description,
-                "url": brain.getURL(),
-                "portal_type": brain.portal_type,
-                "review_state": brain.review_state,
-                "created": brain.created.ISO8601(),
-                "modified": brain.modified.ISO8601(),
-                "similarity_score": round(result["similarity"], 3),
-                "tags": brain.Subject,
-            })
+        items = self._format_semantic_results(results)
 
         return {
             "items": items,
@@ -139,6 +134,42 @@ class SearchService(Service):
             "query": query,
             "search_type": "semantic",
         }
+
+    def _find_and_sort_similar_items(self, source_vector, uid, threshold):
+        """Find and sort similar items based on embedding vector."""
+        catalog = api.portal.get_tool("portal_catalog")
+        all_brains = catalog(
+            portal_type=["ResearchNote", "LearningGoal", "ProjectLog", "BookmarkPlus"]
+        )
+        results = []
+        for brain in all_brains:
+            if uid == brain.UID:
+                continue
+            obj = brain.getObject()
+            if hasattr(obj, "embedding_vector"):
+                other_vector = getattr(obj, "embedding_vector", [])
+                if other_vector:
+                    similarity = self._calculate_similarity(source_vector, other_vector)
+                    if similarity >= threshold:
+                        results.append({"brain": brain, "similarity": similarity})
+        results.sort(key=lambda x: x["similarity"], reverse=True)
+        return results
+
+    def _format_similarity_results(self, results):
+        """Format the results of a similarity search."""
+        return [
+            {
+                "uid": result["brain"].UID,
+                "title": result["brain"].Title,
+                "description": result["brain"].Description,
+                "url": result["brain"].getURL(),
+                "portal_type": result["brain"].portal_type,
+                "review_state": result["brain"].review_state,
+                "similarity_score": round(result["similarity"], 3),
+                "tags": result["brain"].Subject,
+            }
+            for result in results
+        ]
 
     def _similarity_search(self, data):
         """Find similar items to a given item."""
@@ -152,58 +183,20 @@ class SearchService(Service):
 
         catalog = api.portal.get_tool("portal_catalog")
         brains = catalog(UID=uid)
-
         if not brains:
             self.request.response.setStatus(404)
             return {"error": "Item not found"}
 
         source_obj = brains[0].getObject()
-
         if not hasattr(source_obj, "embedding_vector"):
             return {"items": [], "message": "No embedding vector available"}
 
         source_vector = getattr(source_obj, "embedding_vector", [])
-
         if not source_vector:
             return {"items": [], "message": "No embedding vector available"}
 
-        # Search for similar items
-        all_brains = catalog(
-            portal_type=["ResearchNote", "LearningGoal", "ProjectLog", "BookmarkPlus"]
-        )
-
-        results = []
-
-        for brain in all_brains:
-            if uid == brain.UID:
-                continue
-
-            obj = brain.getObject()
-            if hasattr(obj, "embedding_vector"):
-                other_vector = getattr(obj, "embedding_vector", [])
-                if other_vector:
-                    similarity = self._calculate_similarity(source_vector, other_vector)
-                    if similarity >= threshold:
-                        results.append({"brain": brain, "similarity": similarity})
-
-        # Sort by similarity
-        results.sort(key=lambda x: x["similarity"], reverse=True)
-        results = results[:limit]
-
-        # Format results
-        items = []
-        for result in results:
-            brain = result["brain"]
-            items.append({
-                "uid": brain.UID,
-                "title": brain.Title,
-                "description": brain.Description,
-                "url": brain.getURL(),
-                "portal_type": brain.portal_type,
-                "review_state": brain.review_state,
-                "similarity_score": round(result["similarity"], 3),
-                "tags": brain.Subject,
-            })
+        results = self._find_and_sort_similar_items(source_vector, uid, threshold)
+        items = self._format_similarity_results(results[:limit])
 
         return {
             "items": items,

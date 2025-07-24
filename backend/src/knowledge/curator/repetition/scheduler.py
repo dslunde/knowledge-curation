@@ -86,63 +86,54 @@ class ReviewScheduler:
         return due_items
 
     @classmethod
+    def _order_by_urgency(cls, items):
+        return sorted(items, key=lambda x: x.get("urgency_score", 0), reverse=True)
+
+    @classmethod
+    def _order_by_random(cls, items):
+        shuffled = items.copy()
+        secrets.shuffle(shuffled)
+        return shuffled
+
+    @classmethod
+    def _order_by_oldest(cls, items):
+        def get_last_review(item):
+            sr_data = item.get("sr_data", {})
+            last_review = sr_data.get("last_review")
+            if last_review:
+                return datetime.fromisoformat(last_review) if isinstance(last_review, str) else last_review
+            return datetime.min
+        return sorted(items, key=get_last_review)
+
+    @classmethod
+    def _order_by_difficulty(cls, items):
+        return sorted(items, key=lambda x: x.get("sr_data", {}).get("ease_factor", 2.5))
+
+    @classmethod
+    def _order_interleaved(cls, items):
+        new_items = [i for i in items if i.get("sr_data", {}).get("repetitions", 0) < 3]
+        mature_items = [i for i in items if i.get("sr_data", {}).get("repetitions", 0) >= 3]
+        secrets.shuffle(new_items)
+        secrets.shuffle(mature_items)
+        result = []
+        while new_items or mature_items:
+            if new_items and (not mature_items or len(result) % 3 != 2):
+                result.append(new_items.pop(0))
+            elif mature_items:
+                result.append(mature_items.pop(0))
+        return result
+
+    @classmethod
     def _apply_order_strategy(cls, items: list[dict], strategy: str) -> list[dict]:
         """Apply ordering strategy to review items."""
-        if strategy == cls.ORDER_URGENCY:
-            # Sort by urgency score (highest first)
-            return sorted(items, key=lambda x: x.get("urgency_score", 0), reverse=True)
-
-        elif strategy == cls.ORDER_RANDOM:
-            # Random shuffle
-            shuffled = items.copy()
-            secrets.shuffle(shuffled)
-            return shuffled
-
-        elif strategy == cls.ORDER_OLDEST:
-            # Sort by last review date (oldest first)
-            def get_last_review(item):
-                sr_data = item.get("sr_data", {})
-                last_review = sr_data.get("last_review")
-                if last_review:
-                    if isinstance(last_review, str):
-                        return datetime.fromisoformat(last_review)
-                    return last_review
-                return datetime.min
-
-            return sorted(items, key=get_last_review)
-
-        elif strategy == cls.ORDER_DIFFICULTY:
-            # Sort by ease factor (lowest first - most difficult)
-            return sorted(
-                items, key=lambda x: x.get("sr_data", {}).get("ease_factor", 2.5)
-            )
-
-        elif strategy == cls.ORDER_INTERLEAVED:
-            # Interleave new and mature items
-            new_items = [
-                i for i in items if i.get("sr_data", {}).get("repetitions", 0) < 3
-            ]
-            mature_items = [
-                i for i in items if i.get("sr_data", {}).get("repetitions", 0) >= 3
-            ]
-
-            # Shuffle both groups
-            secrets.shuffle(new_items)
-            secrets.shuffle(mature_items)
-
-            # Interleave
-            result = []
-            while new_items or mature_items:
-                if new_items and (not mature_items or len(result) % 3 != 2):
-                    result.append(new_items.pop(0))
-                elif mature_items:
-                    result.append(mature_items.pop(0))
-
-            return result
-
-        else:
-            # Default to urgency
-            return cls._apply_order_strategy(items, cls.ORDER_URGENCY)
+        strategies = {
+            cls.ORDER_URGENCY: cls._order_by_urgency,
+            cls.ORDER_RANDOM: cls._order_by_random,
+            cls.ORDER_OLDEST: cls._order_by_oldest,
+            cls.ORDER_DIFFICULTY: cls._order_by_difficulty,
+            cls.ORDER_INTERLEAVED: cls._order_interleaved,
+        }
+        return strategies.get(strategy, cls._order_by_urgency)(items)
 
     @classmethod
     def _estimate_review_time(cls, item: dict) -> int:
@@ -382,51 +373,42 @@ class ReviewScheduler:
         return recommendations
 
     @classmethod
+    def _group_reviews_by_session(cls, historical_performance):
+        """Group reviews into sessions based on time."""
+        sessions = []
+        current_session = []
+        last_time = None
+        for review in sorted(historical_performance, key=lambda x: x.get("date", "")):
+            if "date" not in review:
+                continue
+            review_time = datetime.fromisoformat(review["date"])
+            if last_time and (review_time - last_time).total_seconds() > 7200:
+                if current_session:
+                    sessions.append(current_session)
+                current_session = []
+            current_session.append(review)
+            last_time = review_time
+        if current_session:
+            sessions.append(current_session)
+        return sessions
+
+    @classmethod
     def _calculate_optimal_session_length(
         cls, historical_performance: list[dict]
     ) -> int:
         """Calculate optimal session length based on performance degradation."""
-        # Group reviews by session (assuming sessions are within 2 hours)
-        sessions = []
-        current_session = []
-        last_time = None
-
-        for review in sorted(historical_performance, key=lambda x: x.get("date", "")):
-            if "date" not in review:
-                continue
-
-            review_time = datetime.fromisoformat(review["date"])
-
-            if (
-                last_time and (review_time - last_time).total_seconds() > 7200
-            ):  # 2 hours
-                if current_session:
-                    sessions.append(current_session)
-                current_session = []
-
-            current_session.append(review)
-            last_time = review_time
-
-        if current_session:
-            sessions.append(current_session)
-
-        # Analyze performance degradation in sessions
+        sessions = cls._group_reviews_by_session(historical_performance)
         optimal_lengths = []
-
         for session in sessions:
             if len(session) >= 5:
-                # Find point where quality drops below 3.5
                 for i, review in enumerate(session):
                     if review.get("quality", 5) < 3.5:
-                        optimal_lengths.append(i * 2)  # Assume 2 minutes per review
+                        optimal_lengths.append(i * 2)
                         break
                 else:
                     optimal_lengths.append(len(session) * 2)
 
-        if optimal_lengths:
-            return min(60, max(10, sum(optimal_lengths) // len(optimal_lengths)))
-        else:
-            return cls.DEFAULT_SESSION_DURATION
+        return min(60, max(10, sum(optimal_lengths) // len(optimal_lengths))) if optimal_lengths else cls.DEFAULT_SESSION_DURATION
 
     @classmethod
     def _create_weekly_schedule(

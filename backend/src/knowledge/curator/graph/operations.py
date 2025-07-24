@@ -388,85 +388,52 @@ class GraphOperations:
 
         return len(orphans)
 
-    def suggest_connections(
-        self, uid: str, limit: int = 10
-    ) -> list[tuple[str, RelationshipType, float]]:
-        """Suggest potential connections for a node.
-
-        Args:
-            uid: Node UID
-            limit: Maximum number of suggestions
-
-        Returns:
-            List of (target_uid, relationship_type, confidence) tuples
-        """
-        node = self.graph.get_node(uid)
-        if not node:
-            return []
-
-        suggestions = []
-        node_type = (
-            node.node_type.value
-            if isinstance(node.node_type, NodeType)
-            else node.node_type
-        )
-
-        # Get existing connections to exclude
-        existing_targets = set()
-        for edge in self.graph.get_edges_from_node(uid):
-            existing_targets.add(edge.target_uid)
-
-        # Find candidates based on shared connections
+    def _find_connection_candidates(self, uid, existing_targets):
+        """Find connection candidates based on shared connections."""
         connection_counts = {}
-
-        # Check neighbors of neighbors
         for neighbor_uid in self.graph.get_neighbors(uid):
             for second_neighbor_uid in self.graph.get_neighbors(neighbor_uid):
-                if (
-                    second_neighbor_uid != uid
-                    and second_neighbor_uid not in existing_targets
-                ):
-                    connection_counts[second_neighbor_uid] = (
-                        connection_counts.get(second_neighbor_uid, 0) + 1
-                    )
+                if second_neighbor_uid != uid and second_neighbor_uid not in existing_targets:
+                    connection_counts[second_neighbor_uid] = connection_counts.get(second_neighbor_uid, 0) + 1
+        return connection_counts
 
-        # Score candidates
-        for candidate_uid, shared_connections in connection_counts.items():
+    def _score_and_suggest(self, node_type, candidates):
+        """Score candidates and generate suggestions."""
+        suggestions = []
+        for candidate_uid, shared_connections in candidates.items():
             candidate = self.graph.get_node(candidate_uid)
             if not candidate:
                 continue
 
-            candidate_type = (
-                candidate.node_type.value
-                if isinstance(candidate.node_type, NodeType)
-                else candidate.node_type
-            )
-
-            # Get suggested relationship types
-            rel_suggestions = self.relationship_manager.suggest_relationship_type(
-                node_type, candidate_type
-            )
+            candidate_type = candidate.node_type.value if isinstance(candidate.node_type, NodeType) else candidate.node_type
+            rel_suggestions = self.relationship_manager.suggest_relationship_type(node_type, candidate_type)
 
             if rel_suggestions:
-                # Use the top suggestion
                 rel_type_str, rel_confidence = rel_suggestions[0]
-
-                # Calculate overall confidence based on shared connections
                 confidence = min(0.9, (shared_connections / 10.0) * rel_confidence)
-
-                # Find matching RelationshipType enum
-                rel_type = None
-                for rt in RelationshipType:
-                    if rt.value == rel_type_str:
-                        rel_type = rt
-                        break
-
-                if rel_type:
+                
+                try:
+                    rel_type = RelationshipType(rel_type_str)
                     suggestions.append((candidate_uid, rel_type, confidence))
+                except ValueError:
+                    continue
+        return suggestions
 
-        # Sort by confidence and limit
+    def suggest_connections(
+        self, uid: str, limit: int = 10
+    ) -> list[tuple[str, RelationshipType, float]]:
+        """Suggest potential connections for a node."""
+        node = self.graph.get_node(uid)
+        if not node:
+            return []
+
+        node_type = node.node_type.value if isinstance(node.node_type, NodeType) else node.node_type
+        existing_targets = {edge.target_uid for edge in self.graph.get_edges_from_node(uid)}
+        
+        candidates = self._find_connection_candidates(uid, existing_targets)
+        suggestions = self._score_and_suggest(node_type, candidates)
+        
         suggestions.sort(key=lambda x: x[2], reverse=True)
-
         return suggestions[:limit]
 
     def _log_operation(self, operation_type: str, details: dict[str, Any]):
