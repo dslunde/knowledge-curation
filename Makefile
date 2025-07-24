@@ -145,7 +145,7 @@ build-images:  ## Build container images
 .PHONY: ai-start
 ai-start:  ## AI Services: Start AI Infrastructure (Qdrant, Redis, MailHog)
 	@echo "Start AI Infrastructure services"
-	VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose --profile ai up -d --build
+	DELETE_EXISTING=$(DELETE_EXISTING) VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose --profile ai up -d --build
 	@echo "Services available:"
 	@echo "  - Qdrant (Vector DB): http://localhost:6333"
 	@echo "  - Redis (Cache): localhost:6379"
@@ -164,7 +164,7 @@ ai-status:  ## AI Services: Check Status
 .PHONY: web-start
 web-start:  ## Web Services: Start Web Application (Frontend, Backend, DB)
 	@echo "Start Web Application services"
-	VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose --profile web up -d --build
+	DELETE_EXISTING=$(DELETE_EXISTING) VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose --profile web up -d --build
 	@echo "Now visit: http://knowledge-curator.localhost"
 
 .PHONY: web-stop
@@ -180,7 +180,7 @@ web-status:  ## Web Services: Check Status
 .PHONY: integration-start
 integration-start:  ## Integration: Start AI + Web Services 
 	@echo "Start Full Integration Stack"
-	VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose --profile integration up -d --build
+	DELETE_EXISTING=$(DELETE_EXISTING) VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose --profile integration up -d --build
 	@echo "Full stack available:"
 	@echo "  - Main Site: http://knowledge-curator.localhost"
 	@echo "  - Classic UI: http://knowledge-curator.localhost/ClassicUI (admin/admin)"
@@ -247,12 +247,12 @@ quick-clean:  ## Quick Clean: Stop everything and clean up
 stack-create-site:  ## Local Stack: Create a new site
 	@echo "Create a new site in the local Docker stack"
 	@echo "(Stack must not be running already.)"
-	VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose -f docker-compose.yml run --build backend ./docker-entrypoint.sh create-site
+	DELETE_EXISTING=$(DELETE_EXISTING) VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose -f docker-compose.yml run --build backend ./docker-entrypoint.sh create-site
 
 .PHONY: stack-start
 stack-start:  ## Local Stack: Start Services
 	@echo "Start local Docker stack"
-	VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose -f docker-compose.yml up -d --build
+	DELETE_EXISTING=$(DELETE_EXISTING) VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose -f docker-compose.yml up -d --build
 	@echo "Now visit: http://knowledge-curator.localhost"
 
 .PHONY: stack-status

@@ -32,6 +32,8 @@ LABEL maintainer="Darren Lund <darren.lund@gauntletai.com>" \
 # Copy /app from builder
 COPY --from=builder /app /app
 
+# Copy Extensions directory for external methods
+COPY --from=builder /app/src/instance/Extensions /app/Extensions
 RUN <<EOT
     set -e
     ln -s /data /app/var

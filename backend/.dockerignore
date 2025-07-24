@@ -4,7 +4,6 @@ bin
 Dockerfile
 Dockerfile.acceptance
 include
-instance
 instance.yaml
 lib
 lib64

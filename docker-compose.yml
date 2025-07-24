@@ -156,6 +156,7 @@ services:
       REDIS_URL: "redis://redis:6379/0"
       QDRANT_HOST: "qdrant"
       QDRANT_PORT: "6333"
+      DELETE_EXISTING: "${DELETE_EXISTING:-0}"
     depends_on:
       - db
     labels:

@@ -1,5 +1,5 @@
 from AccessControl.SecurityManagement import newSecurityManager
-from knowledge.curator.interfaces import IPloneAppKnowledgeLayer
+from knowledge.curator.interfaces import IKnowledgeCuratorLayer
 from Products.CMFPlone.factory import _DEFAULT_PROFILE
 from Products.CMFPlone.factory import addPloneSite
 from Products.GenericSetup.tool import SetupTool
@@ -34,25 +34,15 @@ admin_pass = os.environ.get("PLONE_SITE_PASSWORD", "admin")
 portal_id = os.environ.get("PLONE_SITE_ID", "Plone")
 site_title = os.environ.get("PLONE_SITE_TITLE", "Personal Knowledge Curation")
 
+print(f"=== CREATE SITE SCRIPT STARTING ===")
+print(f"DELETE_EXISTING: {DELETE_EXISTING}")
+print(f"portal_id: {portal_id}")
 
-def create_site():
-    """
-    Create a Plone site programmatically.
-    This script is intended to be run once at startup.
-    """
-
-    # Check if the site already exists
-    app = globals()["app"]
-    if portal_id in app.objectIds():
-        print(f"Plone site '{portal_id}' already exists, skipping creation.")
-        return
-
-    # Set up the request environment
+# Set up the request environment
 app = makerequest(globals()["app"])
-
 request = app.REQUEST
 
-ifaces = [IPloneAppKnowledgeLayer]
+ifaces = [IKnowledgeCuratorLayer]
 for iface in directlyProvidedBy(request):
     ifaces.append(iface)
 
@@ -72,20 +62,35 @@ payload = {
     "portal_timezone": "UTC",
 }
 
+print(f"Existing sites: {list(app.objectIds())}")
+
 if site_id in app.objectIds() and DELETE_EXISTING:
+    print(f"Deleting existing site: {site_id}")
     app.manage_delObjects([site_id])
     transaction.commit()
     app._p_jar.sync()
+    print(f"Site deleted successfully")
 
 if site_id not in app.objectIds():
+    print(f"Creating new site: {site_id}")
     site = addPloneSite(app, site_id, **payload)
     transaction.commit()
+    print(f"Base site created successfully")
 
     portal_setup: SetupTool = site.portal_setup
-    portal_setup.runAllImportStepsFromProfile("profile-knowledge.curator:default")
-    transaction.commit()
-
-    if EXAMPLE_CONTENT:
-        portal_setup.runAllImportStepsFromProfile("profile-knowledge.curator:initial")
+    print(f"Installing Knowledge Curator profile...")
+    try:
+        portal_setup.runAllImportStepsFromProfile("profile-knowledge.curator:default")
         transaction.commit()
+        print(f"Knowledge Curator profile installed successfully!")
+    except Exception as e:
+        print(f"ERROR installing Knowledge Curator profile: {e}")
+        import traceback
+        traceback.print_exc()
+
     app._p_jar.sync()
+    print(f"Site creation completed")
+else:
+    print(f"Site {site_id} already exists and DELETE_EXISTING is False")
+
+print(f"=== CREATE SITE SCRIPT COMPLETED ===")
