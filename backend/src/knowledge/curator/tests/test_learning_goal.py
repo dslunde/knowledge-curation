@@ -1,7 +1,7 @@
 """Tests for Learning Goal content type."""
 
 import unittest
-from datetime import date, datetime
+from datetime import date
 from plone import api
 from plone.app.testing import TEST_USER_ID, setRoles
 from plone.dexterity.interfaces import IDexterityFTI
@@ -39,7 +39,7 @@ class LearningGoalIntegrationTest(unittest.TestCase):
         obj = createObject(factory)
         self.assertTrue(
             ILearningGoal.providedBy(obj),
-            'ILearningGoal not provided by {0}'.format(obj)
+            f'ILearningGoal not provided by {obj}'
         )
 
     def test_ct_learning_goal_adding(self):
@@ -55,7 +55,7 @@ class LearningGoalIntegrationTest(unittest.TestCase):
         )
         self.assertTrue(
             ILearningGoal.providedBy(obj),
-            'ILearningGoal not provided by {0}'.format(obj.id)
+            f'ILearningGoal not provided by {obj.id}'
         )
         # Check fields
         self.assertEqual(obj.title, 'Learn Python')
@@ -69,7 +69,7 @@ class LearningGoalIntegrationTest(unittest.TestCase):
             type='LearningGoal',
             id='goal-with-milestones',
         )
-        
+
         # Test adding milestones
         m1 = obj.add_milestone(
             'Learn basics',
@@ -78,18 +78,18 @@ class LearningGoalIntegrationTest(unittest.TestCase):
         )
         self.assertEqual(m1['title'], 'Learn basics')
         self.assertFalse(m1['completed'])
-        
+
         # Test updating milestone
         obj.update_milestone(m1['id'], completed=True)
         updated = obj.milestones[0]
         self.assertTrue(updated['completed'])
         self.assertIsNotNone(updated['completed_date'])
-        
+
         # Test progress calculation
         obj.add_milestone('Advanced topics', 'Learn advanced Python')
         progress = obj.calculate_progress()
         self.assertEqual(progress, 50)  # 1 of 2 completed
-        
+
         obj.update_progress()
         self.assertEqual(obj.progress, 50)
 
@@ -103,7 +103,7 @@ class LearningGoalIntegrationTest(unittest.TestCase):
             progress=50,
         )
         self.assertTrue(obj.is_overdue())
-        
+
         # Complete the goal
         obj.progress = 100
         self.assertFalse(obj.is_overdue())
@@ -115,15 +115,15 @@ class LearningGoalIntegrationTest(unittest.TestCase):
             type='LearningGoal',
             id='goal-with-notes',
         )
-        
+
         # Test adding related notes
         obj.add_related_note('note-uid-1')
         self.assertIn('note-uid-1', obj.related_notes)
-        
+
         # Test duplicate prevention
         obj.add_related_note('note-uid-1')
         self.assertEqual(len(obj.related_notes), 1)
-        
+
         # Test removing
         obj.remove_related_note('note-uid-1')
         self.assertEqual(len(obj.related_notes), 0)

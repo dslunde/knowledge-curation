@@ -1,7 +1,6 @@
 """Tests for Search API."""
 
 import unittest
-import json
 from plone import api
 from plone.app.testing import setRoles, TEST_USER_ID
 from plone.restapi.testing import RelativeSession
@@ -89,10 +88,10 @@ class TestSearchAPI(unittest.TestCase):
                 'portal_types': ['ResearchNote', 'BookmarkPlus']
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertIn('items', data)
         self.assertIn('items_total', data)
         self.assertIn('query', data)
@@ -108,13 +107,13 @@ class TestSearchAPI(unittest.TestCase):
                 'limit': 20
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertIn('items', data)
         self.assertEqual(data['search_type'], 'fulltext')
-        
+
         # Should find Python-related content
         titles = [item['title'] for item in data['items']]
         python_items = [t for t in titles if 'Python' in t]
@@ -131,14 +130,14 @@ class TestSearchAPI(unittest.TestCase):
                 'threshold': 0.5
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertIn('items', data)
         self.assertEqual(data['source_uid'], self.note1.UID())
         self.assertEqual(data['search_type'], 'similarity')
-        
+
         # Should find similar items (note2 is similar to note1)
         if data['items']:
             # First result should be the most similar
@@ -157,10 +156,10 @@ class TestSearchAPI(unittest.TestCase):
                 }
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         # All results should have 'python' tag
         for item in data['items']:
             self.assertIn('python', item['tags'])
@@ -169,7 +168,7 @@ class TestSearchAPI(unittest.TestCase):
         """Test search with date range filter."""
         yesterday = (datetime.now() - timedelta(days=1)).isoformat()
         tomorrow = (datetime.now() + timedelta(days=1)).isoformat()
-        
+
         response = self.api_session.post(
             '/@knowledge-search',
             json={
@@ -183,10 +182,10 @@ class TestSearchAPI(unittest.TestCase):
                 }
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         # Should find recently created items
         self.assertGreater(len(data['items']), 0)
 
@@ -195,10 +194,10 @@ class TestSearchAPI(unittest.TestCase):
         response = self.api_session.get(
             '/@knowledge-search/semantic?q=python&limit=5'
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertIn('items', data)
         self.assertEqual(data['query'], 'python')
 
@@ -207,10 +206,10 @@ class TestSearchAPI(unittest.TestCase):
         response = self.api_session.get(
             f'{self.note1.absolute_url()}/@knowledge-search/similar?limit=3'
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertIn('items', data)
         self.assertEqual(data['source_uid'], self.note1.UID())
 
@@ -223,7 +222,7 @@ class TestSearchAPI(unittest.TestCase):
                 'query': 'test'
             }
         )
-        
+
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertIn('error', data)
@@ -236,7 +235,7 @@ class TestSearchAPI(unittest.TestCase):
                 'type': 'fulltext'
             }
         )
-        
+
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertIn('error', data)
@@ -250,7 +249,7 @@ class TestSearchAPI(unittest.TestCase):
                 'limit': 5
             }
         )
-        
+
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertIn('error', data)
@@ -265,7 +264,7 @@ class TestSearchAPI(unittest.TestCase):
                 'limit': 5
             }
         )
-        
+
         self.assertEqual(response.status_code, 404)
         data = response.json()
         self.assertIn('error', data)
@@ -280,10 +279,10 @@ class TestSearchAPI(unittest.TestCase):
                 'portal_types': ['BookmarkPlus']
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         # All results should be BookmarkPlus
         for item in data['items']:
             self.assertEqual(item['portal_type'], 'BookmarkPlus')
@@ -298,8 +297,8 @@ class TestSearchAPI(unittest.TestCase):
                 'limit': 2
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertLessEqual(len(data['items']), 2)

@@ -38,7 +38,7 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
         obj = createObject(factory)
         self.assertTrue(
             IBookmarkPlus.providedBy(obj),
-            'IBookmarkPlus not provided by {0}'.format(obj)
+            f'IBookmarkPlus not provided by {obj}'
         )
 
     def test_ct_bookmark_plus_adding(self):
@@ -56,7 +56,7 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
         )
         self.assertTrue(
             IBookmarkPlus.providedBy(obj),
-            'IBookmarkPlus not provided by {0}'.format(obj.id)
+            f'IBookmarkPlus not provided by {obj.id}'
         )
         # Check fields
         self.assertEqual(obj.title, 'Python Documentation')
@@ -73,12 +73,12 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
             url='https://example.com',
             read_status='unread',
         )
-        
+
         # Test marking as reading
         obj.mark_as_reading()
         self.assertEqual(obj.read_status, 'reading')
         self.assertIsNotNone(obj.get_reading_started_date())
-        
+
         # Test marking as read
         obj.mark_as_read()
         self.assertEqual(obj.read_status, 'read')
@@ -94,18 +94,18 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
             importance='medium',
             read_status='unread',
         )
-        
+
         # Test updating importance
         self.assertTrue(obj.update_importance('critical'))
         self.assertEqual(obj.importance, 'critical')
-        
+
         # Test invalid importance
         self.assertFalse(obj.update_importance('invalid'))
         self.assertEqual(obj.importance, 'critical')  # Should remain unchanged
-        
+
         # Test high priority check
         self.assertTrue(obj.is_high_priority())  # unread + critical
-        
+
         obj.read_status = 'read'
         self.assertFalse(obj.is_high_priority())  # read + critical
 
@@ -117,15 +117,15 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
             id='bookmark-tags-test',
             url='https://example.com',
         )
-        
+
         # Test adding tags
         obj.add_tag('python')
         self.assertIn('python', obj.tags)
-        
+
         # Test duplicate prevention
         obj.add_tag('python')
         self.assertEqual(len(obj.tags), 1)
-        
+
         # Test removing tags
         obj.add_tag('documentation')
         obj.remove_tag('python')
@@ -140,7 +140,7 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
             id='bookmark-embedding-test',
             url='https://example.com',
         )
-        
+
         # Test embedding methods
         self.assertEqual(obj.get_embedding(), [])
         obj.update_embedding([0.5, 0.6, 0.7])
@@ -149,7 +149,7 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
     def test_ct_bookmark_plus_summary_text(self):
         """Test BookmarkPlus summary text generation."""
         from plone.app.textfield.value import RichTextValue
-        
+
         obj = api.content.create(
             container=self.portal,
             type='BookmarkPlus',
@@ -158,12 +158,12 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
             url='https://example.com',
             description='A test bookmark',
         )
-        
+
         # Test without notes
         summary = obj.get_summary_text()
         self.assertIn('Test Bookmark', summary)
         self.assertIn('A test bookmark', summary)
-        
+
         # Test with notes
         obj.notes = RichTextValue('Important notes about this resource')
         summary = obj.get_summary_text()

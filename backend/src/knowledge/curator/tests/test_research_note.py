@@ -38,7 +38,7 @@ class ResearchNoteIntegrationTest(unittest.TestCase):
         obj = createObject(factory)
         self.assertTrue(
             IResearchNote.providedBy(obj),
-            'IResearchNote not provided by {0}'.format(obj)
+            f'IResearchNote not provided by {obj}'
         )
 
     def test_ct_research_note_adding(self):
@@ -53,7 +53,7 @@ class ResearchNoteIntegrationTest(unittest.TestCase):
         )
         self.assertTrue(
             IResearchNote.providedBy(obj),
-            'IResearchNote not provided by {0}'.format(obj.id)
+            f'IResearchNote not provided by {obj.id}'
         )
         # Check that all fields are accessible
         self.assertEqual(obj.title, 'Test Research Note')
@@ -77,12 +77,12 @@ class ResearchNoteIntegrationTest(unittest.TestCase):
             type='ResearchNote',
             id='research-note-methods',
         )
-        
+
         # Test embedding methods
         self.assertEqual(obj.get_embedding(), [])
         obj.update_embedding([0.1, 0.2, 0.3])
         self.assertEqual(obj.get_embedding(), [0.1, 0.2, 0.3])
-        
+
         # Test connection methods
         obj.add_connection('uid-1')
         self.assertIn('uid-1', obj.get_connections())
@@ -90,7 +90,7 @@ class ResearchNoteIntegrationTest(unittest.TestCase):
         self.assertEqual(len(obj.get_connections()), 2)
         obj.remove_connection('uid-1')
         self.assertNotIn('uid-1', obj.get_connections())
-        
+
         # Test insight methods
         obj.add_insight('Important insight')
         self.assertIn('Important insight', obj.key_insights)

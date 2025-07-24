@@ -34,7 +34,7 @@ admin_pass = os.environ.get("PLONE_SITE_PASSWORD", "admin")
 portal_id = os.environ.get("PLONE_SITE_ID", "Plone")
 site_title = os.environ.get("PLONE_SITE_TITLE", "Personal Knowledge Curation")
 
-print(f"=== CREATE SITE SCRIPT STARTING ===")
+print("=== CREATE SITE SCRIPT STARTING ===")
 print(f"DELETE_EXISTING: {DELETE_EXISTING}")
 print(f"portal_id: {portal_id}")
 
@@ -69,28 +69,28 @@ if site_id in app.objectIds() and DELETE_EXISTING:
     app.manage_delObjects([site_id])
     transaction.commit()
     app._p_jar.sync()
-    print(f"Site deleted successfully")
+    print("Site deleted successfully")
 
 if site_id not in app.objectIds():
     print(f"Creating new site: {site_id}")
     site = addPloneSite(app, site_id, **payload)
     transaction.commit()
-    print(f"Base site created successfully")
+    print("Base site created successfully")
 
     portal_setup: SetupTool = site.portal_setup
-    print(f"Installing Knowledge Curator profile...")
+    print("Installing Knowledge Curator profile...")
     try:
         portal_setup.runAllImportStepsFromProfile("profile-knowledge.curator:default")
         transaction.commit()
-        print(f"Knowledge Curator profile installed successfully!")
+        print("Knowledge Curator profile installed successfully!")
     except Exception as e:
         print(f"ERROR installing Knowledge Curator profile: {e}")
         import traceback
         traceback.print_exc()
 
     app._p_jar.sync()
-    print(f"Site creation completed")
+    print("Site creation completed")
 else:
     print(f"Site {site_id} already exists and DELETE_EXISTING is False")
 
-print(f"=== CREATE SITE SCRIPT COMPLETED ===")
+print("=== CREATE SITE SCRIPT COMPLETED ===")

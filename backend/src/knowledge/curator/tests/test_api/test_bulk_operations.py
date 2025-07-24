@@ -1,7 +1,6 @@
 """Tests for Bulk Operations API."""
 
 import unittest
-import json
 from plone import api
 from plone.app.testing import setRoles, TEST_USER_ID
 from plone.restapi.testing import RelativeSession
@@ -58,7 +57,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
         """Test bulk workflow transitions."""
         # Get UIDs
         uids = [note.UID() for note in self.notes[:3]]
-        
+
         response = self.api_session.post(
             '/@knowledge-bulk/workflow',
             json={
@@ -67,15 +66,15 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 'comment': 'Publishing reviewed content'
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertEqual(data['operation'], 'workflow_transition')
         self.assertEqual(data['transition'], 'publish')
         self.assertIn('results', data)
         self.assertIn('summary', data)
-        
+
         # Check summary
         summary = data['summary']
         self.assertEqual(summary['total'], 3)
@@ -84,7 +83,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
     def test_bulk_tag_add(self):
         """Test bulk tag addition."""
         uids = [note.UID() for note in self.notes[:3]]
-        
+
         response = self.api_session.post(
             '/@knowledge-bulk/tag',
             json={
@@ -94,13 +93,13 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 'remove_tags': []
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertEqual(data['operation'], 'bulk_tag')
         self.assertEqual(data['mode'], 'add')
-        
+
         # Verify tags were added
         for result in data['results']['successful']:
             self.assertIn('important', result['tags'])
@@ -109,7 +108,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
     def test_bulk_tag_remove(self):
         """Test bulk tag removal."""
         uids = [note.UID() for note in self.notes[:2]]
-        
+
         response = self.api_session.post(
             '/@knowledge-bulk/tag',
             json={
@@ -119,10 +118,10 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 'remove_tags': ['test']
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         # Verify tag was removed
         for result in data['results']['successful']:
             self.assertNotIn('test', result['tags'])
@@ -130,7 +129,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
     def test_bulk_tag_replace(self):
         """Test bulk tag replacement."""
         uids = [note.UID() for note in self.notes[:2]]
-        
+
         response = self.api_session.post(
             '/@knowledge-bulk/tag',
             json={
@@ -139,10 +138,10 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 'add_tags': ['new-tag-1', 'new-tag-2']
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         # Verify tags were replaced
         for result in data['results']['successful']:
             self.assertEqual(set(result['tags']), {'new-tag-1', 'new-tag-2'})
@@ -158,21 +157,21 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 title=f'To Delete {i+1}'
             )
             to_delete.append(note.UID())
-        
+
         import transaction
         transaction.commit()
-        
+
         response = self.api_session.post(
             '/@knowledge-bulk/delete',
             json={'uids': to_delete}
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertEqual(data['operation'], 'bulk_delete')
         self.assertEqual(data['summary']['successful'], 3)
-        
+
         # Verify items were deleted
         catalog = api.portal.get_tool('portal_catalog')
         for uid in to_delete:
@@ -183,7 +182,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
         """Test bulk move operation."""
         uids = [note.UID() for note in self.notes[:2]]
         target_path = '/'.join(self.target_folder.getPhysicalPath())
-        
+
         response = self.api_session.post(
             '/@knowledge-bulk/move',
             json={
@@ -191,13 +190,13 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 'target_path': target_path
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertEqual(data['operation'], 'bulk_move')
         self.assertEqual(data['summary']['successful'], 2)
-        
+
         # Verify items were moved
         for result in data['results']['successful']:
             self.assertIn('/archive/', result['new_path'])
@@ -215,10 +214,10 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 progress=0
             )
             goals.append(goal.UID())
-        
+
         import transaction
         transaction.commit()
-        
+
         response = self.api_session.post(
             '/@knowledge-bulk/update',
             json={
@@ -229,13 +228,13 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 }
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertEqual(data['operation'], 'bulk_update')
         self.assertEqual(data['summary']['successful'], 3)
-        
+
         # Verify updates
         catalog = api.portal.get_tool('portal_catalog')
         for uid in goals:
@@ -247,7 +246,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
         """Test bulk connection creation."""
         source_uids = [self.notes[0].UID(), self.notes[1].UID()]
         target_uids = [self.notes[2].UID(), self.notes[3].UID()]
-        
+
         response = self.api_session.post(
             '/@knowledge-bulk/connect',
             json={
@@ -256,13 +255,13 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 'connection_type': 'bidirectional'
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         self.assertEqual(data['operation'], 'bulk_connect')
         self.assertEqual(data['connection_type'], 'bidirectional')
-        
+
         # Verify connections were created
         self.assertGreater(data['summary']['successful'], 0)
 
@@ -272,7 +271,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
             '/@knowledge-bulk/invalid',
             json={'uids': ['uid-1']}
         )
-        
+
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertIn('error', data)
@@ -283,7 +282,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
             '/@knowledge-bulk/workflow',
             json={'transition': 'publish'}
         )
-        
+
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertIn('error', data)
@@ -297,10 +296,10 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 'transition': 'publish'
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         # All should fail
         self.assertEqual(data['summary']['failed'], 2)
         self.assertEqual(data['summary']['successful'], 0)
@@ -313,14 +312,14 @@ class TestBulkOperationsAPI(unittest.TestCase):
             username='limited',
             password='secret'
         )
-        
+
         # Create new session with limited user
         limited_session = RelativeSession(self.portal_url)
         limited_session.headers.update({'Accept': 'application/json'})
         limited_session.auth = ('limited', 'secret')
-        
+
         uids = [self.notes[0].UID()]
-        
+
         response = limited_session.post(
             '/@knowledge-bulk/workflow',
             json={
@@ -328,10 +327,10 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 'transition': 'publish'
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         # Should be unauthorized
         self.assertEqual(data['summary']['unauthorized'], 1)
         self.assertEqual(data['summary']['successful'], 0)
@@ -339,7 +338,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
     def test_bulk_update_invalid_fields(self):
         """Test bulk update with invalid fields."""
         uids = [self.notes[0].UID()]
-        
+
         response = self.api_session.post(
             '/@knowledge-bulk/update',
             json={
@@ -350,7 +349,7 @@ class TestBulkOperationsAPI(unittest.TestCase):
                 }
             }
         )
-        
+
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertIn('error', data)

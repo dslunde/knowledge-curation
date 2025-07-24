@@ -4,13 +4,10 @@ from plone import api
 from plone.restapi.services import Service
 from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse
-from plone.namedfile.field import NamedBlobFile
 from datetime import datetime
 import json
 import csv
 import io
-import zipfile
-import base64
 from lxml import etree
 import transaction
 
@@ -20,7 +17,7 @@ class ImportExportService(Service):
     """Service for importing and exporting knowledge content."""
 
     def __init__(self, context, request):
-        super(ImportExportService, self).__init__(context, request)
+        super().__init__(context, request)
         self.params = []
 
     def publishTraverse(self, request, name):
@@ -31,9 +28,9 @@ class ImportExportService(Service):
         if len(self.params) == 0:
             self.request.response.setStatus(400)
             return {'error': 'Operation required'}
-        
+
         operation = self.params[0]
-        
+
         if operation == 'export':
             return self.export_content()
         elif operation == 'import':
@@ -57,20 +54,20 @@ class ImportExportService(Service):
         portal_types = self.request.get('types', '').split(',') if self.request.get('types') else None
         include_embeddings = self.request.get('include_embeddings', 'false').lower() == 'true'
         include_connections = self.request.get('include_connections', 'true').lower() == 'true'
-        
+
         if not portal_types:
             portal_types = ['ResearchNote', 'LearningGoal', 'ProjectLog', 'BookmarkPlus']
-        
+
         # Get content
         catalog = api.portal.get_tool('portal_catalog')
         user = api.user.get_current()
-        
+
         brains = catalog(
             Creator=user.getId(),
             portal_type=portal_types,
             path={'query': '/'.join(self.context.getPhysicalPath()), 'depth': -1}
         )
-        
+
         if format == 'json':
             return self._export_json(brains, include_embeddings, include_connections)
         elif format == 'csv':
@@ -88,10 +85,10 @@ class ImportExportService(Service):
     def _export_json(self, brains, include_embeddings, include_connections):
         """Export as JSON format."""
         items = []
-        
+
         for brain in brains:
             obj = brain.getObject()
-            
+
             item = {
                 'uid': brain.UID,
                 'portal_type': brain.portal_type,
@@ -103,7 +100,7 @@ class ImportExportService(Service):
                 'tags': list(brain.Subject),
                 'path': '/'.join(obj.getPhysicalPath())
             }
-            
+
             # Type-specific fields
             if brain.portal_type == 'ResearchNote':
                 item['content'] = obj.content.raw if hasattr(obj, 'content') else ''
@@ -114,7 +111,7 @@ class ImportExportService(Service):
                 if include_embeddings and hasattr(obj, 'embedding_vector'):
                     item['embedding_vector'] = getattr(obj, 'embedding_vector', [])
                 item['ai_summary'] = getattr(obj, 'ai_summary', '')
-                
+
             elif brain.portal_type == 'LearningGoal':
                 item['target_date'] = getattr(obj, 'target_date', None)
                 item['target_date'] = item['target_date'].isoformat() if item['target_date'] else None
@@ -124,7 +121,7 @@ class ImportExportService(Service):
                 item['reflection'] = getattr(obj, 'reflection', '')
                 if include_connections:
                     item['related_notes'] = getattr(obj, 'related_notes', [])
-                    
+
             elif brain.portal_type == 'ProjectLog':
                 item['start_date'] = getattr(obj, 'start_date', None)
                 item['start_date'] = item['start_date'].isoformat() if item['start_date'] else None
@@ -132,7 +129,7 @@ class ImportExportService(Service):
                 item['deliverables'] = getattr(obj, 'deliverables', [])
                 item['learnings'] = getattr(obj, 'learnings', [])
                 item['status'] = getattr(obj, 'status', 'planning')
-                
+
             elif brain.portal_type == 'BookmarkPlus':
                 item['url'] = getattr(obj, 'url', '')
                 item['notes'] = obj.notes.raw if hasattr(obj, 'notes') else ''
@@ -141,9 +138,9 @@ class ImportExportService(Service):
                 if include_embeddings and hasattr(obj, 'embedding_vector'):
                     item['embedding_vector'] = getattr(obj, 'embedding_vector', [])
                 item['ai_summary'] = getattr(obj, 'ai_summary', '')
-            
+
             items.append(item)
-        
+
         # Create export package
         export_data = {
             'version': '1.0',
@@ -152,31 +149,31 @@ class ImportExportService(Service):
             'item_count': len(items),
             'items': items
         }
-        
+
         # Set response headers for download
         filename = f"knowledge_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         self.request.response.setHeader('Content-Type', 'application/json')
         self.request.response.setHeader('Content-Disposition', f'attachment; filename="{filename}"')
-        
+
         return export_data
 
     def _export_csv(self, brains):
         """Export as CSV format."""
         output = io.StringIO()
-        
+
         # Define fields based on content types
         fieldnames = [
             'uid', 'portal_type', 'title', 'description', 'created', 'modified',
             'review_state', 'tags', 'url', 'content', 'source_url', 'priority',
             'progress', 'status', 'importance', 'read_status'
         ]
-        
+
         writer = csv.DictWriter(output, fieldnames=fieldnames)
         writer.writeheader()
-        
+
         for brain in brains:
             obj = brain.getObject()
-            
+
             row = {
                 'uid': brain.UID,
                 'portal_type': brain.portal_type,
@@ -187,7 +184,7 @@ class ImportExportService(Service):
                 'review_state': brain.review_state,
                 'tags': ', '.join(brain.Subject)
             }
-            
+
             # Add type-specific fields
             if brain.portal_type == 'ResearchNote':
                 row['content'] = obj.content.raw if hasattr(obj, 'content') else ''
@@ -201,39 +198,39 @@ class ImportExportService(Service):
                 row['url'] = getattr(obj, 'url', '')
                 row['importance'] = getattr(obj, 'importance', '')
                 row['read_status'] = getattr(obj, 'read_status', '')
-            
+
             writer.writerow(row)
-        
+
         # Set response headers
         filename = f"knowledge_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
         self.request.response.setHeader('Content-Type', 'text/csv')
         self.request.response.setHeader('Content-Disposition', f'attachment; filename="{filename}"')
-        
+
         return output.getvalue()
 
     def _export_opml(self, brains):
         """Export as OPML (Outline Processor Markup Language) format."""
         root = etree.Element('opml', version='2.0')
-        
+
         # Head
         head = etree.SubElement(root, 'head')
         etree.SubElement(head, 'title').text = 'Knowledge Export'
         etree.SubElement(head, 'dateCreated').text = datetime.now().isoformat()
         etree.SubElement(head, 'ownerName').text = api.user.get_current().getProperty('fullname', '')
-        
+
         # Body
         body = etree.SubElement(root, 'body')
-        
+
         # Group by type
         type_outlines = {}
-        
+
         for brain in brains:
             portal_type = brain.portal_type
-            
+
             if portal_type not in type_outlines:
                 outline = etree.SubElement(body, 'outline', text=portal_type)
                 type_outlines[portal_type] = outline
-            
+
             # Create item outline
             item_attrs = {
                 'text': brain.Title,
@@ -241,96 +238,96 @@ class ImportExportService(Service):
                 'created': brain.created.ISO8601(),
                 'category': ', '.join(brain.Subject)
             }
-            
+
             if brain.portal_type == 'BookmarkPlus':
                 obj = brain.getObject()
                 item_attrs['url'] = getattr(obj, 'url', '')
-            
+
             etree.SubElement(type_outlines[portal_type], 'outline', **item_attrs)
-        
+
         # Convert to string
         xml_string = etree.tostring(root, pretty_print=True, encoding='unicode')
-        
+
         # Set response headers
         filename = f"knowledge_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.opml"
         self.request.response.setHeader('Content-Type', 'text/x-opml')
         self.request.response.setHeader('Content-Disposition', f'attachment; filename="{filename}"')
-        
+
         return xml_string
 
     def _export_markdown(self, brains):
         """Export as Markdown format."""
         output = io.StringIO()
-        
+
         # Group by type
         by_type = {}
         for brain in brains:
             if brain.portal_type not in by_type:
                 by_type[brain.portal_type] = []
             by_type[brain.portal_type].append(brain)
-        
+
         # Write header
-        output.write(f"# Knowledge Export\n\n")
+        output.write("# Knowledge Export\n\n")
         output.write(f"*Exported on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n\n")
-        
+
         # Write sections by type
         for portal_type, items in by_type.items():
             output.write(f"## {portal_type}\n\n")
-            
+
             for brain in items:
                 obj = brain.getObject()
-                
+
                 output.write(f"### {brain.Title}\n\n")
-                
+
                 if brain.Description:
                     output.write(f"*{brain.Description}*\n\n")
-                
+
                 # Metadata
                 output.write(f"- **Created:** {brain.created.strftime('%Y-%m-%d')}\n")
                 output.write(f"- **Modified:** {brain.modified.strftime('%Y-%m-%d')}\n")
                 output.write(f"- **State:** {brain.review_state}\n")
-                
+
                 if brain.Subject:
                     output.write(f"- **Tags:** {', '.join(brain.Subject)}\n")
-                
+
                 output.write("\n")
-                
+
                 # Type-specific content
                 if brain.portal_type == 'ResearchNote' and hasattr(obj, 'content'):
                     output.write(f"{obj.content.raw}\n\n")
-                    
+
                     if getattr(obj, 'key_insights', []):
                         output.write("#### Key Insights\n\n")
                         for insight in obj.key_insights:
                             output.write(f"- {insight}\n")
                         output.write("\n")
-                    
+
                     if getattr(obj, 'source_url', ''):
                         output.write(f"**Source:** [{obj.source_url}]({obj.source_url})\n\n")
-                
+
                 elif brain.portal_type == 'BookmarkPlus':
                     if getattr(obj, 'url', ''):
                         output.write(f"**URL:** [{obj.url}]({obj.url})\n\n")
-                    
+
                     if hasattr(obj, 'notes') and obj.notes:
                         output.write(f"{obj.notes.raw}\n\n")
-                
+
                 output.write("---\n\n")
-        
+
         # Set response headers
         filename = f"knowledge_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         self.request.response.setHeader('Content-Type', 'text/markdown')
         self.request.response.setHeader('Content-Disposition', f'attachment; filename="{filename}"')
-        
+
         return output.getvalue()
 
     def _export_roam_json(self, brains):
         """Export in Roam Research JSON format."""
         pages = []
-        
+
         for brain in brains:
             obj = brain.getObject()
-            
+
             # Create page
             page = {
                 'title': brain.Title,
@@ -339,10 +336,10 @@ class ImportExportService(Service):
                 'edited-time': int(brain.modified.millis()),
                 'children': []
             }
-            
+
             # Add metadata block
             metadata = {
-                'string': f"Metadata",
+                'string': "Metadata",
                 'uid': f"{brain.UID[:9]}-meta",
                 'children': [
                     {'string': f"Type:: {brain.portal_type}", 'uid': f"{brain.UID[:9]}-type"},
@@ -351,14 +348,14 @@ class ImportExportService(Service):
                 ]
             }
             page['children'].append(metadata)
-            
+
             # Add content
             if brain.Description:
                 page['children'].append({
                     'string': brain.Description,
                     'uid': f"{brain.UID[:9]}-desc"
                 })
-            
+
             # Type-specific content
             if brain.portal_type == 'ResearchNote':
                 if hasattr(obj, 'content') and obj.content:
@@ -370,7 +367,7 @@ class ImportExportService(Service):
                                 'string': line,
                                 'uid': f"{brain.UID[:9]}-c{i}"
                             })
-                
+
                 # Add key insights
                 if getattr(obj, 'key_insights', []):
                     insights_block = {
@@ -384,7 +381,7 @@ class ImportExportService(Service):
                             'uid': f"{brain.UID[:9]}-i{i}"
                         })
                     page['children'].append(insights_block)
-                
+
                 # Add connections as page references
                 if getattr(obj, 'connections', []):
                     connections_block = {
@@ -401,14 +398,14 @@ class ImportExportService(Service):
                             })
                     if connections_block['children']:
                         page['children'].append(connections_block)
-            
+
             pages.append(page)
-        
+
         # Set response headers
         filename = f"knowledge_roam_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         self.request.response.setHeader('Content-Type', 'application/json')
         self.request.response.setHeader('Content-Disposition', f'attachment; filename="{filename}"')
-        
+
         return pages
 
     def import_content(self):
@@ -421,11 +418,11 @@ class ImportExportService(Service):
         file_data = self.request.get('file')
         format = self.request.get('format', 'json')
         merge_strategy = self.request.get('merge_strategy', 'skip')  # skip, update, duplicate
-        
+
         if not file_data:
             self.request.response.setStatus(400)
             return {'error': 'No file provided'}
-        
+
         try:
             if format == 'json':
                 return self._import_json(file_data, merge_strategy)
@@ -438,7 +435,7 @@ class ImportExportService(Service):
                 return {'error': f'Unsupported format: {format}'}
         except Exception as e:
             self.request.response.setStatus(400)
-            return {'error': f'Import failed: {str(e)}'}
+            return {'error': f'Import failed: {e!s}'}
 
     def _import_json(self, file_data, merge_strategy):
         """Import from JSON format."""
@@ -447,23 +444,23 @@ class ImportExportService(Service):
             content = file_data.read()
         else:
             content = file_data
-        
+
         if isinstance(content, bytes):
             content = content.decode('utf-8')
-        
+
         data = json.loads(content)
-        
+
         # Validate structure
         if not isinstance(data, dict) or 'items' not in data:
             raise ValueError('Invalid JSON structure')
-        
+
         results = {
             'imported': 0,
             'skipped': 0,
             'updated': 0,
             'errors': []
         }
-        
+
         # Import items
         for item_data in data['items']:
             try:
@@ -479,9 +476,9 @@ class ImportExportService(Service):
                     'title': item_data.get('title', 'Unknown'),
                     'error': str(e)
                 })
-        
+
         transaction.commit()
-        
+
         return {
             'success': True,
             'results': results
@@ -491,7 +488,7 @@ class ImportExportService(Service):
         """Import a single item."""
         portal_type = item_data.get('portal_type')
         title = item_data.get('title', 'Untitled')
-        
+
         # Check if item exists (by title and type)
         catalog = api.portal.get_tool('portal_catalog')
         existing = catalog(
@@ -499,7 +496,7 @@ class ImportExportService(Service):
             Title=title,
             path={'query': '/'.join(self.context.getPhysicalPath()), 'depth': -1}
         )
-        
+
         if existing and merge_strategy == 'skip':
             return 'skipped'
         elif existing and merge_strategy == 'update':
@@ -521,13 +518,13 @@ class ImportExportService(Service):
         # Common fields
         if 'description' in data:
             obj.description = data['description']
-        
+
         if 'tags' in data:
             obj.setSubject(data['tags'])
-        
+
         # Type-specific fields
         portal_type = data.get('portal_type')
-        
+
         if portal_type == 'ResearchNote':
             if 'content' in data:
                 obj.content = data['content']
@@ -539,9 +536,9 @@ class ImportExportService(Service):
                 obj.connections = data['connections']
             if 'ai_summary' in data:
                 obj.ai_summary = data['ai_summary']
-                
+
         elif portal_type == 'LearningGoal':
-            if 'target_date' in data and data['target_date']:
+            if data.get('target_date'):
                 obj.target_date = datetime.fromisoformat(data['target_date']).date()
             if 'milestones' in data:
                 obj.milestones = data['milestones']
@@ -553,9 +550,9 @@ class ImportExportService(Service):
                 obj.reflection = data['reflection']
             if 'related_notes' in data:
                 obj.related_notes = data['related_notes']
-                
+
         elif portal_type == 'ProjectLog':
-            if 'start_date' in data and data['start_date']:
+            if data.get('start_date'):
                 obj.start_date = datetime.fromisoformat(data['start_date']).date()
             if 'entries' in data:
                 obj.entries = data['entries']
@@ -565,7 +562,7 @@ class ImportExportService(Service):
                 obj.learnings = data['learnings']
             if 'status' in data:
                 obj.status = data['status']
-                
+
         elif portal_type == 'BookmarkPlus':
             if 'url' in data:
                 obj.url = data['url']
@@ -577,7 +574,7 @@ class ImportExportService(Service):
                 obj.importance = data['importance']
             if 'ai_summary' in data:
                 obj.ai_summary = data['ai_summary']
-        
+
         obj.reindexObject()
 
     def _import_csv(self, file_data, merge_strategy):
@@ -586,19 +583,19 @@ class ImportExportService(Service):
             content = file_data.read()
         else:
             content = file_data
-        
+
         if isinstance(content, bytes):
             content = content.decode('utf-8')
-        
+
         reader = csv.DictReader(io.StringIO(content))
-        
+
         results = {
             'imported': 0,
             'skipped': 0,
             'updated': 0,
             'errors': []
         }
-        
+
         for row in reader:
             try:
                 # Convert CSV row to item data format
@@ -608,12 +605,12 @@ class ImportExportService(Service):
                     'description': row.get('description', ''),
                     'tags': [t.strip() for t in row.get('tags', '').split(',') if t.strip()]
                 }
-                
+
                 # Add type-specific fields
                 for field in ['content', 'source_url', 'url', 'priority', 'progress', 'status', 'importance', 'read_status']:
-                    if field in row and row[field]:
+                    if row.get(field):
                         item_data[field] = row[field]
-                
+
                 result = self._import_item(item_data, merge_strategy)
                 if result == 'imported':
                     results['imported'] += 1
@@ -621,15 +618,15 @@ class ImportExportService(Service):
                     results['updated'] += 1
                 elif result == 'skipped':
                     results['skipped'] += 1
-                    
+
             except Exception as e:
                 results['errors'].append({
                     'title': row.get('title', 'Unknown'),
                     'error': str(e)
                 })
-        
+
         transaction.commit()
-        
+
         return {
             'success': True,
             'results': results
@@ -641,28 +638,28 @@ class ImportExportService(Service):
             content = file_data.read()
         else:
             content = file_data
-        
+
         if isinstance(content, bytes):
             content = content.decode('utf-8')
-        
+
         # Parse OPML
         root = etree.fromstring(content)
         body = root.find('.//body')
-        
+
         if body is None:
             raise ValueError('Invalid OPML structure')
-        
+
         results = {
             'imported': 0,
             'skipped': 0,
             'updated': 0,
             'errors': []
         }
-        
+
         # Process outlines
         for type_outline in body.findall('./outline'):
             portal_type = type_outline.get('text', 'ResearchNote')
-            
+
             for item_outline in type_outline.findall('./outline'):
                 try:
                     item_data = {
@@ -670,11 +667,11 @@ class ImportExportService(Service):
                         'title': item_outline.get('text', 'Untitled'),
                         'tags': [t.strip() for t in item_outline.get('category', '').split(',') if t.strip()]
                     }
-                    
+
                     # Add URL for bookmarks
                     if item_outline.get('url'):
                         item_data['url'] = item_outline.get('url')
-                    
+
                     result = self._import_item(item_data, merge_strategy)
                     if result == 'imported':
                         results['imported'] += 1
@@ -682,15 +679,15 @@ class ImportExportService(Service):
                         results['updated'] += 1
                     elif result == 'skipped':
                         results['skipped'] += 1
-                        
+
                 except Exception as e:
                     results['errors'].append({
                         'title': item_outline.get('text', 'Unknown'),
                         'error': str(e)
                     })
-        
+
         transaction.commit()
-        
+
         return {
             'success': True,
             'results': results
@@ -704,28 +701,28 @@ class ImportExportService(Service):
 
         file_data = self.request.get('file')
         format = self.request.get('format', 'json')
-        
+
         if not file_data:
             self.request.response.setStatus(400)
             return {'error': 'No file provided'}
-        
+
         try:
             if hasattr(file_data, 'read'):
                 content = file_data.read()
                 file_data.seek(0)  # Reset for actual import
             else:
                 content = file_data
-            
+
             if isinstance(content, bytes):
                 content = content.decode('utf-8')
-            
+
             validation = {
                 'valid': True,
                 'errors': [],
                 'warnings': [],
                 'summary': {}
             }
-            
+
             if format == 'json':
                 self._validate_json(content, validation)
             elif format == 'csv':
@@ -735,9 +732,9 @@ class ImportExportService(Service):
             else:
                 validation['valid'] = False
                 validation['errors'].append(f'Unsupported format: {format}')
-            
+
             return validation
-            
+
         except Exception as e:
             return {
                 'valid': False,
@@ -752,24 +749,24 @@ class ImportExportService(Service):
             data = json.loads(content)
         except json.JSONDecodeError as e:
             validation['valid'] = False
-            validation['errors'].append(f'Invalid JSON: {str(e)}')
+            validation['errors'].append(f'Invalid JSON: {e!s}')
             return
-        
+
         if not isinstance(data, dict):
             validation['valid'] = False
             validation['errors'].append('Root must be an object')
             return
-        
+
         if 'items' not in data:
             validation['valid'] = False
             validation['errors'].append('Missing "items" array')
             return
-        
+
         if not isinstance(data['items'], list):
             validation['valid'] = False
             validation['errors'].append('"items" must be an array')
             return
-        
+
         # Count items by type
         type_counts = {}
         required_fields = {
@@ -778,25 +775,25 @@ class ImportExportService(Service):
             'ProjectLog': ['title', 'description', 'start_date'],
             'BookmarkPlus': ['title', 'url']
         }
-        
+
         for i, item in enumerate(data['items']):
             if not isinstance(item, dict):
                 validation['errors'].append(f'Item {i} must be an object')
                 continue
-            
+
             portal_type = item.get('portal_type')
             if not portal_type:
                 validation['warnings'].append(f'Item {i} missing portal_type, will default to ResearchNote')
                 portal_type = 'ResearchNote'
-            
+
             type_counts[portal_type] = type_counts.get(portal_type, 0) + 1
-            
+
             # Check required fields
             if portal_type in required_fields:
                 for field in required_fields[portal_type]:
                     if field not in item or not item[field]:
                         validation['warnings'].append(f'Item {i} ({portal_type}) missing required field: {field}')
-        
+
         validation['summary'] = {
             'total_items': len(data['items']),
             'by_type': type_counts,
@@ -810,31 +807,31 @@ class ImportExportService(Service):
             rows = list(reader)
         except Exception as e:
             validation['valid'] = False
-            validation['errors'].append(f'Invalid CSV: {str(e)}')
+            validation['errors'].append(f'Invalid CSV: {e!s}')
             return
-        
+
         if not rows:
             validation['valid'] = False
             validation['errors'].append('CSV file is empty')
             return
-        
+
         # Check headers
         required_headers = ['title', 'portal_type']
         headers = reader.fieldnames or []
-        
+
         for header in required_headers:
             if header not in headers:
                 validation['errors'].append(f'Missing required column: {header}')
-        
+
         # Count items
         type_counts = {}
         for i, row in enumerate(rows):
             portal_type = row.get('portal_type', 'ResearchNote')
             type_counts[portal_type] = type_counts.get(portal_type, 0) + 1
-            
+
             if not row.get('title'):
                 validation['warnings'].append(f'Row {i+2} missing title')
-        
+
         validation['summary'] = {
             'total_items': len(rows),
             'by_type': type_counts,
@@ -847,31 +844,31 @@ class ImportExportService(Service):
             root = etree.fromstring(content)
         except etree.XMLSyntaxError as e:
             validation['valid'] = False
-            validation['errors'].append(f'Invalid XML: {str(e)}')
+            validation['errors'].append(f'Invalid XML: {e!s}')
             return
-        
+
         if root.tag != 'opml':
             validation['valid'] = False
             validation['errors'].append('Root element must be <opml>')
             return
-        
+
         body = root.find('.//body')
         if body is None:
             validation['valid'] = False
             validation['errors'].append('Missing <body> element')
             return
-        
+
         # Count items
         total_items = 0
         type_counts = {}
-        
+
         for type_outline in body.findall('./outline'):
             portal_type = type_outline.get('text', 'ResearchNote')
             items = type_outline.findall('./outline')
             count = len(items)
             total_items += count
             type_counts[portal_type] = count
-        
+
         validation['summary'] = {
             'total_items': total_items,
             'by_type': type_counts

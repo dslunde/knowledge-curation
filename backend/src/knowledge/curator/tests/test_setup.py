@@ -2,7 +2,6 @@
 from plone import api
 from plone.app.testing import setRoles, TEST_USER_ID
 from knowledge.curator.testing import (
-    PLONE_APP_KNOWLEDGE_FUNCTIONAL_TESTING,
     PLONE_APP_KNOWLEDGE_INTEGRATION_TESTING,
 )
 

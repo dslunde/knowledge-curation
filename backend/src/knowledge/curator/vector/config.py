@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Vector database configuration utilities."""
 
 import os
@@ -14,33 +13,33 @@ def get_vector_config():
         "qdrant_port": int(os.environ.get("QDRANT_PORT", "6333")),
         "qdrant_api_key": os.environ.get("QDRANT_API_KEY"),
         "qdrant_https": os.environ.get("QDRANT_HTTPS", "false").lower() == "true",
-        
+
         # Embedding model settings
         "embedding_model": os.environ.get(
-            "EMBEDDING_MODEL", 
+            "EMBEDDING_MODEL",
             "sentence-transformers/all-MiniLM-L6-v2"
         ),
-        
+
         # Search settings
         "default_search_limit": int(os.environ.get("VECTOR_SEARCH_LIMIT", "10")),
         "default_score_threshold": float(os.environ.get("VECTOR_SCORE_THRESHOLD", "0.5")),
-        
+
         # Batch processing settings
         "batch_size": int(os.environ.get("VECTOR_BATCH_SIZE", "100")),
         "embedding_batch_size": int(os.environ.get("EMBEDDING_BATCH_SIZE", "32")),
-        
+
         # Feature flags
         "auto_index_on_create": os.environ.get("VECTOR_AUTO_INDEX_CREATE", "true").lower() == "true",
         "auto_index_on_modify": os.environ.get("VECTOR_AUTO_INDEX_MODIFY", "true").lower() == "true",
         "auto_delete_on_remove": os.environ.get("VECTOR_AUTO_DELETE", "true").lower() == "true",
     }
-    
+
     # Try to get settings from Plone registry if available
     try:
         portal = api.portal.get()
         if portal:
             registry = api.portal.get_registry_record
-            
+
             # Override with registry values if they exist
             registry_keys = [
                 ("knowledge.curator.vector.qdrant_host", "qdrant_host"),
@@ -50,7 +49,7 @@ def get_vector_config():
                 ("knowledge.curator.vector.default_search_limit", "default_search_limit"),
                 ("knowledge.curator.vector.default_score_threshold", "default_score_threshold"),
             ]
-            
+
             for registry_key, config_key in registry_keys:
                 try:
                     value = registry(registry_key)
@@ -62,14 +61,14 @@ def get_vector_config():
     except:
         # Portal not available or registry not accessible
         pass
-        
+
     return config
 
 
 # Configuration constants
 SUPPORTED_CONTENT_TYPES = [
     "BookmarkPlus",
-    "ResearchNote", 
+    "ResearchNote",
     "LearningGoal",
     "ProjectLog"
 ]

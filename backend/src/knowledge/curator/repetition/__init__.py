@@ -6,8 +6,8 @@ from .scheduler import ReviewScheduler
 from .tracker import PerformanceTracker
 
 __all__ = [
-    'SM2Algorithm',
     'ForgettingCurve',
+    'PerformanceTracker',
     'ReviewScheduler',
-    'PerformanceTracker'
+    'SM2Algorithm'
 ]

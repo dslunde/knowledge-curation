@@ -1,7 +1,7 @@
 """Tests for Project Log content type."""
 
 import unittest
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from plone import api
 from plone.app.testing import TEST_USER_ID, setRoles
 from plone.dexterity.interfaces import IDexterityFTI
@@ -39,7 +39,7 @@ class ProjectLogIntegrationTest(unittest.TestCase):
         obj = createObject(factory)
         self.assertTrue(
             IProjectLog.providedBy(obj),
-            'IProjectLog not provided by {0}'.format(obj)
+            f'IProjectLog not provided by {obj}'
         )
 
     def test_ct_project_log_adding(self):
@@ -56,7 +56,7 @@ class ProjectLogIntegrationTest(unittest.TestCase):
         )
         self.assertTrue(
             IProjectLog.providedBy(obj),
-            'IProjectLog not provided by {0}'.format(obj.id)
+            f'IProjectLog not provided by {obj.id}'
         )
         # Check fields
         self.assertEqual(obj.title, 'Website Redesign')
@@ -71,7 +71,7 @@ class ProjectLogIntegrationTest(unittest.TestCase):
             id='log-with-entries',
             start_date=date.today(),
         )
-        
+
         # Test adding entries
         entry1 = obj.add_entry(
             'Initial Planning',
@@ -81,7 +81,7 @@ class ProjectLogIntegrationTest(unittest.TestCase):
         self.assertEqual(entry1['title'], 'Initial Planning')
         self.assertIn('planning', entry1['tags'])
         self.assertIsNotNone(entry1['timestamp'])
-        
+
         # Test updating entry
         obj.update_entry(
             entry1['id'],
@@ -90,12 +90,12 @@ class ProjectLogIntegrationTest(unittest.TestCase):
         updated = obj.entries[0]
         self.assertEqual(updated['content'], 'Updated content for planning phase')
         self.assertIsNotNone(updated.get('modified'))
-        
+
         # Test getting entries by tag
         entry2 = obj.add_entry('Development Started', 'Begin coding', tags=['development'])
         planning_entries = obj.get_entries_by_tag('planning')
         self.assertEqual(len(planning_entries), 1)
-        
+
         # Test recent entries
         recent = obj.get_recent_entries(limit=1)
         self.assertEqual(len(recent), 1)
@@ -110,15 +110,15 @@ class ProjectLogIntegrationTest(unittest.TestCase):
             start_date=date.today(),
             status='planning',
         )
-        
+
         # Test status update
         self.assertTrue(obj.update_status('active'))
         self.assertEqual(obj.status, 'active')
-        
+
         # Test invalid status
         self.assertFalse(obj.update_status('invalid-status'))
         self.assertEqual(obj.status, 'active')  # Should remain unchanged
-        
+
         # Check that status change was logged
         entries = obj.get_entries_by_tag('status-change')
         self.assertEqual(len(entries), 1)
@@ -134,11 +134,11 @@ class ProjectLogIntegrationTest(unittest.TestCase):
             start_date=start_date,
             status='active',
         )
-        
+
         # Test active project duration
         duration = obj.get_duration()
         self.assertEqual(duration, 10)
-        
+
         # Test completed project duration
         obj.status = 'completed'
         obj.add_entry('Project Completed', 'All done!', tags=['completed'])
@@ -153,12 +153,12 @@ class ProjectLogIntegrationTest(unittest.TestCase):
             id='log-deliverables',
             start_date=date.today(),
         )
-        
+
         # Test adding deliverables
         obj.add_deliverable('Website mockups')
         obj.add_deliverable('API documentation')
         self.assertEqual(len(obj.deliverables), 2)
-        
+
         # Test adding learnings
         obj.add_learning('Always document API endpoints')
         obj.add_learning('User testing is crucial')

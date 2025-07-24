@@ -8,13 +8,13 @@ from .storage import GraphStorage
 from .traversal import GraphTraversal
 
 __all__ = [
-    'Node',
     'Edge',
     'Graph',
-    'RelationshipType',
-    'RelationshipManager',
-    'GraphOperations',
     'GraphAlgorithms',
+    'GraphOperations',
     'GraphStorage',
     'GraphTraversal',
+    'Node',
+    'RelationshipManager',
+    'RelationshipType',
 ]

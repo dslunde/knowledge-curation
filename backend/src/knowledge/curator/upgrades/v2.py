@@ -1,6 +1,5 @@
 """Upgrade to version 2: Add new content types."""
 
-from Products.CMFCore.utils import getToolByName
 from plone.app.upgrade.utils import loadMigrationProfile
 
 
@@ -11,7 +10,7 @@ def add_new_content_types(context):
         'profile-knowledge.curator:default',
         steps=['typeinfo']
     )
-    
+
     # Refresh catalog for new content types
     loadMigrationProfile(
         context,

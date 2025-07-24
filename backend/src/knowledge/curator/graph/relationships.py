@@ -1,13 +1,11 @@
 """Relationship types and management for knowledge graph."""
 
 from enum import Enum
-from typing import Dict, List, Optional, Set, Tuple
-from datetime import datetime
 
 
 class RelationshipType(Enum):
     """Standard relationship types in the knowledge graph."""
-    
+
     # Knowledge relationships
     RELATED_TO = "related_to"
     PREREQUISITE_OF = "prerequisite_of"
@@ -15,52 +13,52 @@ class RelationshipType(Enum):
     CONTRADICTS = "contradicts"
     SUPPORTS = "supports"
     REFUTES = "refutes"
-    
+
     # Hierarchical relationships
     PART_OF = "part_of"
     CONTAINS = "contains"
     PARENT_OF = "parent_of"
     CHILD_OF = "child_of"
-    
+
     # Temporal relationships
     FOLLOWS = "follows"
     PRECEDES = "precedes"
     CONCURRENT_WITH = "concurrent_with"
-    
+
     # Learning relationships
     TEACHES = "teaches"
     LEARNED_FROM = "learned_from"
     APPLIED_IN = "applied_in"
     DERIVED_FROM = "derived_from"
-    
+
     # Project relationships
     USED_IN = "used_in"
     PRODUCED_BY = "produced_by"
     DEPENDS_ON = "depends_on"
     BLOCKS = "blocks"
-    
+
     # Reference relationships
     CITES = "cites"
     CITED_BY = "cited_by"
     REFERENCES = "references"
     MENTIONED_IN = "mentioned_in"
-    
+
     # Tagging relationships
     TAGGED_WITH = "tagged_with"
     HAS_TAG = "has_tag"
-    
+
     # Authorship relationships
     AUTHORED_BY = "authored_by"
     CONTRIBUTED_TO = "contributed_to"
     REVIEWED_BY = "reviewed_by"
-    
+
     # Custom relationship
     CUSTOM = "custom"
 
 
 class RelationshipMetadata:
     """Metadata for relationship types."""
-    
+
     RELATIONSHIP_METADATA = {
         RelationshipType.RELATED_TO: {
             'bidirectional': True,
@@ -189,25 +187,25 @@ class RelationshipMetadata:
             'reverse_name': 'custom_reverse'
         }
     }
-    
+
     @classmethod
-    def get_metadata(cls, relationship_type: RelationshipType) -> Dict:
+    def get_metadata(cls, relationship_type: RelationshipType) -> dict:
         """Get metadata for a relationship type."""
         return cls.RELATIONSHIP_METADATA.get(
             relationship_type,
             cls.RELATIONSHIP_METADATA[RelationshipType.CUSTOM]
         )
-    
+
     @classmethod
     def is_bidirectional(cls, relationship_type: RelationshipType) -> bool:
         """Check if relationship is bidirectional."""
         return cls.get_metadata(relationship_type)['bidirectional']
-    
+
     @classmethod
     def is_transitive(cls, relationship_type: RelationshipType) -> bool:
         """Check if relationship is transitive."""
         return cls.get_metadata(relationship_type)['transitive']
-    
+
     @classmethod
     def get_reverse_name(cls, relationship_type: RelationshipType) -> str:
         """Get the reverse relationship name."""
@@ -216,13 +214,13 @@ class RelationshipMetadata:
 
 class RelationshipManager:
     """Manages relationships and their properties."""
-    
+
     def __init__(self):
         """Initialize relationship manager."""
-        self.custom_relationships: Dict[str, Dict] = {}
-        self.relationship_constraints: Dict[str, List[Tuple[str, str]]] = {}
+        self.custom_relationships: dict[str, dict] = {}
+        self.relationship_constraints: dict[str, list[tuple[str, str]]] = {}
         self._initialize_constraints()
-        
+
     def _initialize_constraints(self):
         """Initialize relationship constraints."""
         # Define which node types can have which relationships
@@ -253,8 +251,8 @@ class RelationshipManager:
                 ('BookmarkPlus', 'Person')
             ]
         }
-    
-    def register_custom_relationship(self, name: str, metadata: Dict):
+
+    def register_custom_relationship(self, name: str, metadata: dict):
         """Register a custom relationship type.
         
         Args:
@@ -265,10 +263,10 @@ class RelationshipManager:
         for field in required_fields:
             if field not in metadata:
                 raise ValueError(f"Missing required field '{field}' in metadata")
-                
+
         self.custom_relationships[name] = metadata
-    
-    def validate_relationship(self, source_type: str, target_type: str, 
+
+    def validate_relationship(self, source_type: str, target_type: str,
                             relationship_type: str) -> bool:
         """Validate if a relationship is allowed between node types.
         
@@ -284,12 +282,12 @@ class RelationshipManager:
         if relationship_type not in self.relationship_constraints:
             # No constraints defined, allow all
             return True
-            
+
         # Check if the type pair is allowed
         allowed_pairs = self.relationship_constraints[relationship_type]
         return (source_type, target_type) in allowed_pairs
-    
-    def get_allowed_relationships(self, source_type: str, target_type: str) -> List[str]:
+
+    def get_allowed_relationships(self, source_type: str, target_type: str) -> list[str]:
         """Get allowed relationship types between two node types.
         
         Args:
@@ -300,7 +298,7 @@ class RelationshipManager:
             List of allowed relationship types
         """
         allowed = []
-        
+
         # Check standard relationships
         for rel_type in RelationshipType:
             if rel_type.value in self.relationship_constraints:
@@ -309,14 +307,14 @@ class RelationshipManager:
             else:
                 # No constraints, allow
                 allowed.append(rel_type.value)
-                
+
         # Add custom relationships
         allowed.extend(self.custom_relationships.keys())
-        
+
         return allowed
-    
-    def suggest_relationship_type(self, source_type: str, target_type: str, 
-                                 context: Optional[Dict] = None) -> List[Tuple[str, float]]:
+
+    def suggest_relationship_type(self, source_type: str, target_type: str,
+                                 context: dict | None = None) -> list[tuple[str, float]]:
         """Suggest appropriate relationship types with confidence scores.
         
         Args:
@@ -328,10 +326,10 @@ class RelationshipManager:
             List of (relationship_type, confidence) tuples
         """
         suggestions = []
-        
+
         # Get allowed relationships
         allowed = self.get_allowed_relationships(source_type, target_type)
-        
+
         # Score based on common patterns
         scoring_rules = {
             ('ResearchNote', 'ResearchNote'): {
@@ -356,25 +354,25 @@ class RelationshipManager:
                 RelationshipType.REFERENCES.value: 0.6
             }
         }
-        
+
         # Get scores for this type pair
         type_pair = (source_type, target_type)
         if type_pair in scoring_rules:
             for rel_type, score in scoring_rules[type_pair].items():
                 if rel_type in allowed:
                     suggestions.append((rel_type, score))
-                    
+
         # Add remaining allowed relationships with lower scores
         suggested_types = {s[0] for s in suggestions}
         for rel_type in allowed:
             if rel_type not in suggested_types:
                 suggestions.append((rel_type, 0.5))
-                
+
         # Sort by confidence
         suggestions.sort(key=lambda x: x[1], reverse=True)
-        
+
         return suggestions
-    
+
     def create_bidirectional_relationship(self, graph, source_uid: str, target_uid: str,
                                         relationship_type: RelationshipType, weight: float = 1.0):
         """Create a bidirectional relationship if applicable.
@@ -387,17 +385,17 @@ class RelationshipManager:
             weight: Relationship weight
         """
         from .model import Edge
-        
+
         # Create forward edge
         forward_edge = Edge(source_uid, target_uid, relationship_type.value, weight)
         graph.add_edge(forward_edge)
-        
+
         # Create reverse edge if bidirectional
         if RelationshipMetadata.is_bidirectional(relationship_type):
             reverse_edge = Edge(target_uid, source_uid, relationship_type.value, weight)
             graph.add_edge(reverse_edge)
-    
-    def infer_transitive_relationships(self, graph, relationship_type: RelationshipType) -> List[Tuple[str, str]]:
+
+    def infer_transitive_relationships(self, graph, relationship_type: RelationshipType) -> list[tuple[str, str]]:
         """Infer transitive relationships in the graph.
         
         Args:
@@ -409,34 +407,34 @@ class RelationshipManager:
         """
         if not RelationshipMetadata.is_transitive(relationship_type):
             return []
-            
+
         inferred = []
         rel_type_value = relationship_type.value
-        
+
         # Find all paths of this relationship type
         for node_uid in graph.nodes:
             # Do depth-first search for transitive paths
             visited = set()
             reachable = set()
-            
+
             def dfs(current_uid: str, path_start: str):
                 if current_uid in visited:
                     return
                 visited.add(current_uid)
-                
+
                 # Get neighbors through this relationship type
                 edges = graph.get_edges_from_node(current_uid, rel_type_value)
                 for edge in edges:
                     if edge.target_uid != path_start:
                         reachable.add(edge.target_uid)
                         dfs(edge.target_uid, path_start)
-            
+
             # Start DFS from this node
             dfs(node_uid, node_uid)
-            
+
             # Check which relationships are missing
             for target_uid in reachable:
                 if not graph.get_edge(node_uid, target_uid, rel_type_value):
                     inferred.append((node_uid, target_uid))
-                    
+
         return inferred

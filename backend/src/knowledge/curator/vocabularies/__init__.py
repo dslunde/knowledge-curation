@@ -6,22 +6,22 @@ from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 
 @implementer(IVocabularyFactory)
-class PriorityVocabulary(object):
+class PriorityVocabulary:
     """Vocabulary for priority levels."""
-    
+
     def __call__(self, context):
         terms = [
             SimpleTerm(value='low', title='Low'),
-            SimpleTerm(value='medium', title='Medium'), 
+            SimpleTerm(value='medium', title='Medium'),
             SimpleTerm(value='high', title='High'),
         ]
         return SimpleVocabulary(terms)
 
 
 @implementer(IVocabularyFactory)
-class ProjectStatusVocabulary(object):
+class ProjectStatusVocabulary:
     """Vocabulary for project status."""
-    
+
     def __call__(self, context):
         terms = [
             SimpleTerm(value='planning', title='Planning'),
@@ -34,9 +34,9 @@ class ProjectStatusVocabulary(object):
 
 
 @implementer(IVocabularyFactory)
-class ReadStatusVocabulary(object):
+class ReadStatusVocabulary:
     """Vocabulary for read status."""
-    
+
     def __call__(self, context):
         terms = [
             SimpleTerm(value='unread', title='Unread'),
@@ -47,9 +47,9 @@ class ReadStatusVocabulary(object):
 
 
 @implementer(IVocabularyFactory)
-class ImportanceVocabulary(object):
+class ImportanceVocabulary:
     """Vocabulary for importance levels."""
-    
+
     def __call__(self, context):
         terms = [
             SimpleTerm(value='low', title='Low'),
