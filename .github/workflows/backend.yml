@@ -92,12 +92,13 @@ jobs:
             enable-cache: false
 
         - name: Set UV cache directory
-          run: echo "UV_CACHE_DIR=$(uv cache dir)" >> $GITHUB_ENV
+          id: uv-cache
+          run: echo "cache-dir=$(uv cache dir)" >> $GITHUB_OUTPUT
 
         - name: Restore uv cache
           uses: actions/cache@v4
           with:
-            path: ${{ env.UV_CACHE_DIR }}
+            path: ${{ steps.uv-cache.outputs.cache-dir }}
             key: uv-${{ runner.os }}-${{ inputs.python-version }}-${{ inputs.plone-version }}-${{ hashFiles('pyproject.toml') }}
             restore-keys: |
               uv-${{ runner.os }}-${{ inputs.python-version }}-${{ inputs.plone-version }}-${{ hashFiles('pyproject.toml') }}
