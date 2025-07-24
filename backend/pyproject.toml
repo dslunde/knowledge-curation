@@ -47,7 +47,7 @@ test = [
     "horse-with-no-namespace",
     "plone.app.testing",
     "plone.testing",
-    "plone.app.robotframework.testing",
+    "plone.app.robotframework",
     "plone.restapi[test]",
     "pytest",
     "pytest-cov",
