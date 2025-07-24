@@ -4,4 +4,4 @@ node_modules
 /public
 *.mo
 
-.env*
+.env.development

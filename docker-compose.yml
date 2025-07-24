@@ -152,7 +152,7 @@ services:
       - plone-internal
       - knowledge-net
     environment:
-      RELSTORAGE_DSN: "dbname='${DB_NAME:-plone}' user='${DB_NAME:-plone}' host='${DB_HOST:-db}' password='${DB_PASSWORD}' port='${DB_PORT:-5432}'"
+      RELSTORAGE_DSN: "dbname='${DB_NAME:-plone}' user='${DB_NAME:-plone}' host='${DB_HOST:-db}' password='${DB_PASSWORD:-rXvRQLsXRrah}' port='${DB_PORT:-5432}'"
       REDIS_URL: "redis://redis:6379/0"
       QDRANT_HOST: "qdrant"
       QDRANT_PORT: "6333"
