@@ -31,4 +31,131 @@
       component=".ImportanceVocabularyFactory"
       />
 
+  <!-- Learning-specific vocabularies -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.difficulty_levels"
+      component=".DifficultyLevelsVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.cognitive_load"
+      component=".CognitiveLoadVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.learning_styles"
+      component=".LearningStylesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.knowledge_types"
+      component=".KnowledgeTypesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.bloom_levels"
+      component=".BloomLevelsVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.knowledge_status"
+      component=".KnowledgeStatusVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.assessment_types"
+      component=".AssessmentTypesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.learning_modalities"
+      component=".LearningModalitiesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.mastery_levels"
+      component=".MasteryLevelsVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.milestone_status"
+      component=".MilestoneStatusVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.competency_levels"
+      component=".CompetencyLevelsVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.entry_types"
+      component=".EntryTypesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.deliverable_status_vocabulary"
+      component=".DeliverableStatusVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.stakeholder_levels"
+      component=".StakeholderLevelsVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.resource_types"
+      component=".ResourceTypesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.availability_status"
+      component=".AvailabilityStatusVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.impact_levels"
+      component=".ImpactLevelsVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.action_status"
+      component=".ActionStatusVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.annotation_types"
+      component=".AnnotationTypesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.objective_category_vocabulary"
+      component=".ObjectiveCategoryVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.citation_formats"
+      component=".CitationFormatsVocabularyFactory"
+      />
+
 </configure>

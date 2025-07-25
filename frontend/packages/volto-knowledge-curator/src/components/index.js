@@ -15,4 +15,32 @@ export { default as AIFeaturesWidget } from './Widgets/AIFeaturesWidget';
 export { default as KnowledgeGraphWidget } from './Widgets/KnowledgeGraphWidget';
 export { default as SpacedRepetitionWidget } from './Widgets/SpacedRepetitionWidget';
 export { default as MilestonesWidget } from './Widgets/MilestonesWidget';
-export { default as TagsWidget } from './Widgets/TagsWidget'; 
+export { default as TagsWidget } from './Widgets/TagsWidget';
+
+// ResearchNote Components
+export { default as StructuredInsightEditor } from './ResearchNote/StructuredInsightEditor';
+export { default as CitationManager } from './ResearchNote/CitationManager';
+export { default as ResearchLineageVisualizer } from './ResearchNote/ResearchLineageVisualizer';
+
+// LearningGoal Components
+export { default as MilestoneTracker } from './LearningGoal/MilestoneTracker';
+export { default as SMARTObjectiveEditor } from './LearningGoal/SMARTObjectiveEditor';
+export { default as CompetencyDashboard } from './LearningGoal/CompetencyDashboard';
+
+// Structured Object Editors
+export { default as KeyInsightEditor } from './StructuredObjects/KeyInsightEditor';
+export { default as LearningMilestoneEditor } from './StructuredObjects/LearningMilestoneEditor';
+export { default as ProjectLogEntryEditor } from './StructuredObjects/ProjectLogEntryEditor';
+export { default as AnnotationEditor } from './StructuredObjects/AnnotationEditor';
+
+// Shared Components
+export { default as BaseStructuredEditor } from './shared/BaseStructuredEditor';
+
+// Analytics Components
+export { 
+  LearningProgressDashboard,
+  CompetencyMatrix,
+  KnowledgeGapAnalysis,
+  LearningVelocityChart,
+  EnhancedKnowledgeGraph
+} from './Analytics'; 

@@ -13,4 +13,13 @@
       handler=".v2.add_new_content_types"
       />
 
+  <genericsetup:upgradeStep
+      title="Data Schema Migration to v3"
+      description="Convert simple text lists to structured objects with intelligent defaults"
+      profile="knowledge.curator:default"
+      source="2"
+      destination="3"
+      handler=".to_v3.data_schema_migration_to_v3"
+      />
+
 </configure>

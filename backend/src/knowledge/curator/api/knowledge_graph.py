@@ -1,9 +1,13 @@
 """Knowledge Graph API endpoints."""
 
+from datetime import datetime
 from plone import api
 from plone.restapi.services import Service
 from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse
+from zope.component import getUtility
+from knowledge.curator.behaviors.interfaces import IKnowledgeRelationship, ISuggestedRelationship
+import json
 
 
 @implementer(IPublishTraverse)
@@ -19,17 +23,40 @@ class KnowledgeGraphService(Service):
         return self
 
     def reply(self):
-        if len(self.params) == 0:
-            return self.get_graph()
-        elif self.params[0] == "connections":
-            return self.get_connections()
-        elif self.params[0] == "suggest":
-            return self.suggest_connections()
-        elif self.params[0] == "visualize":
-            return self.visualize_graph()
-        else:
-            self.request.response.setStatus(404)
-            return {"error": "Not found"}
+        if self.request.method == 'GET':
+            if len(self.params) == 0:
+                return self.get_graph()
+            elif self.params[0] == "connections":
+                return self.get_connections()
+            elif self.params[0] == "suggest":
+                return self.suggest_connections()
+            elif self.params[0] == "visualize":
+                return self.visualize_graph()
+            elif self.params[0] == "metrics":
+                return self.get_graph_metrics()
+            elif self.params[0] == "analysis":
+                return self.get_graph_analysis()
+            else:
+                self.request.response.setStatus(404)
+                return {"error": "Not found"}
+        elif self.request.method == 'POST':
+            if len(self.params) > 0:
+                if self.params[0] == "relationship":
+                    return self.create_relationship()
+                elif self.params[0] == "accept-suggestion":
+                    return self.accept_suggestion()
+            self.request.response.setStatus(400)
+            return {"error": "Invalid endpoint"}
+        elif self.request.method == 'PUT':
+            if len(self.params) > 0 and self.params[0] == "relationship":
+                return self.update_relationship()
+            self.request.response.setStatus(400)
+            return {"error": "Invalid endpoint"}
+        elif self.request.method == 'DELETE':
+            if len(self.params) > 0 and self.params[0] == "relationship":
+                return self.delete_relationship()
+            self.request.response.setStatus(400)
+            return {"error": "Invalid endpoint"}
 
     def get_graph(self):
         """Get the knowledge graph for the current context."""
@@ -77,13 +104,30 @@ class KnowledgeGraphService(Service):
 
             nodes.append(node)
 
-            # Create edges from connections
-            if hasattr(obj, "connections"):
+            # Create edges from typed relationships
+            if hasattr(obj, "relationships"):
+                for rel in getattr(obj, "relationships", []):
+                    edge = {
+                        "source": brain.UID,
+                        "target": rel.get("target_uid"),
+                        "type": rel.get("relationship_type", "related"),
+                        "strength": rel.get("strength", 0.5),
+                        "metadata": rel.get("metadata", {}),
+                        "created": rel.get("created"),
+                        "confidence": rel.get("confidence", 1.0)
+                    }
+                    edges.append(edge)
+            # Backwards compatibility with old connections field
+            elif hasattr(obj, "connections"):
                 for target_uid in getattr(obj, "connections", []):
                     edge = {
                         "source": brain.UID,
                         "target": target_uid,
                         "type": "connection",
+                        "strength": 0.5,
+                        "metadata": {},
+                        "created": brain.created.ISO8601(),
+                        "confidence": 1.0
                     }
                     edges.append(edge)
 
@@ -153,7 +197,52 @@ class KnowledgeGraphService(Service):
                     "connection_type": "reference",
                 })
 
-        return {"connections": connections, "count": len(connections)}
+        # Get typed relationships
+        if hasattr(self.context, "relationships"):
+            for rel in getattr(self.context, "relationships", []):
+                target_uid = rel.get("target_uid")
+                brain = catalog(UID=target_uid)
+                if brain:
+                    brain = brain[0]
+                    connections.append({
+                        "uid": target_uid,
+                        "title": brain.Title,
+                        "type": brain.portal_type,
+                        "url": brain.getURL(),
+                        "connection_type": rel.get("relationship_type", "related"),
+                        "strength": rel.get("strength", 0.5),
+                        "metadata": rel.get("metadata", {}),
+                        "created": rel.get("created"),
+                        "confidence": rel.get("confidence", 1.0)
+                    })
+        
+        # Get suggested relationships
+        suggested = []
+        if hasattr(self.context, "suggested_relationships"):
+            for sug in getattr(self.context, "suggested_relationships", []):
+                if not sug.get("is_accepted", False):
+                    target_uid = sug.get("target_uid")
+                    brain = catalog(UID=target_uid)
+                    if brain:
+                        brain = brain[0]
+                        suggested.append({
+                            "uid": target_uid,
+                            "title": brain.Title,
+                            "type": brain.portal_type,
+                            "url": brain.getURL(),
+                            "connection_type": sug.get("relationship_type", "related"),
+                            "strength": sug.get("strength", 0.5),
+                            "suggestion_reason": sug.get("suggestion_reason", ""),
+                            "similarity_score": sug.get("similarity_score", 0.0),
+                            "confidence": sug.get("confidence", 0.7)
+                        })
+
+        return {
+            "connections": connections, 
+            "suggested": suggested,
+            "count": len(connections),
+            "suggested_count": len(suggested)
+        }
 
     def _get_existing_connections(self):
         """Get existing connections to exclude from suggestions."""
@@ -272,4 +361,389 @@ class KnowledgeGraphService(Service):
                 "height": 800,
                 "force": {"charge": -300, "linkDistance": 100, "gravity": 0.05},
             },
+        }
+    
+    def create_relationship(self):
+        """Create a typed relationship between content items."""
+        if not api.user.has_permission("Modify portal content", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+        
+        data = json.loads(self.request.body)
+        source_uid = data.get("source_uid") or api.content.get_uuid(self.context)
+        target_uid = data.get("target_uid")
+        relationship_type = data.get("relationship_type", "related")
+        strength = data.get("strength", 0.5)
+        metadata = data.get("metadata", {})
+        
+        if not target_uid:
+            self.request.response.setStatus(400)
+            return {"error": "target_uid is required"}
+        
+        # Get source object
+        catalog = api.portal.get_tool("portal_catalog")
+        source_brain = catalog(UID=source_uid)
+        if not source_brain:
+            self.request.response.setStatus(404)
+            return {"error": "Source content not found"}
+        
+        source_obj = source_brain[0].getObject()
+        
+        # Initialize relationships if not exists
+        if not hasattr(source_obj, "relationships"):
+            source_obj.relationships = []
+        
+        # Check if relationship already exists
+        existing = [r for r in source_obj.relationships 
+                   if r.get("target_uid") == target_uid 
+                   and r.get("relationship_type") == relationship_type]
+        
+        if existing:
+            self.request.response.setStatus(409)
+            return {"error": "Relationship already exists"}
+        
+        # Create new relationship
+        new_relationship = {
+            "source_uid": source_uid,
+            "target_uid": target_uid,
+            "relationship_type": relationship_type,
+            "strength": strength,
+            "metadata": metadata,
+            "created": datetime.now().isoformat(),
+            "confidence": 1.0
+        }
+        
+        source_obj.relationships.append(new_relationship)
+        source_obj.reindexObject()
+        
+        return {
+            "status": "created",
+            "relationship": new_relationship
+        }
+    
+    def update_relationship(self):
+        """Update an existing relationship."""
+        if not api.user.has_permission("Modify portal content", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+        
+        data = json.loads(self.request.body)
+        source_uid = data.get("source_uid") or api.content.get_uuid(self.context)
+        target_uid = data.get("target_uid")
+        relationship_type = data.get("relationship_type")
+        
+        if not target_uid or not relationship_type:
+            self.request.response.setStatus(400)
+            return {"error": "target_uid and relationship_type are required"}
+        
+        # Get source object
+        catalog = api.portal.get_tool("portal_catalog")
+        source_brain = catalog(UID=source_uid)
+        if not source_brain:
+            self.request.response.setStatus(404)
+            return {"error": "Source content not found"}
+        
+        source_obj = source_brain[0].getObject()
+        
+        # Find and update relationship
+        updated = False
+        for rel in getattr(source_obj, "relationships", []):
+            if (rel.get("target_uid") == target_uid and 
+                rel.get("relationship_type") == relationship_type):
+                # Update fields
+                if "strength" in data:
+                    rel["strength"] = data["strength"]
+                if "metadata" in data:
+                    rel["metadata"].update(data["metadata"])
+                if "confidence" in data:
+                    rel["confidence"] = data["confidence"]
+                rel["modified"] = datetime.now().isoformat()
+                updated = True
+                break
+        
+        if not updated:
+            self.request.response.setStatus(404)
+            return {"error": "Relationship not found"}
+        
+        source_obj.reindexObject()
+        return {"status": "updated"}
+    
+    def delete_relationship(self):
+        """Delete a relationship."""
+        if not api.user.has_permission("Modify portal content", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+        
+        data = json.loads(self.request.body)
+        source_uid = data.get("source_uid") or api.content.get_uuid(self.context)
+        target_uid = data.get("target_uid")
+        relationship_type = data.get("relationship_type")
+        
+        if not target_uid:
+            self.request.response.setStatus(400)
+            return {"error": "target_uid is required"}
+        
+        # Get source object
+        catalog = api.portal.get_tool("portal_catalog")
+        source_brain = catalog(UID=source_uid)
+        if not source_brain:
+            self.request.response.setStatus(404)
+            return {"error": "Source content not found"}
+        
+        source_obj = source_brain[0].getObject()
+        
+        # Remove relationship
+        if hasattr(source_obj, "relationships"):
+            original_count = len(source_obj.relationships)
+            source_obj.relationships = [
+                r for r in source_obj.relationships
+                if not (r.get("target_uid") == target_uid and
+                       (not relationship_type or r.get("relationship_type") == relationship_type))
+            ]
+            
+            if len(source_obj.relationships) < original_count:
+                source_obj.reindexObject()
+                return {"status": "deleted"}
+        
+        self.request.response.setStatus(404)
+        return {"error": "Relationship not found"}
+    
+    def accept_suggestion(self):
+        """Accept a suggested relationship."""
+        if not api.user.has_permission("Modify portal content", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+        
+        data = json.loads(self.request.body)
+        source_uid = data.get("source_uid") or api.content.get_uuid(self.context)
+        target_uid = data.get("target_uid")
+        
+        if not target_uid:
+            self.request.response.setStatus(400)
+            return {"error": "target_uid is required"}
+        
+        # Get source object
+        catalog = api.portal.get_tool("portal_catalog")
+        source_brain = catalog(UID=source_uid)
+        if not source_brain:
+            self.request.response.setStatus(404)
+            return {"error": "Source content not found"}
+        
+        source_obj = source_brain[0].getObject()
+        
+        # Find suggested relationship
+        suggestion = None
+        if hasattr(source_obj, "suggested_relationships"):
+            for sug in source_obj.suggested_relationships:
+                if sug.get("target_uid") == target_uid and not sug.get("is_accepted"):
+                    suggestion = sug
+                    break
+        
+        if not suggestion:
+            self.request.response.setStatus(404)
+            return {"error": "Suggestion not found"}
+        
+        # Move to accepted relationships
+        if not hasattr(source_obj, "relationships"):
+            source_obj.relationships = []
+        
+        # Create accepted relationship
+        new_relationship = {
+            "source_uid": source_uid,
+            "target_uid": target_uid,
+            "relationship_type": suggestion.get("relationship_type", "related"),
+            "strength": suggestion.get("strength", 0.5),
+            "metadata": suggestion.get("metadata", {}),
+            "created": datetime.now().isoformat(),
+            "confidence": suggestion.get("confidence", 0.7),
+            "accepted_from_suggestion": True
+        }
+        
+        source_obj.relationships.append(new_relationship)
+        
+        # Mark suggestion as accepted
+        suggestion["is_accepted"] = True
+        suggestion["review_date"] = datetime.now().isoformat()
+        
+        source_obj.reindexObject()
+        
+        return {
+            "status": "accepted",
+            "relationship": new_relationship
+        }
+    
+    def get_graph_metrics(self):
+        """Calculate graph metrics for a node or the entire graph."""
+        if not api.user.has_permission("View", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+        
+        node_uid = self.request.get("node_uid") or api.content.get_uuid(self.context)
+        
+        # Get graph data
+        graph_data = self.get_graph()
+        nodes = graph_data["nodes"]
+        edges = graph_data["edges"]
+        
+        # Build adjacency lists
+        adjacency = {}
+        for node in nodes:
+            adjacency[node["id"]] = []
+        
+        for edge in edges:
+            if edge["source"] in adjacency:
+                adjacency[edge["source"]].append(edge["target"])
+            if edge["target"] in adjacency:
+                adjacency[edge["target"]].append(edge["source"])
+        
+        if node_uid:
+            # Calculate metrics for specific node
+            if node_uid not in adjacency:
+                self.request.response.setStatus(404)
+                return {"error": "Node not found"}
+            
+            degree = len(adjacency[node_uid])
+            
+            # Calculate local clustering coefficient
+            neighbors = adjacency[node_uid]
+            if degree < 2:
+                clustering_coefficient = 0.0
+            else:
+                edges_between_neighbors = 0
+                for i, n1 in enumerate(neighbors):
+                    for n2 in neighbors[i+1:]:
+                        if n2 in adjacency.get(n1, []):
+                            edges_between_neighbors += 1
+                
+                possible_edges = degree * (degree - 1) / 2
+                clustering_coefficient = edges_between_neighbors / possible_edges if possible_edges > 0 else 0
+            
+            # Calculate betweenness centrality (simplified)
+            # For now, just use degree centrality as approximation
+            centrality = degree / (len(nodes) - 1) if len(nodes) > 1 else 0
+            
+            return {
+                "node_uid": node_uid,
+                "degree": degree,
+                "clustering_coefficient": round(clustering_coefficient, 3),
+                "centrality_score": round(centrality, 3),
+                "connections": neighbors
+            }
+        else:
+            # Calculate overall graph metrics
+            total_nodes = len(nodes)
+            total_edges = len(edges)
+            
+            # Average degree
+            avg_degree = (2 * total_edges) / total_nodes if total_nodes > 0 else 0
+            
+            # Density
+            possible_edges = total_nodes * (total_nodes - 1) / 2
+            density = total_edges / possible_edges if possible_edges > 0 else 0
+            
+            # Find connected components (simplified)
+            visited = set()
+            components = 0
+            
+            def dfs(node):
+                visited.add(node)
+                for neighbor in adjacency.get(node, []):
+                    if neighbor not in visited:
+                        dfs(neighbor)
+            
+            for node in nodes:
+                if node["id"] not in visited:
+                    dfs(node["id"])
+                    components += 1
+            
+            return {
+                "total_nodes": total_nodes,
+                "total_edges": total_edges,
+                "average_degree": round(avg_degree, 2),
+                "density": round(density, 3),
+                "connected_components": components,
+                "is_connected": components == 1
+            }
+    
+    def get_graph_analysis(self):
+        """Perform advanced graph analysis."""
+        if not api.user.has_permission("View", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+        
+        # Get graph data
+        graph_data = self.get_graph()
+        nodes = graph_data["nodes"]
+        edges = graph_data["edges"]
+        
+        # Identify knowledge hubs (nodes with high degree)
+        node_degrees = {}
+        for edge in edges:
+            node_degrees[edge["source"]] = node_degrees.get(edge["source"], 0) + 1
+            node_degrees[edge["target"]] = node_degrees.get(edge["target"], 0) + 1
+        
+        # Sort by degree
+        sorted_nodes = sorted(node_degrees.items(), key=lambda x: x[1], reverse=True)
+        
+        # Knowledge hubs (top 10%)
+        hub_count = max(1, len(sorted_nodes) // 10)
+        hubs = []
+        
+        for node_id, degree in sorted_nodes[:hub_count]:
+            node_info = next((n for n in nodes if n["id"] == node_id), None)
+            if node_info:
+                hubs.append({
+                    "uid": node_id,
+                    "title": node_info["title"],
+                    "type": node_info["type"],
+                    "degree": degree,
+                    "url": node_info["url"]
+                })
+        
+        # Find isolated nodes
+        connected_nodes = set()
+        for edge in edges:
+            connected_nodes.add(edge["source"])
+            connected_nodes.add(edge["target"])
+        
+        isolated = []
+        for node in nodes:
+            if node["id"] not in connected_nodes:
+                isolated.append({
+                    "uid": node["id"],
+                    "title": node["title"],
+                    "type": node["type"],
+                    "url": node["url"]
+                })
+        
+        # Analyze relationship types
+        relationship_stats = {}
+        for edge in edges:
+            rel_type = edge.get("type", "unknown")
+            if rel_type not in relationship_stats:
+                relationship_stats[rel_type] = {
+                    "count": 0,
+                    "total_strength": 0,
+                    "avg_confidence": 0
+                }
+            
+            stats = relationship_stats[rel_type]
+            stats["count"] += 1
+            stats["total_strength"] += edge.get("strength", 0.5)
+            stats["avg_confidence"] += edge.get("confidence", 1.0)
+        
+        # Calculate averages
+        for rel_type, stats in relationship_stats.items():
+            if stats["count"] > 0:
+                stats["avg_strength"] = round(stats["total_strength"] / stats["count"], 3)
+                stats["avg_confidence"] = round(stats["avg_confidence"] / stats["count"], 3)
+                del stats["total_strength"]
+        
+        return {
+            "knowledge_hubs": hubs,
+            "isolated_nodes": isolated,
+            "relationship_statistics": relationship_stats,
+            "hub_count": len(hubs),
+            "isolated_count": len(isolated),
+            "analysis_timestamp": datetime.now().isoformat()
         }

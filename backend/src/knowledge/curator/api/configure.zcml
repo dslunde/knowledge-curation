@@ -7,7 +7,7 @@
 
   <!-- Knowledge Graph API -->
   <plone:service
-      method="GET"
+      method="GET,POST,PUT,DELETE"
       accept="application/json"
       factory=".knowledge_graph.KnowledgeGraphService"
       for="*"
@@ -33,6 +33,16 @@
       for="*"
       permission="zope2.View"
       name="@knowledge-analytics"
+      />
+
+  <!-- Learning Progression API -->
+  <plone:service
+      method="GET,POST,PUT"
+      accept="application/json"
+      factory=".learning_progression.LearningProgressionService"
+      for="*"
+      permission="zope2.View"
+      name="@learning-progression"
       />
 
   <!-- Bulk Operations API -->

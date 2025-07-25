@@ -8,6 +8,9 @@ from plone.supermodel import model
 from zope.interface import Interface
 from zope.interface import provider
 from plone.theme.interfaces import IDefaultPloneLayer
+from plone.app.vocabularies.catalog import CatalogSource
+from plone.autoform import directives
+from z3c.form.browser.radio import RadioFieldWidget
 
 from knowledge.curator import _
 
@@ -16,8 +19,630 @@ class IKnowledgeCuratorLayer(IDefaultPloneLayer):
     """Marker interface for the knowledge curator theme layer."""
 
 
+# Base schema for all knowledge objects with learning-specific metadata
 @provider(IFormFieldProvider)
-class IResearchNote(model.Schema):
+class IKnowledgeObjectBase(model.Schema):
+    """Base schema for all knowledge objects with learning-specific metadata."""
+    
+    # Learning metadata fields
+    difficulty_level = schema.Choice(
+        title=_("Difficulty Level"),
+        description=_("The difficulty level of this content"),
+        vocabulary="knowledge.curator.difficulty_levels",
+        required=False,
+        default="intermediate",
+    )
+    
+    cognitive_load = schema.Choice(
+        title=_("Cognitive Load"),
+        description=_("The cognitive load required to understand this content"),
+        vocabulary="knowledge.curator.cognitive_load",
+        required=False,
+    )
+    
+    learning_style = schema.List(
+        title=_("Learning Styles"),
+        description=_("Learning styles this content supports"),
+        value_type=schema.Choice(vocabulary="knowledge.curator.learning_styles"),
+        required=False,
+    )
+    
+    knowledge_status = schema.Choice(
+        title=_("Knowledge Status"),
+        description=_("Current status of this knowledge"),
+        vocabulary="knowledge.curator.knowledge_status",
+        required=True,
+        default="draft",
+    )
+    
+    last_reviewed = schema.Datetime(
+        title=_("Last Reviewed"),
+        description=_("When this content was last reviewed"),
+        required=False,
+    )
+    
+    review_frequency = schema.Int(
+        title=_("Review Frequency (days)"),
+        description=_("How often this content should be reviewed"),
+        required=False,
+        default=30,
+    )
+    
+    confidence_score = schema.Float(
+        title=_("Confidence Score"),
+        description=_("Your confidence in understanding this content"),
+        min=0.0,
+        max=1.0,
+        required=False,
+    )
+    
+    # Bibliographic metadata fields
+    authors = schema.List(
+        title=_("Authors"),
+        description=_("Authors of this content"),
+        value_type=schema.Object(schema=Interface),  # IAuthor will be defined below
+        required=False,
+    )
+    
+    publication_date = schema.Date(
+        title=_("Publication Date"),
+        description=_("Date of publication"),
+        required=False,
+    )
+    
+    source_url = schema.URI(
+        title=_("Source URL"),
+        description=_("Original source URL"),
+        required=False,
+    )
+    
+    doi = schema.TextLine(
+        title=_("DOI"),
+        description=_("Digital Object Identifier"),
+        required=False,
+    )
+    
+    isbn = schema.TextLine(
+        title=_("ISBN"),
+        description=_("International Standard Book Number"),
+        required=False,
+    )
+    
+    journal_name = schema.TextLine(
+        title=_("Journal Name"),
+        description=_("Name of the journal"),
+        required=False,
+    )
+    
+    volume_issue = schema.TextLine(
+        title=_("Volume/Issue"),
+        description=_("Volume and issue number"),
+        required=False,
+    )
+    
+    page_numbers = schema.TextLine(
+        title=_("Page Numbers"),
+        description=_("Page numbers"),
+        required=False,
+    )
+    
+    publisher = schema.TextLine(
+        title=_("Publisher"),
+        description=_("Publisher name"),
+        required=False,
+    )
+    
+    citation_format = schema.Text(
+        title=_("Formatted Citation"),
+        description=_("Full formatted citation"),
+        required=False,
+        readonly=True,
+    )
+
+
+# Supporting sub-object interfaces
+class IAuthor(Interface):
+    """Interface for author information."""
+    
+    name = schema.TextLine(
+        title=_("Name"),
+        description=_("Full name of the author"),
+        required=True,
+    )
+    
+    email = schema.TextLine(
+        title=_("Email"),
+        description=_("Email address"),
+        required=False,
+    )
+    
+    orcid = schema.TextLine(
+        title=_("ORCID"),
+        description=_("ORCID identifier"),
+        required=False,
+    )
+    
+    affiliation = schema.TextLine(
+        title=_("Affiliation"),
+        description=_("Institutional affiliation"),
+        required=False,
+    )
+
+
+class IKeyInsight(Interface):
+    """Interface for key insights."""
+    
+    text = schema.Text(
+        title=_("Insight Text"),
+        description=_("The key insight"),
+        required=True,
+    )
+    
+    importance = schema.Choice(
+        title=_("Importance"),
+        description=_("Importance of this insight"),
+        vocabulary="knowledge.curator.importance_vocabulary",
+        required=False,
+        default="medium",
+    )
+    
+    evidence = schema.Text(
+        title=_("Evidence"),
+        description=_("Supporting evidence for this insight"),
+        required=False,
+    )
+    
+    timestamp = schema.Datetime(
+        title=_("Timestamp"),
+        description=_("When this insight was added"),
+        required=True,
+    )
+
+
+class ILearningMilestone(Interface):
+    """Interface for a learning milestone."""
+    
+    id = schema.TextLine(
+        title=_("Milestone ID"),
+        description=_("Unique identifier for the milestone"),
+        required=True,
+    )
+    
+    title = schema.TextLine(
+        title=_("Title"),
+        description=_("Title of the milestone"),
+        required=True,
+    )
+    
+    description = schema.Text(
+        title=_("Description"),
+        description=_("Detailed description of the milestone"),
+        required=False,
+    )
+    
+    target_date = schema.Date(
+        title=_("Target Date"),
+        description=_("Target completion date for the milestone"),
+        required=False,
+    )
+    
+    status = schema.Choice(
+        title=_("Status"),
+        description=_("Current status of the milestone"),
+        vocabulary="knowledge.curator.milestone_status",
+        required=False,
+        default="not_started",
+    )
+    
+    progress_percentage = schema.Int(
+        title=_("Progress Percentage"),
+        description=_("Progress percentage (0-100)"),
+        required=False,
+        default=0,
+        min=0,
+        max=100,
+    )
+    
+    completion_criteria = schema.Text(
+        title=_("Completion Criteria"),
+        description=_("Criteria for considering this milestone complete"),
+        required=False,
+    )
+
+
+class ILearningObjective(Interface):
+    """Interface for learning objectives following SMART criteria."""
+    
+    objective_text = schema.Text(
+        title=_("Objective"),
+        description=_("The learning objective"),
+        required=True,
+    )
+    
+    measurable = schema.Bool(
+        title=_("Measurable"),
+        description=_("Is this objective measurable?"),
+        required=False,
+        default=False,
+    )
+    
+    achievable = schema.Bool(
+        title=_("Achievable"),
+        description=_("Is this objective achievable?"),
+        required=False,
+        default=False,
+    )
+    
+    relevant = schema.Bool(
+        title=_("Relevant"),
+        description=_("Is this objective relevant?"),
+        required=False,
+        default=False,
+    )
+    
+    time_bound = schema.Bool(
+        title=_("Time-bound"),
+        description=_("Is this objective time-bound?"),
+        required=False,
+        default=False,
+    )
+    
+    success_metrics = schema.List(
+        title=_("Success Metrics"),
+        description=_("How to measure success"),
+        value_type=schema.TextLine(),
+        required=False,
+    )
+
+
+class IAnnotation(Interface):
+    """Interface for annotations on content."""
+    
+    text = schema.Text(
+        title=_("Annotation Text"),
+        description=_("The annotation"),
+        required=True,
+    )
+    
+    author = schema.TextLine(
+        title=_("Author"),
+        description=_("Who made this annotation"),
+        required=True,
+    )
+    
+    timestamp = schema.Datetime(
+        title=_("Timestamp"),
+        description=_("When this annotation was made"),
+        required=True,
+    )
+    
+    target_element = schema.TextLine(
+        title=_("Target Element"),
+        description=_("What element this annotation refers to"),
+        required=False,
+    )
+    
+    annotation_type = schema.Choice(
+        title=_("Annotation Type"),
+        description=_("Type of annotation"),
+        vocabulary="knowledge.curator.annotation_types",
+        required=False,
+    )
+
+
+class IAssessmentCriterion(Interface):
+    """Interface for assessment criteria."""
+    
+    criterion = schema.Text(
+        title=_("Criterion"),
+        description=_("The assessment criterion"),
+        required=True,
+    )
+    
+    weight = schema.Float(
+        title=_("Weight"),
+        description=_("Weight of this criterion (0-1)"),
+        min=0.0,
+        max=1.0,
+        required=False,
+        default=1.0,
+    )
+    
+    description = schema.Text(
+        title=_("Description"),
+        description=_("Detailed description of the criterion"),
+        required=False,
+    )
+
+
+class ICompetency(Interface):
+    """Interface for competencies."""
+    
+    name = schema.TextLine(
+        title=_("Competency Name"),
+        description=_("Name of the competency"),
+        required=True,
+    )
+    
+    description = schema.Text(
+        title=_("Description"),
+        description=_("Description of the competency"),
+        required=False,
+    )
+    
+    level = schema.Choice(
+        title=_("Level"),
+        description=_("Current competency level"),
+        vocabulary="knowledge.curator.competency_levels",
+        required=False,
+    )
+    
+    category = schema.TextLine(
+        title=_("Category"),
+        description=_("Category of this competency"),
+        required=False,
+    )
+
+
+class IProjectLogEntry(Interface):
+    """Interface for a project log entry."""
+    
+    id = schema.TextLine(
+        title=_("Entry ID"),
+        description=_("Unique identifier for the entry"),
+        required=True,
+    )
+    
+    timestamp = schema.Datetime(
+        title=_("Timestamp"),
+        description=_("When the entry was created"),
+        required=True,
+    )
+    
+    author = schema.TextLine(
+        title=_("Author"),
+        description=_("Who created this entry"),
+        required=True,
+    )
+    
+    entry_type = schema.Choice(
+        title=_("Entry Type"),
+        description=_("Type of log entry"),
+        vocabulary="knowledge.curator.entry_types",
+        required=False,
+    )
+    
+    description = schema.Text(
+        title=_("Description"),
+        description=_("Entry description"),
+        required=True,
+    )
+    
+    related_items = schema.List(
+        title=_("Related Items"),
+        description=_("Related content items"),
+        value_type=schema.TextLine(),
+        required=False,
+    )
+
+
+class IProjectDeliverable(Interface):
+    """Interface for project deliverables."""
+    
+    title = schema.TextLine(
+        title=_("Title"),
+        description=_("Deliverable title"),
+        required=True,
+    )
+    
+    description = schema.Text(
+        title=_("Description"),
+        description=_("What this deliverable includes"),
+        required=False,
+    )
+    
+    due_date = schema.Date(
+        title=_("Due Date"),
+        description=_("When the deliverable is due"),
+        required=False,
+    )
+    
+    status = schema.Choice(
+        title=_("Status"),
+        description=_("Current status of the deliverable"),
+        vocabulary="knowledge.curator.deliverable_status_vocabulary",
+        required=False,
+    )
+    
+    assigned_to = schema.TextLine(
+        title=_("Assigned To"),
+        description=_("Who is responsible for this deliverable"),
+        required=False,
+    )
+    
+    completion_percentage = schema.Int(
+        title=_("Completion Percentage"),
+        description=_("Progress percentage (0-100)"),
+        required=False,
+        default=0,
+        min=0,
+        max=100,
+    )
+
+
+class IStakeholder(Interface):
+    """Interface for project stakeholders."""
+    
+    name = schema.TextLine(
+        title=_("Name"),
+        description=_("Stakeholder name"),
+        required=True,
+    )
+    
+    role = schema.TextLine(
+        title=_("Role"),
+        description=_("Stakeholder role"),
+        required=False,
+    )
+    
+    interest_level = schema.Choice(
+        title=_("Interest Level"),
+        description=_("Level of interest in the project"),
+        vocabulary="knowledge.curator.stakeholder_levels",
+        required=False,
+    )
+    
+    influence_level = schema.Choice(
+        title=_("Influence Level"),
+        description=_("Level of influence on the project"),
+        vocabulary="knowledge.curator.stakeholder_levels",
+        required=False,
+    )
+    
+    contact_info = schema.Text(
+        title=_("Contact Information"),
+        description=_("How to contact this stakeholder"),
+        required=False,
+    )
+
+
+class IProjectResource(Interface):
+    """Interface for project resources."""
+    
+    resource_type = schema.Choice(
+        title=_("Resource Type"),
+        description=_("Type of resource"),
+        vocabulary="knowledge.curator.resource_types",
+        required=True,
+    )
+    
+    name = schema.TextLine(
+        title=_("Name"),
+        description=_("Resource name"),
+        required=True,
+    )
+    
+    quantity = schema.Float(
+        title=_("Quantity"),
+        description=_("Amount of resource needed"),
+        required=False,
+    )
+    
+    availability = schema.Choice(
+        title=_("Availability"),
+        description=_("Resource availability"),
+        vocabulary="knowledge.curator.availability_status",
+        required=False,
+    )
+    
+    cost = schema.Float(
+        title=_("Cost"),
+        description=_("Cost of the resource"),
+        required=False,
+    )
+
+
+class ISuccessMetric(Interface):
+    """Interface for success metrics."""
+    
+    metric_name = schema.TextLine(
+        title=_("Metric Name"),
+        description=_("Name of the metric"),
+        required=True,
+    )
+    
+    target_value = schema.TextLine(
+        title=_("Target Value"),
+        description=_("Target value to achieve"),
+        required=True,
+    )
+    
+    current_value = schema.TextLine(
+        title=_("Current Value"),
+        description=_("Current value"),
+        required=False,
+    )
+    
+    unit = schema.TextLine(
+        title=_("Unit"),
+        description=_("Unit of measurement"),
+        required=False,
+    )
+    
+    measurement_method = schema.Text(
+        title=_("Measurement Method"),
+        description=_("How to measure this metric"),
+        required=False,
+    )
+
+
+class ILessonLearned(Interface):
+    """Interface for lessons learned."""
+    
+    lesson = schema.Text(
+        title=_("Lesson"),
+        description=_("The lesson learned"),
+        required=True,
+    )
+    
+    context = schema.Text(
+        title=_("Context"),
+        description=_("Context in which this lesson was learned"),
+        required=False,
+    )
+    
+    impact = schema.Choice(
+        title=_("Impact"),
+        description=_("Impact of this lesson"),
+        vocabulary="knowledge.curator.impact_levels",
+        required=False,
+    )
+    
+    recommendations = schema.Text(
+        title=_("Recommendations"),
+        description=_("Recommendations based on this lesson"),
+        required=False,
+    )
+
+
+class IFollowUpAction(Interface):
+    """Interface for follow-up actions."""
+    
+    action = schema.Text(
+        title=_("Action"),
+        description=_("The follow-up action"),
+        required=True,
+    )
+    
+    responsible_party = schema.TextLine(
+        title=_("Responsible Party"),
+        description=_("Who is responsible for this action"),
+        required=False,
+    )
+    
+    due_date = schema.Date(
+        title=_("Due Date"),
+        description=_("When this action is due"),
+        required=False,
+    )
+    
+    priority = schema.Choice(
+        title=_("Priority"),
+        description=_("Priority of this action"),
+        vocabulary="knowledge.curator.priority_vocabulary",
+        required=False,
+    )
+    
+    status = schema.Choice(
+        title=_("Status"),
+        description=_("Current status"),
+        vocabulary="knowledge.curator.action_status",
+        required=False,
+    )
+
+
+@provider(IFormFieldProvider)
+class IResearchNote(IKnowledgeObjectBase):
     """Schema for Research Note content type."""
 
     title = schema.TextLine(
@@ -45,16 +670,56 @@ class IResearchNote(model.Schema):
         default=[],
     )
 
-    source_url = schema.URI(
-        title=_("Source URL"),
-        description=_("Original source of the research"),
+    # Enhanced fields for research
+    key_insights = schema.List(
+        title=_("Key Insights"),
+        description=_("Structured key insights from this research"),
+        value_type=schema.Object(schema=IKeyInsight),
+        required=False,
+        default=[],
+    )
+
+    research_method = schema.TextLine(
+        title=_("Research Method"),
+        description=_("Methodology used for this research"),
         required=False,
     )
 
-    key_insights = schema.List(
-        title=_("Key Insights"),
-        description=_("List of key insights from this research"),
-        value_type=schema.Text(),
+    citation_format = schema.Choice(
+        title=_("Citation Format"),
+        description=_("Citation format to use"),
+        vocabulary="knowledge.curator.citation_formats",
+        required=False,
+        default="APA",
+    )
+
+    builds_upon = schema.List(
+        title=_("Builds Upon"),
+        description=_("UIDs of research this work builds upon"),
+        value_type=schema.TextLine(),
+        required=False,
+        default=[],
+    )
+
+    contradicts = schema.List(
+        title=_("Contradicts"),
+        description=_("UIDs of research this work contradicts"),
+        value_type=schema.TextLine(),
+        required=False,
+        default=[],
+    )
+
+    peer_reviewed = schema.Bool(
+        title=_("Peer Reviewed"),
+        description=_("Has this research been peer reviewed?"),
+        required=False,
+        default=False,
+    )
+
+    replication_studies = schema.List(
+        title=_("Replication Studies"),
+        description=_("UIDs of studies that replicate this research"),
+        value_type=schema.TextLine(),
         required=False,
         default=[],
     )
@@ -64,7 +729,7 @@ class IResearchNote(model.Schema):
 
 
 @provider(IFormFieldProvider)
-class ILearningGoal(model.Schema):
+class ILearningGoal(IKnowledgeObjectBase):
     """Schema for Learning Goal content type."""
 
     title = schema.TextLine(
@@ -101,10 +766,55 @@ class ILearningGoal(model.Schema):
         max=100,
     )
 
+    # Enhanced fields with structured objects
     milestones = schema.List(
         title=_("Milestones"),
-        description=_("List of milestones to achieve this goal"),
-        value_type=schema.Text(),
+        description=_("Structured milestones to achieve this goal"),
+        value_type=schema.Object(schema=ILearningMilestone),
+        required=False,
+        default=[],
+    )
+
+    learning_objectives = schema.List(
+        title=_("Learning Objectives"),
+        description=_("SMART learning objectives"),
+        value_type=schema.Object(schema=ILearningObjective),
+        required=False,
+        default=[],
+    )
+
+    prerequisite_knowledge = schema.List(
+        title=_("Prerequisite Knowledge"),
+        description=_("Knowledge required before starting this goal"),
+        value_type=schema.TextLine(),
+        required=False,
+        default=[],
+    )
+
+    assessment_criteria = schema.List(
+        title=_("Assessment Criteria"),
+        description=_("Criteria for assessing achievement of this goal"),
+        value_type=schema.Object(schema=IAssessmentCriterion),
+        required=False,
+        default=[],
+    )
+
+    learning_approach = schema.Text(
+        title=_("Learning Approach"),
+        description=_("Approach to be taken for learning"),
+        required=False,
+    )
+
+    estimated_effort = schema.Int(
+        title=_("Estimated Effort (hours)"),
+        description=_("Estimated hours needed to achieve this goal"),
+        required=False,
+    )
+
+    competencies = schema.List(
+        title=_("Competencies"),
+        description=_("Competencies to be developed"),
+        value_type=schema.Object(schema=ICompetency),
         required=False,
         default=[],
     )
@@ -125,7 +835,7 @@ class ILearningGoal(model.Schema):
 
 
 @provider(IFormFieldProvider)
-class IProjectLog(model.Schema):
+class IProjectLog(IKnowledgeObjectBase):
     """Schema for Project Log content type."""
 
     title = schema.TextLine(
@@ -153,10 +863,11 @@ class IProjectLog(model.Schema):
         default="planning",
     )
 
+    # Enhanced fields with structured objects
     entries = schema.List(
         title=_("Log Entries"),
-        description=_("Project log entries"),
-        value_type=schema.Text(),
+        description=_("Structured project log entries"),
+        value_type=schema.Object(schema=IProjectLogEntry),
         required=False,
         default=[],
     )
@@ -164,14 +875,52 @@ class IProjectLog(model.Schema):
     deliverables = schema.List(
         title=_("Deliverables"),
         description=_("Project deliverables"),
-        value_type=schema.Text(),
+        value_type=schema.Object(schema=IProjectDeliverable),
+        required=False,
+        default=[],
+    )
+
+    project_methodology = schema.TextLine(
+        title=_("Project Methodology"),
+        description=_("Methodology used for this project"),
+        required=False,
+    )
+
+    stakeholders = schema.List(
+        title=_("Stakeholders"),
+        description=_("Project stakeholders"),
+        value_type=schema.Object(schema=IStakeholder),
+        required=False,
+        default=[],
+    )
+
+    resources_used = schema.List(
+        title=_("Resources Used"),
+        description=_("Resources used in this project"),
+        value_type=schema.Object(schema=IProjectResource),
+        required=False,
+        default=[],
+    )
+
+    success_metrics = schema.List(
+        title=_("Success Metrics"),
+        description=_("Metrics for measuring project success"),
+        value_type=schema.Object(schema=ISuccessMetric),
+        required=False,
+        default=[],
+    )
+
+    lessons_learned = schema.List(
+        title=_("Lessons Learned"),
+        description=_("Lessons learned from this project"),
+        value_type=schema.Object(schema=ILessonLearned),
         required=False,
         default=[],
     )
 
     learnings = schema.Text(
-        title=_("Learnings"),
-        description=_("What was learned from this project"),
+        title=_("General Learnings"),
+        description=_("General learnings from this project"),
         required=False,
     )
 
@@ -352,3 +1101,213 @@ class IAIEnhanced(Interface):
 
     def analyze_sentiment(content):
         """Analyze sentiment of content."""
+
+
+# New interfaces for structured objects (Task 1 & 2)
+
+class ILearningMilestone(Interface):
+    """Interface for a learning milestone."""
+    
+    id = schema.TextLine(
+        title=_("Milestone ID"),
+        description=_("Unique identifier for the milestone"),
+        required=True,
+    )
+    
+    title = schema.TextLine(
+        title=_("Title"),
+        description=_("Title of the milestone"),
+        required=True,
+    )
+    
+    description = schema.Text(
+        title=_("Description"),
+        description=_("Detailed description of the milestone"),
+        required=False,
+    )
+    
+    target_date = schema.Date(
+        title=_("Target Date"),
+        description=_("Target completion date for the milestone"),
+        required=False,
+    )
+    
+    completed = schema.Bool(
+        title=_("Completed"),
+        description=_("Whether the milestone is completed"),
+        required=False,
+        default=False,
+    )
+    
+    completed_date = schema.Datetime(
+        title=_("Completed Date"),
+        description=_("Date when the milestone was completed"),
+        required=False,
+    )
+    
+    effort_hours = schema.Float(
+        title=_("Effort Hours"),
+        description=_("Estimated effort in hours"),
+        required=False,
+    )
+    
+    notes = schema.Text(
+        title=_("Notes"),
+        description=_("Additional notes about the milestone"),
+        required=False,
+    )
+
+
+class ILearningObjective(Interface):
+    """Interface for a learning objective."""
+    
+    id = schema.TextLine(
+        title=_("Objective ID"),
+        description=_("Unique identifier for the objective"),
+        required=True,
+    )
+    
+    description = schema.Text(
+        title=_("Description"),
+        description=_("What should be learned"),
+        required=True,
+    )
+    
+    success_criteria = schema.Text(
+        title=_("Success Criteria"),
+        description=_("How to measure success"),
+        required=False,
+    )
+    
+    category = schema.Choice(
+        title=_("Category"),
+        description=_("Type of learning objective"),
+        vocabulary="knowledge.curator.objective_category_vocabulary",
+        required=False,
+    )
+    
+    priority = schema.Int(
+        title=_("Priority"),
+        description=_("Priority order (1-10)"),
+        required=False,
+        min=1,
+        max=10,
+    )
+
+
+class IProjectLogEntry(Interface):
+    """Interface for a project log entry."""
+    
+    id = schema.TextLine(
+        title=_("Entry ID"),
+        description=_("Unique identifier for the entry"),
+        required=True,
+    )
+    
+    timestamp = schema.Datetime(
+        title=_("Timestamp"),
+        description=_("When the entry was created"),
+        required=True,
+    )
+    
+    title = schema.TextLine(
+        title=_("Title"),
+        description=_("Entry title"),
+        required=True,
+    )
+    
+    content = RichText(
+        title=_("Content"),
+        description=_("Detailed entry content"),
+        required=True,
+    )
+    
+    tags = schema.List(
+        title=_("Tags"),
+        description=_("Tags for categorization"),
+        value_type=schema.TextLine(),
+        required=False,
+        default=[],
+    )
+    
+    attachments = schema.List(
+        title=_("Attachments"),
+        description=_("File attachments"),
+        value_type=NamedBlobFile(),
+        required=False,
+        default=[],
+    )
+    
+    entry_type = schema.Choice(
+        title=_("Entry Type"),
+        description=_("Type of log entry"),
+        vocabulary="knowledge.curator.entry_type_vocabulary",
+        required=False,
+    )
+    
+    modified = schema.Datetime(
+        title=_("Last Modified"),
+        description=_("When the entry was last modified"),
+        required=False,
+    )
+    
+    effort_hours = schema.Float(
+        title=_("Effort Hours"),
+        description=_("Hours spent on this work"),
+        required=False,
+    )
+
+
+class IProjectDeliverable(Interface):
+    """Interface for a project deliverable."""
+    
+    id = schema.TextLine(
+        title=_("Deliverable ID"),
+        description=_("Unique identifier for the deliverable"),
+        required=True,
+    )
+    
+    title = schema.TextLine(
+        title=_("Title"),
+        description=_("Deliverable title"),
+        required=True,
+    )
+    
+    description = schema.Text(
+        title=_("Description"),
+        description=_("What this deliverable includes"),
+        required=False,
+    )
+    
+    status = schema.Choice(
+        title=_("Status"),
+        description=_("Current status of the deliverable"),
+        vocabulary="knowledge.curator.deliverable_status_vocabulary",
+        required=False,
+    )
+    
+    due_date = schema.Date(
+        title=_("Due Date"),
+        description=_("When the deliverable is due"),
+        required=False,
+    )
+    
+    completed_date = schema.Date(
+        title=_("Completed Date"),
+        description=_("When the deliverable was completed"),
+        required=False,
+    )
+    
+    artifacts = schema.List(
+        title=_("Artifacts"),
+        description=_("Files or links to deliverable artifacts"),
+        value_type=schema.TextLine(),
+        required=False,
+        default=[],
+    )
+    
+    acceptance_criteria = schema.Text(
+        title=_("Acceptance Criteria"),
+        description=_("Criteria for accepting the deliverable"),
+        required=False,
+    )
