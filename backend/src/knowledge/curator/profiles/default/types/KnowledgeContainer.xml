@@ -1,32 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
         meta_type="Dexterity FTI"
-        name="BookmarkPlus"
+        name="KnowledgeContainer"
         i18n:domain="knowledge.curator"
 >
   <property name="title"
             i18n:translate=""
-  >Bookmark+</property>
+  >Knowledge Container</property>
   <property name="description"
             i18n:translate=""
-  >An enhanced bookmark with notes and read status</property>
+  >A container for organizing knowledge items</property>
   <property name="icon_expr" />
-  <property name="factory">BookmarkPlus</property>
-  <property name="add_view_expr">string:${folder_url}/++add++BookmarkPlus</property>
+  <property name="factory">KnowledgeContainer</property>
+  <property name="add_view_expr">string:${folder_url}/++add++KnowledgeContainer</property>
   <property name="link_target" />
   <property name="immediate_view">view</property>
   <property name="global_allow">True</property>
-  <property name="filter_content_types">False</property>
-  <property name="allowed_content_types" />
+  <property name="filter_content_types">True</property>
+  <property name="allowed_content_types">
+    <element value="KnowledgeItem" />
+    <element value="ResearchNote" />
+    <element value="LearningGoal" />
+    <element value="ProjectLog" />
+    <element value="BookmarkPlus" />
+    <element value="KnowledgeContainer" />
+  </property>
   <property name="allow_discussion">False</property>
   <property name="default_view">view</property>
   <property name="view_methods">
     <element value="view" />
   </property>
   <property name="default_view_fallback">False</property>
-  <property name="add_permission">knowledge.curator.AddBookmarkPlus</property>
-  <property name="klass">knowledge.curator.content.bookmark_plus.BookmarkPlus</property>
-  <property name="schema">knowledge.curator.interfaces.IBookmarkPlus</property>
+  <property name="add_permission">knowledge.curator.AddKnowledgeContainer</property>
+  <property name="klass">plone.dexterity.content.Container</property>
+  <property name="schema" />
   <property name="model_source" />
   <property name="model_file" />
   <property name="behaviors">
@@ -40,9 +47,6 @@
     <element value="plone.app.dexterity.behaviors.exclfromnav.IExcludeFromNavigation" />
     <element value="plone.app.versioningbehavior.behaviors.IVersionable" />
     <element value="plone.app.relationfield.behavior.IRelatedItems" />
-    <element value="knowledge.curator.knowledge_graph" />
-    <element value="knowledge.curator.ai_enhanced" />
-    <element value="knowledge.curator.spaced_repetition" />
   </property>
   <alias from="(Default)"
          to="(dynamic view)"

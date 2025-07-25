@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2022-05-25 17:12+0000\n"
+"POT-Creation-Date: 2025-07-25 02:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,3 +16,1763 @@ msgstr ""
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: knowledge.curator\n"
+
+#: knowledge/curator/browser/views/templates/bulk_workflow.pt:16
+msgid "${count} items selected for bulk transition."
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bulk_workflow.pt:48
+msgid "-- Select a transition --"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bulk_workflow.pt:73
+msgid "<strong>Warning:</strong> This action will apply the selected transition to all selected items. Make sure all items are in a valid state for this transition."
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/KnowledgeContainer.xml
+msgid "A container for organizing knowledge items"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/KnowledgeItem.xml
+msgid "A knowledge item for storing structured information"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/LearningGoal.xml
+msgid "A learning goal with milestones and progress tracking"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/ProjectLog.xml
+msgid "A project log for tracking progress and learnings"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/ResearchNote.xml
+msgid "A research note for capturing insights and knowledge"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:988
+msgid "A short summary of the knowledge item"
+msgstr ""
+
+#: knowledge/curator/behaviors/configure.zcml:14
+msgid "AI Enhanced"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:24
+msgid "AI Features"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:120
+msgid "AI Model Version"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:59
+msgid "AI Suggested Tags"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:43
+#: knowledge/curator/interfaces.py:1021
+msgid "AI Summary"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:112
+msgid "AI-calculated readability score (0-100)"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1029
+msgid "AI-calculated relevance score"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:94
+msgid "AI-calculated sentiment score (-1 to 1)"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:65
+#: knowledge/curator/interfaces.py:1014
+msgid "AI-generated embedding vector for similarity search"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:44
+#: knowledge/curator/interfaces.py:1022
+msgid "AI-generated summary of the content"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:57
+msgid "AI-suggested relationships pending review"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Abandon"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Abandon this learning goal"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Abandoned"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1310
+msgid "Acceptance Criteria"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:270
+msgid "Achievable"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/workflow_history.pt:27
+#: knowledge/curator/interfaces.py:612
+msgid "Action"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Activate"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Active"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:25
+msgid "Add a comment about this transition"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:90
+msgid "Additional metadata for knowledge graph"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1156
+msgid "Additional notes about the milestone"
+msgstr ""
+
+#: knowledge/curator/behaviors/configure.zcml:14
+msgid "Adds AI enhancement capabilities to content"
+msgstr ""
+
+#: knowledge/curator/behaviors/configure.zcml:24
+msgid "Adds knowledge graph relationship capabilities"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:166
+msgid "Affiliation"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:527
+msgid "Amount of resource needed"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/BookmarkPlus.xml
+msgid "An enhanced bookmark with notes and read status"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Analyzing and refining content"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:302
+msgid "Annotation Text"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:326
+msgid "Annotation Type"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bulk_workflow.pt:81
+msgid "Apply Transition"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:804
+msgid "Approach to be taken for learning"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1302
+msgid "Artifacts"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:795
+msgid "Assessment Criteria"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:458
+msgid "Assigned To"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1036
+msgid "Attachment"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1234
+msgid "Attachments"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:308
+msgid "Author"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:81
+msgid "Authors"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:82
+msgid "Authors of this content"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:532
+msgid "Availability"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Back to Active"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Back to Capture"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/workflow_history.pt:59
+msgid "Back to Item"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Back to Process"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Begin connecting to other knowledge items"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Begin reviewing the learning goal progress"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:993
+msgid "Body Text"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/BookmarkPlus.xml
+msgid "Bookmark+"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:655
+msgid "Brief description of the research note"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:697
+msgid "Builds Upon"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bulk_workflow.pt:12
+msgid "Bulk Workflow Transition"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bulk_workflow.pt:85
+#: knowledge/curator/browser/views/workflow_views.py:82
+msgid "Cancel"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Capture"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:381
+msgid "Category"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:382
+msgid "Category of this competency"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:98
+msgid "Centrality Score"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:689
+msgid "Citation Format"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:690
+msgid "Citation format to use"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:37
+msgid "Cognitive Load"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:24
+msgid "Comment"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bulk_workflow.pt:61
+msgid "Comment (optional)"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/workflow_history.pt:30
+msgid "Comments"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:815
+msgid "Competencies"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:816
+msgid "Competencies to be developed"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:362
+msgid "Competency Name"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Complete"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/learning_goal.pt:85
+#: knowledge/curator/interfaces.py:1136
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Completed"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1143
+msgid "Completed Date"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:247
+msgid "Completion Criteria"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:464
+msgid "Completion Percentage"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:80
+msgid "Concept Weight"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:78
+msgid "Concepts extracted from the content"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:73
+msgid "Concepts related to this content"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:143
+msgid "Confidence Breakdown"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:72
+msgid "Confidence Score"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:103
+msgid "Confidence in sentiment analysis"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:51
+msgid "Confidence score for the AI summary"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:69
+msgid "Confidence score for the AI tags"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:144
+msgid "Confidence scores for each AI feature"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:56
+msgid "Confirm Transition"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Connect"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:107
+msgid "Connection Strength"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:40
+msgid "Connections Reviewed"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:503
+msgid "Contact Information"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:660
+msgid "Content"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:34
+msgid "Content Quality"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:589
+msgid "Context"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:590
+msgid "Context in which this lesson was learned"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Continue working on the learning goal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:705
+msgid "Contradicts"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:539
+msgid "Cost"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:540
+msgid "Cost of the resource"
+msgstr ""
+
+#: knowledge/curator/profiles.zcml:22
+msgid "Create example content to showcase the new website"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1311
+msgid "Criteria for accepting the deliverable"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:796
+msgid "Criteria for assessing achievement of this goal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:248
+msgid "Criteria for considering this milestone complete"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:337
+msgid "Criterion"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/workflow_history.pt:15
+msgid "Current State:"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:561
+msgid "Current Value"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:375
+msgid "Current competency level"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:638
+msgid "Current status"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:452
+msgid "Current status of the deliverable"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:231
+msgid "Current status of the milestone"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:860
+msgid "Current status of the project"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:52
+msgid "Current status of this knowledge"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:562
+msgid "Current value"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Currently working on this learning goal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:100
+msgid "DOI"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/workflow_history.pt:26
+msgid "Date"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:89
+msgid "Date of publication"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1144
+msgid "Date when the milestone was completed"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1265
+msgid "Deliverable ID"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:434
+msgid "Deliverable title"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/project_log.pt:47
+#: knowledge/curator/interfaces.py:876
+msgid "Deliverables"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:218
+msgid "Description"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:369
+msgid "Description of the competency"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:353
+msgid "Detailed description of the criterion"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:742
+msgid "Detailed description of the learning goal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:219
+msgid "Detailed description of the milestone"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1221
+msgid "Detailed entry content"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:29
+msgid "Difficulty Level"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:101
+msgid "Digital Object Identifier"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:445
+msgid "Due Date"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/project_log.pt:39
+msgid "Duration:"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1149
+msgid "Effort Hours"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:154
+msgid "Email"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:155
+msgid "Email address"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:64
+#: knowledge/curator/interfaces.py:1013
+msgid "Embedding Vector"
+msgstr ""
+
+#: knowledge/curator/behaviors/configure.zcml:36
+msgid "Enables spaced repetition learning with SM-2 algorithm"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:391
+msgid "Entry ID"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:409
+msgid "Entry Type"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:417
+msgid "Entry description"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1215
+msgid "Entry title"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:809
+msgid "Estimated Effort (hours)"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1150
+msgid "Estimated effort in hours"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:810
+msgid "Estimated hours needed to achieve this goal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:190
+msgid "Evidence"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:77
+msgid "Extracted Concepts"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1235
+msgid "File attachments"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1303
+msgid "Files or links to deliverable artifacts"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/project_log.pt:74
+msgid "Filter by tag:"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:136
+msgid "Formatted Citation"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:137
+msgid "Full formatted citation"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:149
+msgid "Full name of the author"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:922
+msgid "General Learnings"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:923
+msgid "General learnings from this project"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:89
+msgid "Graph Metadata"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:714
+msgid "Has this research been peer reviewed?"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1256
+msgid "Hours spent on this work"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:967
+msgid "How important is this bookmark"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:66
+msgid "How often this content should be reviewed"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:504
+msgid "How to contact this stakeholder"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:292
+msgid "How to measure success"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:574
+msgid "How to measure this metric"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:35
+msgid "I confirm this content meets quality standards"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:41
+msgid "I have reviewed and established relevant connections"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:106
+msgid "ISBN"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:86
+msgid "Identified gaps in knowledge"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:595
+msgid "Impact"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:596
+msgid "Impact of this lesson"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:182
+msgid "Importance"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:183
+msgid "Importance of this insight"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bookmark_plus.pt:45
+msgid "Importance:"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:496
+msgid "Influence Level"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Initial state for gathering information"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:176
+msgid "Insight Text"
+msgstr ""
+
+#: knowledge/curator/configure.zcml:39
+msgid "Installs the Knowledge Curator add-on."
+msgstr ""
+
+#: knowledge/curator/interfaces.py:167
+msgid "Institutional affiliation"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:489
+msgid "Interest Level"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:107
+msgid "International Standard Book Number"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:271
+msgid "Is this objective achievable?"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:264
+msgid "Is this objective measurable?"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:278
+msgid "Is this objective relevant?"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:285
+msgid "Is this objective time-bound?"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:112
+msgid "Journal Name"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/research_note.pt:58
+#: knowledge/curator/interfaces.py:675
+msgid "Key Insights"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/project_log.pt:58
+msgid "Key Learnings"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/KnowledgeContainer.xml
+msgid "Knowledge Container"
+msgstr ""
+
+#: knowledge/curator/configure.zcml:39
+msgid "Knowledge Curator"
+msgstr ""
+
+#: knowledge/curator/configure.zcml:48
+msgid "Knowledge Curator (uninstall)"
+msgstr ""
+
+#: knowledge/curator/profiles.zcml:22
+msgid "Knowledge Curator: Example content"
+msgstr ""
+
+#: knowledge/curator/profiles.zcml:13
+msgid "Knowledge Curator: Install"
+msgstr ""
+
+#: knowledge/curator/profiles.zcml:30
+msgid "Knowledge Curator: Uninstall"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:85
+msgid "Knowledge Gaps"
+msgstr ""
+
+#: knowledge/curator/behaviors/configure.zcml:24
+#: knowledge/curator/behaviors/knowledge_graph.py:25
+msgid "Knowledge Graph"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/KnowledgeItem.xml
+msgid "Knowledge Item"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Knowledge Management Workflow"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:51
+msgid "Knowledge Status"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:788
+msgid "Knowledge required before starting this goal"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:127
+msgid "Last AI Analysis"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1249
+msgid "Last Modified"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:59
+msgid "Last Reviewed"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:803
+msgid "Learning Approach"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/LearningGoal.xml
+msgid "Learning Goal"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Learning Goal Workflow"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:779
+msgid "Learning Objectives"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:44
+msgid "Learning Styles"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Learning goal has been abandoned"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Learning goal has been completed"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Learning goal is temporarily paused"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:45
+msgid "Learning styles this content supports"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:40
+msgid "Legacy Connections"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:41
+msgid "Legacy simple connections - will be migrated to typed relationships"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:583
+msgid "Lesson"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:914
+msgid "Lessons Learned"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:915
+msgid "Lessons learned from this project"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:374
+msgid "Level"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:497
+msgid "Level of influence on the project"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:490
+msgid "Level of interest in the project"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Linking to other knowledge items"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:868
+msgid "Log Entries"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:994
+msgid "Main content of the knowledge item"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:661
+msgid "Main content of the research note"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bookmark_plus.pt:95
+msgid "Mark as Read"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bookmark_plus.pt:90
+msgid "Mark as Reading"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Mark learning goal as completed"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:263
+msgid "Measurable"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:573
+msgid "Measurement Method"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:885
+msgid "Methodology used for this project"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:684
+msgid "Methodology used for this research"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:549
+msgid "Metric Name"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:907
+msgid "Metrics for measuring project success"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:206
+msgid "Milestone ID"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/learning_goal.pt:62
+#: knowledge/curator/interfaces.py:771
+msgid "Milestones"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Move to processing phase to analyze and refine content"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:148
+msgid "Name"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:363
+msgid "Name of the competency"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:113
+msgid "Name of the journal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:550
+msgid "Name of the metric"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bulk_workflow.pt:97
+msgid "No common transitions available for the selected items. This may mean the items are in different workflow states."
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/workflow_history.pt:55
+msgid "No workflow history available."
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:99
+msgid "Node centrality in the knowledge graph"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bookmark_plus.pt:82
+#: knowledge/curator/interfaces.py:952
+msgid "Notes"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:160
+msgid "ORCID"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:161
+msgid "ORCID identifier"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:257
+msgid "Objective"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1165
+msgid "Objective ID"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:95
+msgid "Original source URL"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1008
+msgid "Original source of the information"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:134
+msgid "Overall Confidence"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:135
+msgid "Overall confidence in AI analysis"
+msgstr ""
+
+#: knowledge/curator/profiles.zcml:13
+msgid "Package to configure a new Knowledge Curator site"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:124
+msgid "Page Numbers"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:125
+msgid "Page numbers"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Pause"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Paused"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:713
+msgid "Peer Reviewed"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/learning_goal.pt:67
+msgid "Pending"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:953
+msgid "Personal notes about this bookmark"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:832
+msgid "Personal reflection on the learning process"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Planning"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Planning phase for the learning goal"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:104
+msgid "Please confirm all requirements before publishing."
+msgstr ""
+
+#: knowledge/curator/interfaces.py:787
+msgid "Prerequisite Knowledge"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:630
+msgid "Priority"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:754
+msgid "Priority level of this goal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:631
+msgid "Priority of this action"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1191
+msgid "Priority order (1-10)"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/learning_goal.pt:25
+msgid "Priority:"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Process"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/learning_goal.pt:47
+#: knowledge/curator/interfaces.py:761
+msgid "Progress"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:238
+msgid "Progress Percentage"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:239
+msgid "Progress percentage (0-100)"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/ProjectLog.xml
+msgid "Project Log"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/project_log.pt:69
+msgid "Project Log Entries"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:884
+msgid "Project Methodology"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:877
+msgid "Project deliverables"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:848
+msgid "Project description"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:891
+msgid "Project stakeholders"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:854
+msgid "Project start date"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:88
+msgid "Publication Date"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Publish"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:95
+msgid "Publish Content"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Publish for public consumption"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Published"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:130
+msgid "Publisher"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:131
+msgid "Publisher name"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:526
+msgid "Quantity"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bookmark_plus.pt:56
+msgid "Read Date:"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:958
+msgid "Read Status"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:111
+msgid "Readability Score"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bookmark_plus.pt:63
+msgid "Reading Duration:"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Ready for sharing/public consumption"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:602
+msgid "Recommendations"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:603
+msgid "Recommendations based on this lesson"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:831
+msgid "Reflection"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:72
+msgid "Related Concepts"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/research_note.pt:69
+msgid "Related Content"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:422
+msgid "Related Items"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:823
+msgid "Related Notes"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/learning_goal.pt:106
+msgid "Related Research Notes"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:423
+msgid "Related content items"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:48
+msgid "Relationships"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1028
+msgid "Relevance Score"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:277
+msgid "Relevant"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Reopen"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Reopen this learning goal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:720
+msgid "Replication Studies"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:683
+msgid "Research Method"
+msgstr ""
+
+#: knowledge/curator/profiles/default/types/ResearchNote.xml
+msgid "Research Note"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:824
+msgid "Research notes related to this goal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:513
+msgid "Resource Type"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:533
+msgid "Resource availability"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:521
+msgid "Resource name"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:898
+msgid "Resources Used"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:899
+msgid "Resources used in this project"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:618
+msgid "Responsible Party"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Resume"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Resume working on this learning goal"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Retract"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Retract from public view"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Return to capture state for more information gathering"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Return to processing for more refinement"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Review"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:65
+msgid "Review Frequency (days)"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Reviewing progress and outcomes"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Revise"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:483
+msgid "Role"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:780
+msgid "SMART learning objectives"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bulk_workflow.pt:40
+msgid "Select Transition"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Send back for revision"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:102
+msgid "Sentiment Confidence"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:93
+msgid "Sentiment Score"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:94
+msgid "Source URL"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/research_note.pt:27
+msgid "Source:"
+msgstr ""
+
+#: knowledge/curator/behaviors/configure.zcml:36
+msgid "Spaced Repetition"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:478
+msgid "Stakeholder name"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:484
+msgid "Stakeholder role"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:890
+msgid "Stakeholders"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Start Connecting"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:853
+msgid "Start Date"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/project_log.pt:34
+msgid "Start Date:"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Start Processing"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Start Review"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Start working on this learning goal"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/workflow_history.pt:29
+msgid "State"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:230
+msgid "Status"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bookmark_plus.pt:36
+#: knowledge/curator/browser/views/templates/project_log.pt:25
+msgid "Status:"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:108
+msgid "Strength of connections to other nodes"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:676
+msgid "Structured key insights from this research"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:772
+msgid "Structured milestones to achieve this goal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:869
+msgid "Structured project log entries"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1177
+msgid "Success Criteria"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:291
+msgid "Success Metrics"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:56
+msgid "Suggested Relationships"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:987
+msgid "Summary"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:50
+msgid "Summary Confidence"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:191
+msgid "Supporting evidence for this insight"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:666
+msgid "Tags"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:68
+msgid "Tags Confidence"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:667
+msgid "Tags for categorization"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:60
+msgid "Tags suggested by AI analysis"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bookmark_plus.pt:70
+#: knowledge/curator/browser/views/templates/research_note.pt:39
+msgid "Tags:"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:224
+msgid "Target Date"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/learning_goal.pt:36
+msgid "Target Date:"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:320
+msgid "Target Element"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:555
+msgid "Target Value"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:748
+msgid "Target completion date"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:225
+msgid "Target completion date for the milestone"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:556
+msgid "Target value to achieve"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Temporarily pause this learning goal"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:303
+msgid "The annotation"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:338
+msgid "The assessment criterion"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:939
+msgid "The bookmarked URL"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:38
+msgid "The cognitive load required to understand this content"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:30
+msgid "The difficulty level of this content"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:613
+msgid "The follow-up action"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:177
+msgid "The key insight"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:258
+msgid "The learning objective"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:584
+msgid "The lesson learned"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:284
+msgid "Time-bound"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:196
+msgid "Timestamp"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:212
+msgid "Title"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:213
+msgid "Title of the milestone"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:85
+msgid "Transition cancelled."
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:78
+msgid "Transition failed: ${error}"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:327
+msgid "Type of annotation"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1184
+msgid "Type of learning objective"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:410
+msgid "Type of log entry"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:514
+msgid "Type of resource"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:49
+msgid "Typed relationships to other content items"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:698
+msgid "UIDs of research this work builds upon"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:706
+msgid "UIDs of research this work contradicts"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:721
+msgid "UIDs of studies that replicate this research"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:938
+msgid "URL"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/bookmark_plus.pt:25
+msgid "URL:"
+msgstr ""
+
+#: knowledge/curator/profiles.zcml:30
+msgid "Uninstall Knowledge Curator setup."
+msgstr ""
+
+#: knowledge/curator/configure.zcml:48
+msgid "Uninstalls the Knowledge Curator add-on."
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1266
+msgid "Unique identifier for the deliverable"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:392
+msgid "Unique identifier for the entry"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:207
+msgid "Unique identifier for the milestone"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1166
+msgid "Unique identifier for the objective"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:567
+msgid "Unit"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:568
+msgid "Unit of measurement"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1037
+msgid "Upload a file attachment"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/workflow_history.pt:28
+msgid "User"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:121
+msgid "Version of AI model used for analysis"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:119
+msgid "Volume and issue number"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:118
+msgid "Volume/Issue"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:343
+msgid "Weight"
+msgstr ""
+
+#: knowledge/curator/behaviors/knowledge_graph.py:81
+msgid "Weight of this content in the knowledge graph"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:344
+msgid "Weight of this criterion (0-1)"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:321
+msgid "What element this annotation refers to"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1172
+msgid "What should be learned"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:440
+msgid "What this deliverable includes"
+msgstr ""
+
+#: knowledge/curator/behaviors/ai_enhanced.py:128
+msgid "When the content was last analyzed by AI"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:446
+msgid "When the deliverable is due"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1297
+msgid "When the deliverable was completed"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:398
+msgid "When the entry was created"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1250
+msgid "When the entry was last modified"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:625
+msgid "When this action is due"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:315
+msgid "When this annotation was made"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:60
+msgid "When this content was last reviewed"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:197
+msgid "When this insight was added"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:1137
+msgid "Whether the milestone is completed"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:959
+msgid "Whether you have read this content"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:404
+msgid "Who created this entry"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:619
+msgid "Who is responsible for this action"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:459
+msgid "Who is responsible for this deliverable"
+msgstr ""
+
+#: knowledge/curator/interfaces.py:309
+msgid "Who made this annotation"
+msgstr ""
+
+#: knowledge/curator/browser/views/templates/workflow_history.pt:12
+msgid "Workflow History"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:234
+msgid "Workflow Transition"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/knowledge_workflow/definition.xml
+msgid "Workflow for knowledge items with capture, process, connect, and publish states"
+msgstr ""
+
+#: knowledge/curator/profiles/default/workflows/learning_goal_workflow/definition.xml
+msgid "Workflow for learning goals with planning, active, review, and completed states"
+msgstr ""
+
+#: knowledge/curator/browser/views/workflow_views.py:71
+msgid "Workflow transition completed successfully."
+msgstr ""
+
+#: knowledge/curator/interfaces.py:73
+msgid "Your confidence in understanding this content"
+msgstr ""

@@ -37,6 +37,16 @@ const applyConfig = (config) => {
     },
   };
 
+  // Register edit components for content types
+  config.views.contentTypesEdit = {
+    ...config.views.contentTypesEdit,
+    ResearchNote: ResearchNoteEdit,
+    LearningGoal: LearningGoalEdit,
+    ProjectLog: ProjectLogEdit,
+    BookmarkPlus: BookmarkPlusEdit,
+    KnowledgeItem: KnowledgeItemEdit,
+  };
+
   return config;
 };
 

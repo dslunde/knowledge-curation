@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Container, Segment, Tab } from 'semantic-ui-react';
+import { Container, Segment, Tab, Header } from 'semantic-ui-react';
 import { Form } from '@plone/volto/components';
 import { injectIntl } from 'react-intl';
 import MilestoneTracker from './MilestoneTracker';
@@ -83,8 +83,14 @@ const LearningGoalEdit = (props) => {
     },
   ];
 
+  // Check if we're in add mode by looking at the content
+  const isAddMode = !props.content?.['@id'];
+  
   return (
     <Container>
+      <Header as="h1" style={{ marginBottom: '2rem' }}>
+        {isAddMode ? 'Add New Learning Goal' : 'Edit Learning Goal'}
+      </Header>
       <Segment>
         <Tab panes={panes} />
       </Segment>
