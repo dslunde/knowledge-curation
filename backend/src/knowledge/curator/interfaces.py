@@ -7,12 +7,32 @@ from plone.namedfile.field import NamedBlobFile
 from plone.supermodel import model
 from zope.interface import Interface
 from zope.interface import provider
+from zope.interface import invariant
 from plone.theme.interfaces import IDefaultPloneLayer
 from plone.app.vocabularies.catalog import CatalogSource
 from plone.autoform import directives
 from z3c.form.browser.radio import RadioFieldWidget
+from z3c.relationfield.schema import RelationChoice, RelationList
+from plone.app.z3cform.widget import RelatedItemsFieldWidget
 
 from knowledge.curator import _
+from knowledge.curator.content.validators import (
+    validate_title_length,
+    validate_description_length,
+    validate_content_length,
+    validate_knowledge_type,
+    validate_atomic_concepts,
+    validate_tags,
+    validate_embedding_vector,
+    validate_mastery_threshold,
+    validate_learning_progress,
+    validate_difficulty_level,
+    validate_uid_references_list,
+    validate_prerequisite_enables_consistency,
+    validate_mastery_threshold_progress_consistency,
+    validate_knowledge_item_progress_dict,
+)
+from knowledge.curator.graph.interfaces import IKnowledgeItemConnection
 
 
 class IKnowledgeCuratorLayer(IDefaultPloneLayer):
@@ -641,6 +661,129 @@ class IFollowUpAction(Interface):
     )
 
 
+class ILearningSession(Interface):
+    """Interface for learning session data."""
+    
+    session_id = schema.TextLine(
+        title=_("Session ID"),
+        description=_("Unique identifier for the learning session"),
+        required=True,
+    )
+    
+    start_time = schema.Datetime(
+        title=_("Start Time"),
+        description=_("When the learning session started"),
+        required=True,
+    )
+    
+    end_time = schema.Datetime(
+        title=_("End Time"),
+        description=_("When the learning session ended"),
+        required=False,
+    )
+    
+    duration_minutes = schema.Int(
+        title=_("Duration (minutes)"),
+        description=_("Session duration in minutes"),
+        required=False,
+        min=0,
+    )
+    
+    knowledge_items_studied = schema.List(
+        title=_("Knowledge Items Studied"),
+        description=_("UIDs of knowledge items studied during this session"),
+        value_type=schema.TextLine(),
+        required=False,
+        default=[],
+    )
+    
+    progress_updates = schema.Dict(
+        title=_("Progress Updates"),
+        description=_("Progress updates for each knowledge item (UID -> progress delta)"),
+        key_type=schema.TextLine(),
+        value_type=schema.Float(min=0.0, max=1.0),
+        required=False,
+        default={},
+    )
+    
+    notes = schema.Text(
+        title=_("Session Notes"),
+        description=_("Notes from the learning session"),
+        required=False,
+    )
+    
+    effectiveness_rating = schema.Int(
+        title=_("Effectiveness Rating"),
+        description=_("Self-rated effectiveness of the session (1-5)"),
+        required=False,
+        min=1,
+        max=5,
+    )
+    
+    session_type = schema.Choice(
+        title=_("Session Type"),
+        description=_("Type of learning session"),
+        vocabulary="knowledge.curator.session_types",
+        required=False,
+        default="self_study",
+    )
+
+
+class IKnowledgeItemMilestone(Interface):
+    """Interface for knowledge item milestone achievements."""
+    
+    milestone_id = schema.TextLine(
+        title=_("Milestone ID"),
+        description=_("Unique identifier for the milestone"),
+        required=True,
+    )
+    
+    knowledge_item_uid = schema.TextLine(
+        title=_("Knowledge Item UID"),
+        description=_("UID of the related knowledge item"),
+        required=True,
+    )
+    
+    milestone_type = schema.Choice(
+        title=_("Milestone Type"),
+        description=_("Type of milestone achieved"),
+        vocabulary="knowledge.curator.milestone_types",
+        required=True,
+    )
+    
+    achievement_date = schema.Datetime(
+        title=_("Achievement Date"),
+        description=_("When the milestone was achieved"),
+        required=True,
+    )
+    
+    mastery_level = schema.Float(
+        title=_("Mastery Level"),
+        description=_("Mastery level when milestone was achieved (0.0-1.0)"),
+        required=True,
+        min=0.0,
+        max=1.0,
+    )
+    
+    description = schema.Text(
+        title=_("Description"),
+        description=_("Description of the milestone achievement"),
+        required=False,
+    )
+    
+    evidence = schema.Text(
+        title=_("Evidence"),
+        description=_("Evidence supporting the milestone achievement"),
+        required=False,
+    )
+    
+    validation_criteria = schema.Text(
+        title=_("Validation Criteria"),
+        description=_("Criteria used to validate the milestone achievement"),
+        required=False,
+    )
+
+
 @provider(IFormFieldProvider)
 class IResearchNote(IKnowledgeObjectBase):
     """Schema for Research Note content type."""
@@ -757,9 +900,56 @@ class ILearningGoal(IKnowledgeObjectBase):
         default="medium",
     )
 
+    # Graph-based fields
+    starting_knowledge_item = schema.TextLine(
+        title=_("Starting Knowledge Item"),
+        description=_("UUID of the starting knowledge item for this learning path"),
+        required=False,
+    )
+    
+    target_knowledge_items = schema.List(
+        title=_("Target Knowledge Items"),
+        description=_("List of UUIDs for target knowledge items to master"),
+        value_type=schema.TextLine(
+            title=_("Knowledge Item UUID"),
+        ),
+        required=False,
+        default=[],
+    )
+    
+    knowledge_item_connections = schema.List(
+        title=_("Knowledge Item Connections"),
+        description=_("List of connections between knowledge items in this learning path"),
+        value_type=schema.Object(
+            title=_("Knowledge Item Connection"),
+            schema=IKnowledgeItemConnection
+        ),
+        required=False,
+        default=[],
+    )
+    
+    learning_strategy = schema.Choice(
+        title=_("Learning Strategy"),
+        description=_("Strategy for navigating the knowledge graph"),
+        vocabulary="knowledge.curator.learning_strategies",
+        required=False,
+        default="adaptive",
+    )
+    
+    overall_progress = schema.Float(
+        title=_("Overall Progress"),
+        description=_("Calculated overall progress across all target items (0.0-1.0)"),
+        required=False,
+        default=0.0,
+        min=0.0,
+        max=1.0,
+        readonly=True,
+    )
+
+    # DEPRECATED: Keeping for backwards compatibility
     progress = schema.Int(
-        title=_("Progress"),
-        description=_("Progress percentage (0-100)"),
+        title=_("Progress (Deprecated)"),
+        description=_("Progress percentage (0-100) - DEPRECATED: Use overall_progress instead"),
         required=False,
         default=0,
         min=0,
@@ -924,6 +1114,47 @@ class IProjectLog(IKnowledgeObjectBase):
         required=False,
     )
 
+    # Learning Goal Integration Fields
+    attached_learning_goal = schema.TextLine(
+        title=_("Attached Learning Goal"),
+        description=_("UID of the attached Learning Goal"),
+        required=True,
+    )
+    
+    knowledge_item_progress = schema.Dict(
+        title=_("Knowledge Item Progress"),
+        description=_("Progress tracking for Knowledge Items (UID -> mastery level)"),
+        key_type=schema.TextLine(
+            title=_("Knowledge Item UID"),
+            description=_("UID of the Knowledge Item"),
+        ),
+        value_type=schema.Float(
+            title=_("Mastery Level"),
+            description=_("Current mastery level (0.0-1.0)"),
+            min=0.0,
+            max=1.0,
+        ),
+        required=False,
+        default={},
+        constraint=validate_knowledge_item_progress_dict,
+    )
+    
+    learning_sessions = schema.List(
+        title=_("Learning Sessions"),
+        description=_("List of learning sessions for this project"),
+        value_type=schema.Object(schema=ILearningSession),
+        required=False,
+        default=[],
+    )
+    
+    knowledge_item_milestones = schema.List(
+        title=_("Knowledge Item Milestones"),
+        description=_("List of achieved knowledge item milestones"),
+        value_type=schema.Object(schema=IKnowledgeItemMilestone),
+        required=False,
+        default=[],
+    )
+
 
 @provider(IFormFieldProvider)
 class IBookmarkPlus(model.Schema):
@@ -980,19 +1211,43 @@ class IKnowledgeItem(model.Schema):
 
     title = schema.TextLine(
         title=_("Title"),
+        description=_("Title of the knowledge item"),
         required=True,
+        constraint=validate_title_length,
     )
 
     description = schema.Text(
-        title=_("Summary"),
-        description=_("A short summary of the knowledge item"),
-        required=False,
+        title=_("Description"),
+        description=_("A detailed description of the knowledge item"),
+        required=True,
+        constraint=validate_description_length,
     )
 
-    text = RichText(
-        title=_("Body Text"),
+    content = RichText(
+        title=_("Content"),
         description=_("Main content of the knowledge item"),
-        required=False,
+        required=True,
+        constraint=validate_content_length,
+    )
+
+    knowledge_type = schema.Choice(
+        title=_("Knowledge Type"),
+        description=_("Type of knowledge according to cognitive taxonomy"),
+        vocabulary="knowledge.curator.knowledge_types",
+        required=True,
+        constraint=validate_knowledge_type,
+    )
+
+    atomic_concepts = schema.List(
+        title=_("Atomic Concepts"),
+        description=_("List of atomic knowledge units contained in this item"),
+        value_type=schema.TextLine(
+            title=_("Concept"),
+            description=_("An atomic concept or knowledge unit"),
+        ),
+        required=True,
+        default=["main_concept"],  # Changed from empty list to have at least one concept
+        constraint=validate_atomic_concepts,
     )
 
     tags = schema.List(
@@ -1001,6 +1256,7 @@ class IKnowledgeItem(model.Schema):
         value_type=schema.TextLine(),
         required=False,
         default=[],
+        constraint=validate_tags,
     )
 
     source_url = schema.URI(
@@ -1015,6 +1271,7 @@ class IKnowledgeItem(model.Schema):
         value_type=schema.Float(),
         required=False,
         readonly=True,
+        constraint=validate_embedding_vector,
     )
 
     ai_summary = schema.Text(
@@ -1038,6 +1295,81 @@ class IKnowledgeItem(model.Schema):
         required=False,
     )
 
+    # Learning Integration Fields
+    mastery_threshold = schema.Float(
+        title=_("Mastery Threshold"),
+        description=_("The threshold value (0.0-1.0) that indicates mastery of this knowledge item"),
+        required=False,
+        default=0.8,
+        min=0.0,
+        max=1.0,
+        constraint=validate_mastery_threshold,
+    )
+
+    learning_progress = schema.Float(
+        title=_("Learning Progress"),
+        description=_("Current learning progress (0.0-1.0) for this knowledge item"),
+        required=False,
+        default=0.0,
+        min=0.0,
+        max=1.0,
+        readonly=True,
+        constraint=validate_learning_progress,
+    )
+
+    last_reviewed = schema.Datetime(
+        title=_("Last Reviewed"),
+        description=_("Timestamp of when this knowledge item was last reviewed"),
+        required=False,
+    )
+
+    difficulty_level = schema.Choice(
+        title=_("Difficulty Level"),
+        description=_("The difficulty level of this knowledge item for adaptive learning"),
+        vocabulary="knowledge.curator.difficulty_levels",
+        required=False,
+        default="intermediate",
+        constraint=validate_difficulty_level,
+    )
+
+    # Relationship fields for knowledge item dependencies
+    directives.widget('prerequisite_items', RelatedItemsFieldWidget)
+    prerequisite_items = schema.List(
+        title=_("Prerequisite Knowledge Items"),
+        description=_("Knowledge items that should be understood before this one"),
+        value_type=schema.Choice(
+            title=_("Knowledge Item"),
+            source=CatalogSource(portal_type='KnowledgeItem'),
+        ),
+        required=False,
+        default=[],
+        constraint=validate_uid_references_list,
+    )
+
+    directives.widget('enables_items', RelatedItemsFieldWidget)
+    enables_items = schema.List(
+        title=_("Enables Knowledge Items"),
+        description=_("Knowledge items that this item enables or unlocks"),
+        value_type=schema.Choice(
+            title=_("Knowledge Item"),
+            source=CatalogSource(portal_type='KnowledgeItem'),
+        ),
+        required=False,
+        default=[],
+        constraint=validate_uid_references_list,
+    )
+    
+    # Invariants for cross-field validation
+    @invariant
+    def validate_prerequisite_enables_consistency(data):
+        """Ensure prerequisite and enables lists don't overlap."""
+        validate_prerequisite_enables_consistency(data)
+    
+    @invariant
+    def validate_mastery_threshold_progress_consistency(data):
+        """Ensure learning progress and mastery threshold are consistent."""
+        validate_mastery_threshold_progress_consistency(data)
+
 
 # Additional interfaces for the system
 
@@ -1056,6 +1388,24 @@ class IKnowledgeGraph(Interface):
 
     def get_related_items(uid, max_items=10):
         """Get related items based on connections and similarity."""
+
+    def get_prerequisite_graph(uid):
+        """Get the full prerequisite dependency graph for a knowledge item.
+        
+        Returns a dict with 'nodes' and 'edges' for visualization.
+        """
+
+    def get_learning_path(start_uid, end_uid):
+        """Calculate the optimal learning path between two knowledge items.
+        
+        Returns a list of knowledge item UIDs representing the path.
+        """
+
+    def validate_no_circular_dependencies():
+        """Validate that there are no circular dependencies in the knowledge graph.
+        
+        Returns a dict with 'valid' (bool) and 'cycles' (list of cycles found).
+        """
 
 
 class IVectorSearch(Interface):

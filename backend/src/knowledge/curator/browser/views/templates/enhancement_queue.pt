@@ -1,0 +1,302 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="knowledge.curator"
+      metal:use-macro="context/main_template/macros/master">
+
+<metal:content-core fill-slot="content-core">
+<metal:block define-macro="content-core">
+
+<div class="enhancement-queue-management">
+    <h1>AI Enhancement Queue</h1>
+    
+    <div class="queue-actions">
+        <button class="btn btn-primary" onclick="processQueue()">
+            Process Queue (Batch: 10)
+        </button>
+        <button class="btn btn-success" onclick="processKnowledgeItems()">
+            Process Knowledge Items Only
+        </button>
+        <button class="btn btn-info" onclick="refreshQueue()">
+            Refresh
+        </button>
+        <button class="btn btn-warning" onclick="showStats()">
+            Show Statistics
+        </button>
+        <button class="btn btn-danger" onclick="clearQueue()">
+            Clear Queue
+        </button>
+    </div>
+    
+    <div id="queue-stats" class="queue-statistics" style="display:none;">
+        <!-- Statistics will be loaded here -->
+    </div>
+    
+    <h2>Knowledge Items Priority Queue</h2>
+    <div class="knowledge-items-section">
+        <table class="listing" id="knowledge-items-queue">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>State</th>
+                    <th>Priority</th>
+                    <th>Operation</th>
+                    <th>Queued</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:items repeat="item view/get_knowledge_items_queue">
+                <tr>
+                    <td>
+                        <a tal:attributes="href string:${item/path}/view"
+                           tal:content="item/title">Title</a>
+                    </td>
+                    <td tal:content="item/state">State</td>
+                    <td>
+                        <span tal:attributes="class python:view.get_priority_class(item['priority'])"
+                              tal:content="python:view.format_priority(item['priority'])">Priority</span>
+                    </td>
+                    <td tal:content="item/operation">Operation</td>
+                    <td tal:content="item/queued_at">Queued</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary"
+                                tal:attributes="onclick string:processItem('${item/uid}')">
+                            Process Now
+                        </button>
+                        <button class="btn btn-sm btn-warning"
+                                tal:attributes="onclick string:requeueItem('${item/uid}')">
+                            Requeue
+                        </button>
+                    </td>
+                </tr>
+                </tal:items>
+            </tbody>
+        </table>
+    </div>
+    
+    <h2>Other Items Queue</h2>
+    <div class="other-items-section">
+        <table class="listing" id="other-items-queue">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>State</th>
+                    <th>Priority</th>
+                    <th>Operation</th>
+                    <th>Queued</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:items repeat="item python:[i for i in view.get_queue_items() if i.get('portal_type') != 'KnowledgeItem']">
+                <tr>
+                    <td>
+                        <a tal:attributes="href string:${item/path}/view"
+                           tal:content="item/title">Title</a>
+                    </td>
+                    <td tal:content="item/portal_type">Type</td>
+                    <td tal:content="item/state">State</td>
+                    <td>
+                        <span tal:attributes="class python:view.get_priority_class(item['priority'])"
+                              tal:content="python:view.format_priority(item['priority'])">Priority</span>
+                    </td>
+                    <td tal:content="item/operation">Operation</td>
+                    <td tal:content="item/queued_at">Queued</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary"
+                                tal:attributes="onclick string:processItem('${item/uid}')">
+                            Process
+                        </button>
+                        <button class="btn btn-sm btn-warning"
+                                tal:attributes="onclick string:requeueItem('${item/uid}')">
+                            Requeue
+                        </button>
+                    </td>
+                </tr>
+                </tal:items>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.enhancement-queue-management {
+    padding: 20px;
+}
+
+.queue-actions {
+    margin-bottom: 20px;
+}
+
+.queue-actions button {
+    margin-right: 10px;
+}
+
+.queue-statistics {
+    background: #f5f5f5;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.knowledge-items-section {
+    margin-bottom: 30px;
+}
+
+.priority-critical {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.priority-high {
+    color: #f0ad4e;
+    font-weight: bold;
+}
+
+.priority-medium {
+    color: #5bc0de;
+}
+
+.priority-low {
+    color: #777;
+}
+
+table.listing {
+    width: 100%;
+    margin-top: 10px;
+}
+
+table.listing th {
+    background: #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+table.listing td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.btn-sm {
+    padding: 2px 8px;
+    font-size: 12px;
+}
+</style>
+
+<script>
+function processQueue() {
+    fetch('@@enhancement-queue?action=process', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'batch_size=10'
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(`Processed ${data.processed} items`);
+        location.reload();
+    });
+}
+
+function processKnowledgeItems() {
+    fetch('@@enhancement-queue?action=process', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'batch_size=10&content_type=KnowledgeItem'
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(`Processed ${data.processed} Knowledge Items`);
+        location.reload();
+    });
+}
+
+function processItem(uid) {
+    fetch('@@enhancement-queue?action=process', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `batch_size=1&uid=${uid}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Item processed');
+        location.reload();
+    });
+}
+
+function requeueItem(uid) {
+    fetch('@@enhancement-queue?action=requeue', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `uid=${uid}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(`Item requeued with priority ${data.priority}`);
+        location.reload();
+    });
+}
+
+function clearQueue() {
+    if (confirm('Are you sure you want to clear the entire queue?')) {
+        fetch('@@enhancement-queue?action=clear', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Queue cleared');
+            location.reload();
+        });
+    }
+}
+
+function showStats() {
+    fetch('@@enhancement-queue?action=stats')
+    .then(response => response.json())
+    .then(data => {
+        const statsDiv = document.getElementById('queue-stats');
+        statsDiv.innerHTML = `
+            <h3>Queue Statistics</h3>
+            <p><strong>Total items:</strong> ${data.total}</p>
+            <p><strong>Knowledge Items:</strong> ${data.knowledge_items}</p>
+            <p><strong>Average Priority:</strong> ${data.average_priority.toFixed(2)}</p>
+            <h4>By Type:</h4>
+            <ul>
+            ${Object.entries(data.by_type).map(([type, count]) => 
+                `<li>${type}: ${count}</li>`
+            ).join('')}
+            </ul>
+            <h4>By Operation:</h4>
+            <ul>
+            ${Object.entries(data.by_operation).map(([op, count]) => 
+                `<li>${op}: ${count}</li>`
+            ).join('')}
+            </ul>
+            ${data.highest_priority ? `
+                <h4>Highest Priority Item:</h4>
+                <p>${data.highest_priority.title} (${data.highest_priority.portal_type}) - Priority: ${data.highest_priority.priority.toFixed(2)}</p>
+            ` : ''}
+        `;
+        statsDiv.style.display = 'block';
+    });
+}
+
+function refreshQueue() {
+    location.reload();
+}
+</script>
+
+</metal:block>
+</metal:content-core>
+
+</html>

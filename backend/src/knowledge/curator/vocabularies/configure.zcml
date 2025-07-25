@@ -165,4 +165,39 @@
       component=".RelationshipTypesVocabularyFactory"
       />
 
+  <!-- Knowledge items vocabulary -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.knowledge_items"
+      component=".knowledge_items.KnowledgeItemsVocabularyFactory"
+      />
+
+  <!-- Connection types vocabulary -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.connection_types"
+      component=".connection_types.ConnectionTypesVocabularyFactory"
+      />
+
+  <!-- Learning strategies vocabulary -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.learning_strategies"
+      component=".LearningStrategiesVocabularyFactory"
+      />
+
+  <!-- Session types vocabulary -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.session_types"
+      component=".SessionTypesVocabularyFactory"
+      />
+
+  <!-- Milestone types vocabulary -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.milestone_types"
+      component=".MilestoneTypesVocabularyFactory"
+      />
+
 </configure>

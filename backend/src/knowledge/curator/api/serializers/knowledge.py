@@ -1,6 +1,7 @@
 """Custom serializers for knowledge content types."""
 
 from knowledge.curator.interfaces import IBookmarkPlus
+from knowledge.curator.interfaces import IKnowledgeItem
 from knowledge.curator.interfaces import ILearningGoal
 from knowledge.curator.interfaces import IProjectLog
 from knowledge.curator.interfaces import IResearchNote
@@ -417,5 +418,110 @@ class BookmarkPlusSerializer(SerializeFolderToJson):
 
             parsed = urlparse(result["url"])
             result["domain"] = parsed.netloc
+
+        return result
+
+
+@implementer(ISerializeToJson)
+@adapter(IKnowledgeItem, Interface)
+class KnowledgeItemSerializer(SerializeFolderToJson):
+    """Serializer for Knowledge Item content type."""
+
+    def __call__(self, version=None, include_items=True):
+        result = super().__call__(version, include_items)
+
+        obj = self.context
+
+        # Include embedding vector if requested
+        include_embeddings = (
+            self.request.get("include_embeddings", "false").lower() == "true"
+        )
+
+        # Core fields
+        result["content"] = obj.content.raw if hasattr(obj, "content") else ""
+        result["knowledge_type"] = getattr(obj, "knowledge_type", "")
+        result["atomic_concepts"] = getattr(obj, "atomic_concepts", [])
+        result["source_url"] = getattr(obj, "source_url", "")
+        result["ai_summary"] = getattr(obj, "ai_summary", "")
+        result["relevance_score"] = getattr(obj, "relevance_score", 0.0)
+        
+        # Learning integration fields
+        result["mastery_threshold"] = getattr(obj, "mastery_threshold", 0.8)
+        result["learning_progress"] = getattr(obj, "learning_progress", 0.0)
+        result["last_reviewed"] = getattr(obj, "last_reviewed", None)
+        if result["last_reviewed"]:
+            result["last_reviewed"] = result["last_reviewed"].isoformat()
+        result["difficulty_level"] = getattr(obj, "difficulty_level", "intermediate")
+        
+        # Relationship fields
+        result["prerequisite_items"] = getattr(obj, "prerequisite_items", [])
+        result["enables_items"] = getattr(obj, "enables_items", [])
+        
+        # Include embedding vector if requested
+        if include_embeddings and hasattr(obj, "embedding_vector"):
+            result["embedding_vector"] = getattr(obj, "embedding_vector", [])
+
+        # Add prerequisite details
+        if result["prerequisite_items"]:
+            catalog = api.portal.get_tool("portal_catalog")
+            prerequisite_details = []
+
+            for uid in result["prerequisite_items"]:
+                brains = catalog(UID=uid)
+                if brains:
+                    brain = brains[0]
+                    prerequisite_details.append({
+                        "uid": uid,
+                        "title": brain.Title,
+                        "portal_type": brain.portal_type,
+                        "url": brain.getURL(),
+                    })
+
+            result["prerequisite_details"] = prerequisite_details
+
+        # Add enabled item details
+        if result["enables_items"]:
+            catalog = api.portal.get_tool("portal_catalog")
+            enabled_details = []
+
+            for uid in result["enables_items"]:
+                brains = catalog(UID=uid)
+                if brains:
+                    brain = brains[0]
+                    enabled_details.append({
+                        "uid": uid,
+                        "title": brain.Title,
+                        "portal_type": brain.portal_type,
+                        "url": brain.getURL(),
+                    })
+
+            result["enabled_details"] = enabled_details
+
+        # Add attachment info if present
+        if hasattr(obj, "attachment") and obj.attachment:
+            result["has_attachment"] = True
+            result["attachment_filename"] = obj.attachment.filename
+            result["attachment_size"] = obj.attachment.size
+            result["attachment_content_type"] = obj.attachment.contentType
+
+        # Add spaced repetition data if available
+        if hasattr(obj, "_sr_data"):
+            sr_data = obj._sr_data
+            result["spaced_repetition"] = {
+                "interval": sr_data.get("interval"),
+                "repetitions": sr_data.get("repetitions"),
+                "ease_factor": sr_data.get("ease_factor"),
+                "last_review": sr_data.get("last_review", "").isoformat()
+                if sr_data.get("last_review")
+                else None,
+                "next_review": sr_data.get("next_review", "").isoformat()
+                if sr_data.get("next_review")
+                else None,
+            }
+
+        # Calculate mastery status
+        progress = result["learning_progress"]
+        threshold = result["mastery_threshold"]
+        result["is_mastered"] = progress >= threshold
 
         return result

@@ -22,4 +22,24 @@
   <!-- BookmarkPlus content type -->
   <include file="bookmark_plus.zcml" />
 
+  <!-- Event handlers for Knowledge Item relationships -->
+  <subscriber
+      handler=".events.handle_knowledge_item_deletion"
+      />
+
+  <subscriber
+      handler=".events.validate_knowledge_item_before_deletion"
+      />
+
+  <!-- Field validators for Knowledge Item -->
+  <adapter
+      factory=".field_validators.NoSelfReferenceValidator"
+      name="knowledge.curator.no_self_reference"
+      />
+
+  <adapter
+      factory=".field_validators.CircularDependencyValidator"
+      name="knowledge.curator.circular_dependency"
+      />
+
 </configure>

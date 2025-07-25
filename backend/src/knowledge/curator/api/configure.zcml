@@ -127,4 +127,14 @@
       name="@vector-clustering"
       />
 
+  <!-- Enhancement Queue API -->
+  <plone:service
+      method="GET,POST,DELETE"
+      accept="application/json"
+      factory=".enhancement_queue.EnhancementQueueService"
+      for="*"
+      permission="zope2.View"
+      name="@enhancement-queue"
+      />
+
 </configure>

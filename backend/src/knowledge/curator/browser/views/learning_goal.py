@@ -61,3 +61,39 @@ class LearningGoalView(BrowserView):
             "high": "priority-high",
         }
         return priority_map.get(self.context.priority, "priority-medium")
+    
+    def get_overall_progress(self, knowledge_item_mastery=None):
+        """Get overall progress calculation for the learning goal.
+        
+        Args:
+            knowledge_item_mastery: Optional dict mapping knowledge item UIDs to mastery levels
+                                  If not provided, will attempt to get from current user's progress
+        
+        Returns:
+            dict with overall progress data including visualization information
+        """
+        if hasattr(self.context, 'calculate_overall_progress'):
+            # If no mastery levels provided, try to get from user's learning progress
+            if knowledge_item_mastery is None:
+                # This could be extended to fetch from a user progress tracking system
+                # For now, just use empty dict
+                knowledge_item_mastery = {}
+            
+            return self.context.calculate_overall_progress(knowledge_item_mastery)
+        else:
+            # Return empty result if method not available
+            return {
+                'overall_percentage': 0,
+                'weighted_progress': 0.0,
+                'items_mastered': 0,
+                'total_items': 0,
+                'prerequisite_satisfaction': 0.0,
+                'path_segments': [],
+                'visualization_data': {
+                    'nodes': [],
+                    'edges': [],
+                    'progress_by_level': {}
+                },
+                'bottlenecks': [],
+                'next_milestones': []
+            }

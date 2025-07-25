@@ -397,6 +397,19 @@ class CitationFormatsVocabulary:
 
 
 @implementer(IVocabularyFactory)
+class LearningStrategiesVocabulary:
+    """Vocabulary for learning strategies for navigating knowledge graphs."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="linear", title="Linear"),
+            SimpleTerm(value="adaptive", title="Adaptive"),
+            SimpleTerm(value="exploratory", title="Exploratory"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
 class RelationshipTypesVocabulary:
     """Vocabulary for knowledge graph relationship types."""
 
@@ -409,5 +422,40 @@ class RelationshipTypesVocabulary:
         return SimpleVocabulary(terms)
 
 
+@implementer(IVocabularyFactory)
+class SessionTypesVocabulary:
+    """Vocabulary for learning session types."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="self_study", title="Self Study"),
+            SimpleTerm(value="guided_learning", title="Guided Learning"),
+            SimpleTerm(value="review_session", title="Review Session"),
+            SimpleTerm(value="practice_session", title="Practice Session"),
+            SimpleTerm(value="assessment", title="Assessment"),
+            SimpleTerm(value="collaborative", title="Collaborative Learning"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class MilestoneTypesVocabulary:
+    """Vocabulary for knowledge item milestone types."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="first_encounter", title="First Encounter"),
+            SimpleTerm(value="basic_understanding", title="Basic Understanding"),
+            SimpleTerm(value="practical_application", title="Practical Application"),
+            SimpleTerm(value="mastery_achieved", title="Mastery Achieved"),
+            SimpleTerm(value="teaching_ready", title="Teaching Ready"),
+            SimpleTerm(value="advanced_synthesis", title="Advanced Synthesis"),
+        ]
+        return SimpleVocabulary(terms)
+
+
 RelationshipTypesVocabularyFactory = RelationshipTypesVocabulary()
 CitationFormatsVocabularyFactory = CitationFormatsVocabulary()
+LearningStrategiesVocabularyFactory = LearningStrategiesVocabulary()
+SessionTypesVocabularyFactory = SessionTypesVocabulary()
+MilestoneTypesVocabularyFactory = MilestoneTypesVocabulary()

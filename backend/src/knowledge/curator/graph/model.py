@@ -6,8 +6,14 @@ from enum import Enum
 
 
 class NodeType(Enum):
-    """Types of nodes in the knowledge graph."""
+    """Types of nodes in the knowledge graph.
+    
+    KNOWLEDGE_ITEM is the primary content type with highest priority,
+    appearing first in enum iteration and serving as the default type
+    for knowledge graph operations.
+    """
 
+    KNOWLEDGE_ITEM = "KnowledgeItem"  # Primary content type with highest priority
     RESEARCH_NOTE = "ResearchNote"
     LEARNING_GOAL = "LearningGoal"
     PROJECT_LOG = "ProjectLog"

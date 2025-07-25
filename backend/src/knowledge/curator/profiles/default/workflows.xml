@@ -25,6 +25,9 @@
     <type type_id="LearningGoal">
       <bound-workflow workflow_id="learning_goal_workflow" />
     </type>
+    <type type_id="KnowledgeItem">
+      <bound-workflow workflow_id="knowledge_workflow" />
+    </type>
   </bindings>
 
 </object>

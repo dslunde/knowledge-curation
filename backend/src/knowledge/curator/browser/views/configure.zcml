@@ -126,4 +126,20 @@
       permission="zope2.View"
       />
 
+  <!-- Enhancement Queue Management Views -->
+  <browser:page
+      name="enhancement-queue"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".enhancement_queue.EnhancementQueueView"
+      template="templates/enhancement_queue.pt"
+      permission="cmf.ManagePortal"
+      />
+
+  <browser:page
+      name="batch-enhancement"
+      for="*"
+      class=".enhancement_queue.BatchEnhancementView"
+      permission="cmf.ManagePortal"
+      />
+
 </configure>
