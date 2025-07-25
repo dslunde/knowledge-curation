@@ -1,0 +1,403 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="knowledge.curator"
+      metal:use-macro="context/main_template/macros/master">
+
+<metal:content-core fill-slot="content-core">
+<metal:block define-macro="content-core">
+
+<div class="quality-dashboard">
+    <h1>Quality Assessment Dashboard</h1>
+    
+    <div class="dashboard-actions">
+        <button class="btn btn-primary" onclick="refreshDashboard()">
+            Refresh Dashboard
+        </button>
+        <button class="btn btn-info" onclick="exportQualityReport()">
+            Export Report
+        </button>
+        <button class="btn btn-warning" onclick="bulkReview()">
+            Bulk Review
+        </button>
+    </div>
+    
+    <!-- Quality Overview Section -->
+    <div class="quality-overview-section" 
+         tal:define="overview view/get_quality_overview">
+        <h2>Quality Overview</h2>
+        
+        <div class="overview-stats">
+            <div class="stat-card">
+                <h3>Total Resources</h3>
+                <span class="stat-number" tal:content="overview/total_resources">0</span>
+            </div>
+            <div class="stat-card high-quality">
+                <h3>High Quality</h3>
+                <span class="stat-number" tal:content="overview/high_quality">0</span>
+            </div>
+            <div class="stat-card medium-quality">
+                <h3>Medium Quality</h3>
+                <span class="stat-number" tal:content="overview/medium_quality">0</span>
+            </div>
+            <div class="stat-card low-quality">
+                <h3>Low Quality</h3>
+                <span class="stat-number" tal:content="overview/low_quality">0</span>
+            </div>
+            <div class="stat-card flagged">
+                <h3>Flagged for Review</h3>
+                <span class="stat-number" tal:content="overview/flagged_for_review">0</span>
+            </div>
+            <div class="stat-card average">
+                <h3>Average Quality</h3>
+                <span class="stat-number" tal:content="overview/average_quality">0.0</span>
+            </div>
+        </div>
+        
+        <!-- Quality Distribution Chart -->
+        <div class="quality-distribution" tal:condition="overview/quality_distribution">
+            <h3>Quality Distribution</h3>
+            <div class="distribution-chart">
+                <tal:distribution repeat="bucket overview/quality_distribution">
+                <div class="distribution-bar">
+                    <label tal:content="bucket/range">Range</label>
+                    <div class="bar">
+                        <div class="bar-fill" 
+                             tal:attributes="style string:width: ${python:min(100, (bucket['count'] / overview['total_resources'] * 100) if overview['total_resources'] > 0 else 0)}%">
+                        </div>
+                        <span class="bar-count" tal:content="bucket/count">0</span>
+                    </div>
+                </div>
+                </tal:distribution>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Flagged Resources Section -->
+    <div class="flagged-resources-section"
+         tal:define="flagged view/get_flagged_resources"
+         tal:condition="flagged">
+        <h2>Resources Flagged for Review</h2>
+        
+        <table class="listing flagged-resources-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Quality Score</th>
+                    <th>Flag Reason</th>
+                    <th>Flag Date</th>
+                    <th>Read Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:flagged repeat="resource flagged">
+                <tr tal:attributes="class python:'flagged-resource priority-' + str(int((1-resource['quality_score']) * 3))">
+                    <td>
+                        <a tal:attributes="href resource/url" 
+                           tal:content="resource/title">Title</a>
+                        <br/>
+                        <small>
+                            <a tal:attributes="href resource/resource_url" 
+                               tal:content="resource/resource_url"
+                               target="_blank">Resource URL</a>
+                        </small>
+                    </td>
+                    <td>
+                        <span class="quality-score"
+                              tal:attributes="class python:'score-' + ('low' if resource['quality_score'] < 0.4 else 'medium' if resource['quality_score'] < 0.7 else 'high')"
+                              tal:content="python:'{:.3f}'.format(resource['quality_score'])">0.000</span>
+                    </td>
+                    <td tal:content="resource/flag_reason">Reason</td>
+                    <td tal:content="resource/flag_date">Date</td>
+                    <td>
+                        <span tal:attributes="class string:status-${resource/read_status}"
+                              tal:content="resource/read_status">Status</span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary"
+                                tal:attributes="onclick string:reviewResource('${resource/uid}')">
+                            Review
+                        </button>
+                        <button class="btn btn-sm btn-success"
+                                tal:attributes="onclick string:unflagResource('${resource/uid}')">
+                            Unflag
+                        </button>
+                        <button class="btn btn-sm btn-warning"
+                                tal:attributes="onclick string:enhanceResource('${resource/uid}')">
+                            Enhance
+                        </button>
+                    </td>
+                </tr>
+                </tal:flagged>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Top Quality Resources Section -->
+    <div class="top-resources-section"
+         tal:define="top_resources python:view.get_top_quality_resources(10)"
+         tal:condition="top_resources">
+        <h2>Top Quality Resources</h2>
+        
+        <table class="listing top-resources-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Quality Score</th>
+                    <th>Read Status</th>
+                    <th>Last Modified</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:top repeat="resource top_resources">
+                <tr class="top-resource">
+                    <td>
+                        <a tal:attributes="href resource/url" 
+                           tal:content="resource/title">Title</a>
+                        <br/>
+                        <small>
+                            <a tal:attributes="href resource/resource_url" 
+                               tal:content="resource/resource_url"
+                               target="_blank">Resource URL</a>
+                        </small>
+                    </td>
+                    <td>
+                        <span class="quality-score score-high"
+                              tal:content="python:'{:.3f}'.format(resource['quality_score'])">0.000</span>
+                    </td>
+                    <td>
+                        <span tal:attributes="class string:status-${resource/read_status}"
+                              tal:content="resource/read_status">Status</span>
+                    </td>
+                    <td tal:content="resource/modified">Modified</td>
+                    <td>
+                        <button class="btn btn-sm btn-info"
+                                tal:attributes="onclick string:viewResource('${resource/uid}')">
+                            View
+                        </button>
+                        <button class="btn btn-sm btn-success"
+                                tal:attributes="onclick string:shareResource('${resource/uid}')">
+                            Share
+                        </button>
+                    </td>
+                </tr>
+                </tal:top>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Empty State Messages -->
+    <div class="empty-state" 
+         tal:condition="python:not view.get_flagged_resources() and not view.get_top_quality_resources(10)">
+        <h3>No Quality Data Available</h3>
+        <p>No BookmarkPlus resources found or quality assessment not yet performed.</p>
+        <button class="btn btn-primary" onclick="runQualityAssessment()">
+            Run Quality Assessment
+        </button>
+    </div>
+</div>
+
+<!-- JavaScript for Dashboard Functionality -->
+<script type="text/javascript">
+function refreshDashboard() {
+    location.reload();
+}
+
+function exportQualityReport() {
+    window.open('@@quality-assessment-api?action=export', '_blank');
+}
+
+function bulkReview() {
+    // Implement bulk review functionality
+    alert('Bulk review functionality to be implemented');
+}
+
+function reviewResource(uid) {
+    window.open('/@@review-interface?uid=' + uid, '_blank');
+}
+
+function unflagResource(uid) {
+    if (confirm('Are you sure you want to unflag this resource?')) {
+        fetch('@@quality-assessment-api', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({action: 'unflag', uid: uid})
+        }).then(() => refreshDashboard());
+    }
+}
+
+function enhanceResource(uid) {
+    fetch('@@quality-assessment-api', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action: 'enhance', uid: uid})
+    }).then(() => refreshDashboard());
+}
+
+function viewResource(uid) {
+    window.open('/++api++/content/' + uid, '_blank');
+}
+
+function shareResource(uid) {
+    // Implement sharing functionality
+    alert('Share functionality to be implemented');
+}
+
+function runQualityAssessment() {
+    if (confirm('Run quality assessment on all BookmarkPlus resources? This may take some time.')) {
+        fetch('@@quality-assessment-api', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({action: 'assess_all'})
+        }).then(() => refreshDashboard());
+    }
+}
+</script>
+
+<!-- CSS Styles for Dashboard -->
+<style type="text/css">
+.quality-dashboard {
+    padding: 20px;
+}
+
+.dashboard-actions {
+    margin-bottom: 20px;
+}
+
+.dashboard-actions .btn {
+    margin-right: 10px;
+}
+
+.overview-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+
+.stat-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #495057;
+}
+
+.stat-card.high-quality .stat-number { color: #28a745; }
+.stat-card.medium-quality .stat-number { color: #ffc107; }
+.stat-card.low-quality .stat-number { color: #dc3545; }
+.stat-card.flagged .stat-number { color: #fd7e14; }
+.stat-card.average .stat-number { color: #17a2b8; }
+
+.distribution-chart {
+    margin-top: 15px;
+}
+
+.distribution-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.distribution-bar label {
+    width: 80px;
+    font-size: 12px;
+}
+
+.bar {
+    flex: 1;
+    height: 20px;
+    background: #e9ecef;
+    border-radius: 10px;
+    position: relative;
+    margin: 0 10px;
+}
+
+.bar-fill {
+    height: 100%;
+    background: #007bff;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.bar-count {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: #495057;
+}
+
+.quality-score.score-high { color: #28a745; font-weight: bold; }
+.quality-score.score-medium { color: #ffc107; font-weight: bold; }
+.quality-score.score-low { color: #dc3545; font-weight: bold; }
+
+.status-read { color: #28a745; }
+.status-unread { color: #6c757d; }
+.status-reading { color: #17a2b8; }
+
+.flagged-resource.priority-0 { background-color: #fff5f5; }
+.flagged-resource.priority-1 { background-color: #fff8e1; }
+.flagged-resource.priority-2 { background-color: #ffebee; }
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.listing {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.listing th, .listing td {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    text-align: left;
+}
+
+.listing th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+}
+
+.btn-primary { background-color: #007bff; color: white; }
+.btn-success { background-color: #28a745; color: white; }
+.btn-warning { background-color: #ffc107; color: black; }
+.btn-info { background-color: #17a2b8; color: white; }
+.btn-danger { background-color: #dc3545; color: white; }
+.btn-sm { padding: 4px 8px; font-size: 11px; }
+</style>
+
+</metal:block>
+</metal:content-core>
+
+</html> 

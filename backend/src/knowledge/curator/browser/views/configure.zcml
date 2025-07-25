@@ -132,14 +132,14 @@
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".enhancement_queue.EnhancementQueueView"
       template="templates/enhancement_queue.pt"
-      permission="cmf.ManagePortal"
+      permission="zope2.View"
       />
 
   <browser:page
       name="batch-enhancement"
       for="*"
       class=".enhancement_queue.BatchEnhancementView"
-      permission="cmf.ManagePortal"
+      permission="zope2.View"
       />
 
   <!-- Quality Assessment Views -->
@@ -155,7 +155,7 @@
       name="quality-assessment-api"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".quality_dashboard.QualityAssessmentAPIView"
-      permission="cmf.ManagePortal"
+      permission="zope2.View"
       />
 
   <browser:page

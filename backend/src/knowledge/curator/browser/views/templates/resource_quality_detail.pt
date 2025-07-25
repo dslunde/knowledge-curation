@@ -1,0 +1,494 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="knowledge.curator"
+      metal:use-macro="context/main_template/macros/master">
+
+<metal:content-core fill-slot="content-core">
+<metal:block define-macro="content-core">
+
+<div class="resource-quality-detail">
+    <h1 class="documentFirstHeading">Quality Assessment for: 
+        <span tal:content="context/title">Resource Title</span>
+    </h1>
+    
+    <div class="resource-basic-info">
+        <div class="field" tal:condition="context/description">
+            <label>Description:</label>
+            <p tal:content="context/description">Description</p>
+        </div>
+        
+        <div class="field" tal:condition="context/url">
+            <label>Resource URL:</label>
+            <a tal:content="context/url" 
+               tal:attributes="href context/url"
+               target="_blank">URL</a>
+        </div>
+        
+        <div class="field">
+            <label>Status:</label>
+            <span tal:content="context/review_state">Status</span>
+        </div>
+    </div>
+    
+    <!-- Quality Metrics Section -->
+    <div class="quality-metrics-section"
+         tal:define="metrics view/get_quality_metrics">
+        <h2>Quality Metrics</h2>
+        
+        <div class="metrics-overview" tal:condition="metrics">
+            <div class="metric-card overall-score">
+                <h3>Overall Quality Score</h3>
+                <span class="metric-value" 
+                      tal:content="python:'{:.3f}'.format(metrics.get('overall_score', 0.0))"
+                      tal:attributes="class python:'score-' + ('high' if metrics.get('overall_score', 0) >= 0.7 else 'medium' if metrics.get('overall_score', 0) >= 0.4 else 'low')">0.000</span>
+            </div>
+            
+            <div class="metric-card">
+                <h3>Content Quality</h3>
+                <span class="metric-value" tal:content="python:'{:.3f}'.format(metrics.get('content_quality', 0.0))">0.000</span>
+            </div>
+            
+            <div class="metric-card">
+                <h3>Resource Accessibility</h3>
+                <span class="metric-value" tal:content="python:'{:.3f}'.format(metrics.get('resource_accessibility', 0.0))">0.000</span>
+            </div>
+            
+            <div class="metric-card">
+                <h3>Metadata Completeness</h3>
+                <span class="metric-value" tal:content="python:'{:.3f}'.format(metrics.get('metadata_completeness', 0.0))">0.000</span>
+            </div>
+            
+            <div class="metric-card">
+                <h3>Recency</h3>
+                <span class="metric-value" tal:content="python:'{:.3f}'.format(metrics.get('recency', 0.0))">0.000</span>
+            </div>
+            
+            <div class="metric-card">
+                <h3>User Engagement</h3>
+                <span class="metric-value" tal:content="python:'{:.3f}'.format(metrics.get('user_engagement', 0.0))">0.000</span>
+            </div>
+        </div>
+        
+        <!-- Detailed Metrics -->
+        <div class="detailed-metrics" tal:condition="metrics">
+            <h3>Detailed Analysis</h3>
+            
+            <div class="metric-detail">
+                <label>Read Status:</label>
+                <span tal:content="metrics/read_status|nothing"
+                      tal:attributes="class string:status-${metrics/read_status}">unread</span>
+            </div>
+            
+            <div class="metric-detail" tal:condition="metrics/tags|nothing">
+                <label>Tags:</label>
+                <span tal:repeat="tag metrics/tags">
+                    <span class="tag" tal:content="tag">Tag</span>
+                </span>
+            </div>
+            
+            <div class="metric-detail" tal:condition="metrics/category|nothing">
+                <label>Category:</label>
+                <span tal:content="metrics/category">Category</span>
+            </div>
+            
+            <div class="metric-detail" tal:condition="metrics/priority|nothing">
+                <label>Priority:</label>
+                <span tal:content="metrics/priority">Priority</span>
+            </div>
+            
+            <div class="metric-detail" tal:condition="metrics/last_accessed|nothing">
+                <label>Last Accessed:</label>
+                <span tal:content="metrics/last_accessed">Date</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quality Flag Section -->
+    <div class="quality-flag-section" 
+         tal:condition="view/is_flagged_for_review"
+         tal:define="flag_info view/get_flag_info">
+        <h2>Quality Review Flag</h2>
+        
+        <div class="flag-alert">
+            <h3>This resource is flagged for quality review</h3>
+            
+            <div class="flag-details" tal:condition="flag_info">
+                <div class="flag-detail">
+                    <label>Reason:</label>
+                    <span tal:content="flag_info/reason|string:No reason specified">Reason</span>
+                </div>
+                
+                <div class="flag-detail" tal:condition="flag_info/timestamp|nothing">
+                    <label>Flagged on:</label>
+                    <span tal:content="flag_info/timestamp">Date</span>
+                </div>
+                
+                <div class="flag-detail" tal:condition="flag_info/flagged_by|nothing">
+                    <label>Flagged by:</label>
+                    <span tal:content="flag_info/flagged_by">User</span>
+                </div>
+                
+                <div class="flag-detail" tal:condition="flag_info/severity|nothing">
+                    <label>Severity:</label>
+                    <span tal:content="flag_info/severity"
+                          tal:attributes="class string:severity-${flag_info/severity}">Severity</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quality History Section -->
+    <div class="quality-history-section"
+         tal:define="history view/get_quality_history"
+         tal:condition="history">
+        <h2>Quality History</h2>
+        
+        <table class="listing quality-history-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Overall Score</th>
+                    <th>Content Quality</th>
+                    <th>Accessibility</th>
+                    <th>Metadata</th>
+                    <th>Trend</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:history repeat="entry history">
+                <tr>
+                    <td tal:content="entry/timestamp_readable|entry/timestamp">Date</td>
+                    <td>
+                        <span class="quality-score"
+                              tal:content="python:'{:.3f}'.format(entry.get('overall_score', 0.0))"
+                              tal:attributes="class python:'score-' + ('high' if entry.get('overall_score', 0) >= 0.7 else 'medium' if entry.get('overall_score', 0) >= 0.4 else 'low')">0.000</span>
+                    </td>
+                    <td tal:content="python:'{:.3f}'.format(entry.get('content_quality', 0.0))">0.000</td>
+                    <td tal:content="python:'{:.3f}'.format(entry.get('resource_accessibility', 0.0))">0.000</td>
+                    <td tal:content="python:'{:.3f}'.format(entry.get('metadata_completeness', 0.0))">0.000</td>
+                    <td>
+                        <span tal:content="entry/trend|string:stable"
+                              tal:attributes="class string:trend-${entry/trend}">stable</span>
+                    </td>
+                </tr>
+                </tal:history>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Quality Trend Section -->
+    <div class="quality-trend-section">
+        <h2>Quality Trend</h2>
+        
+        <div class="trend-indicator">
+            <span tal:define="trend view/get_quality_trend"
+                  tal:content="trend"
+                  tal:attributes="class string:trend-${trend}">stable</span>
+        </div>
+    </div>
+    
+    <!-- Actions Section -->
+    <div class="quality-actions">
+        <h2>Actions</h2>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="updateQualityTracking()">
+                Update Quality Tracking
+            </button>
+            
+            <button class="btn btn-success" tal:condition="view/is_flagged_for_review"
+                    onclick="unflagResource()">
+                Remove Quality Flag
+            </button>
+            
+            <button class="btn btn-warning" tal:condition="not:view/is_flagged_for_review"
+                    onclick="flagForReview()">
+                Flag for Review
+            </button>
+            
+            <button class="btn btn-info" onclick="exportQualityReport()">
+                Export Quality Report
+            </button>
+            
+            <a class="btn btn-secondary" 
+               tal:attributes="href string:${context/absolute_url}/edit">
+                Edit Resource
+            </a>
+            
+            <a class="btn btn-secondary" 
+               tal:attributes="href string:${context/aq_parent/absolute_url}/@@quality-dashboard">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Empty State -->
+    <div class="empty-state" tal:condition="not:view/get_quality_metrics">
+        <h3>No Quality Data Available</h3>
+        <p>Quality assessment has not been performed for this resource yet.</p>
+        <button class="btn btn-primary" onclick="runQualityAssessment()">
+            Run Quality Assessment
+        </button>
+    </div>
+</div>
+
+<!-- JavaScript for Resource Quality Detail Functionality -->
+<script type="text/javascript">
+function updateQualityTracking() {
+    fetch(window.location.href + '/@@update-quality-tracking', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    }).then(response => {
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Error updating quality tracking');
+        }
+    });
+}
+
+function unflagResource() {
+    if (confirm('Are you sure you want to remove the quality flag from this resource?')) {
+        fetch('@@quality-assessment-api', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                action: 'unflag',
+                uid: getResourceUID()
+            })
+        }).then(() => location.reload());
+    }
+}
+
+function flagForReview() {
+    const reason = prompt('Please provide a reason for flagging this resource:');
+    if (reason) {
+        fetch('@@quality-assessment-api', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                action: 'flag',
+                uid: getResourceUID(),
+                reason: reason
+            })
+        }).then(() => location.reload());
+    }
+}
+
+function exportQualityReport() {
+    window.open('@@quality-assessment-api?action=export&uid=' + getResourceUID(), '_blank');
+}
+
+function runQualityAssessment() {
+    if (confirm('Run quality assessment for this resource?')) {
+        fetch('@@quality-assessment-api', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                action: 'assess',
+                uid: getResourceUID()
+            })
+        }).then(() => location.reload());
+    }
+}
+
+function getResourceUID() {
+    // Extract UID from URL or use a data attribute
+    const urlParts = window.location.pathname.split('/');
+    return urlParts[urlParts.length - 2]; // Assuming UID is in the URL
+}
+</script>
+
+<!-- CSS Styles for Resource Quality Detail -->
+<style type="text/css">
+.resource-quality-detail {
+    padding: 20px;
+}
+
+.resource-basic-info {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.resource-basic-info .field {
+    margin-bottom: 10px;
+}
+
+.resource-basic-info label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.metrics-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.metric-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+
+.metric-card.overall-score {
+    background: #e3f2fd;
+    border-color: #2196f3;
+}
+
+.metric-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.metric-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #495057;
+}
+
+.metric-value.score-high { color: #28a745; }
+.metric-value.score-medium { color: #ffc107; }
+.metric-value.score-low { color: #dc3545; }
+
+.detailed-metrics {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.metric-detail {
+    margin-bottom: 8px;
+}
+
+.metric-detail label {
+    font-weight: bold;
+    margin-right: 10px;
+    display: inline-block;
+    min-width: 120px;
+}
+
+.flag-alert {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.flag-alert h3 {
+    color: #856404;
+    margin-top: 0;
+}
+
+.flag-detail {
+    margin-bottom: 8px;
+}
+
+.flag-detail label {
+    font-weight: bold;
+    margin-right: 10px;
+    display: inline-block;
+    min-width: 100px;
+}
+
+.quality-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.quality-history-table th,
+.quality-history-table td {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    text-align: left;
+}
+
+.quality-history-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.trend-indicator {
+    padding: 20px;
+    text-align: center;
+}
+
+.trend-indicator span {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.trend-improving { background-color: #d4edda; color: #155724; }
+.trend-declining { background-color: #f8d7da; color: #721c24; }
+.trend-stable { background-color: #e2e3e5; color: #383d41; }
+
+.severity-high { color: #dc3545; font-weight: bold; }
+.severity-medium { color: #ffc107; font-weight: bold; }
+.severity-low { color: #28a745; font-weight: bold; }
+
+.status-read { color: #28a745; }
+.status-unread { color: #6c757d; }
+.status-reading { color: #17a2b8; }
+
+.tag {
+    background-color: #007bff;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.action-buttons {
+    margin-top: 20px;
+}
+
+.action-buttons .btn {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+}
+
+.btn-primary { background-color: #007bff; color: white; }
+.btn-success { background-color: #28a745; color: white; }
+.btn-warning { background-color: #ffc107; color: black; }
+.btn-info { background-color: #17a2b8; color: white; }
+.btn-secondary { background-color: #6c757d; color: white; }
+</style>
+
+</metal:block>
+</metal:content-core>
+
+</html> 
