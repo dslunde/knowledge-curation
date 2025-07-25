@@ -4,6 +4,7 @@ from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
+from knowledge.curator.graph.relationships import RelationshipType
 
 
 @implementer(IVocabularyFactory)
@@ -395,4 +396,18 @@ class CitationFormatsVocabulary:
         return SimpleVocabulary(terms)
 
 
+@implementer(IVocabularyFactory)
+class RelationshipTypesVocabulary:
+    """Vocabulary for knowledge graph relationship types."""
+
+    def __call__(self, context):
+        terms = []
+        for rel_type in RelationshipType:
+            # Create user-friendly titles from enum values
+            title = rel_type.value.replace('_', ' ').title()
+            terms.append(SimpleTerm(value=rel_type.value, title=title))
+        return SimpleVocabulary(terms)
+
+
+RelationshipTypesVocabularyFactory = RelationshipTypesVocabulary()
 CitationFormatsVocabularyFactory = CitationFormatsVocabulary()

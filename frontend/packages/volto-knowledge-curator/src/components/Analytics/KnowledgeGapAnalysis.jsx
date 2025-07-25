@@ -16,7 +16,7 @@ import {
   Form,
   Statistic
 } from 'semantic-ui-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, TreeMap } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Treemap } from 'recharts';
 import PropTypes from 'prop-types';
 
 const importanceLevels = {
@@ -182,7 +182,7 @@ const KnowledgeGapAnalysis = ({
       <Header as="h4">Knowledge Gap Hierarchy</Header>
       <div style={{ height: '500px' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <TreeMap
+          <Treemap
             data={[treemapData]}
             dataKey="size"
             ratio={4/3}
