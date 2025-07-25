@@ -8,7 +8,7 @@
   <include file="knowledge_item.zcml" />
 
   <!-- Knowledge Container content type -->
-  <!-- <include file="knowledge_container.zcml" /> -->
+  <include file="knowledge_container.zcml" />
 
   <!-- Research Note content type -->
   <include file="research_note.zcml" />
@@ -29,6 +29,24 @@
 
   <subscriber
       handler=".events.validate_knowledge_item_before_deletion"
+      />
+
+  <!-- Event handler for BookmarkPlus status changes -->
+  <subscriber
+      handler=".events.handle_bookmark_status_change"
+      />
+
+  <!-- Event handlers for Research Note validation -->
+  <subscriber
+      handler=".research_note_events.validate_research_note_on_create"
+      />
+
+  <subscriber
+      handler=".research_note_events.validate_research_note_on_modify"
+      />
+
+  <subscriber
+      handler=".research_note_events.log_research_note_workflow_changes"
       />
 
   <!-- Field validators for Knowledge Item -->

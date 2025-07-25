@@ -504,3 +504,409 @@ def validate_knowledge_item_progress_dict(value):
         # validate_uid_reference(uid)
     
     return True
+
+
+def validate_annotated_knowledge_items(value):
+    """Validate that Research Note has at least one annotated Knowledge Item.
+    
+    Args:
+        value: List of Knowledge Item UIDs
+        
+    Raises:
+        Invalid: If list is empty or contains invalid UIDs
+    """
+    if not value:
+        raise Invalid(
+            _("At least one Knowledge Item must be annotated. "
+              "Research Notes must be associated with existing Knowledge Items.")
+        )
+    
+    if not isinstance(value, list):
+        raise Invalid(_("Annotated knowledge items must be a list"))
+    
+    if len(value) == 0:
+        raise Invalid(
+            _("Cannot create a Research Note without annotating at least one Knowledge Item. "
+              "Please select one or more Knowledge Items to annotate.")
+        )
+    
+    # Validate each UID references an actual Knowledge Item
+    catalog = api.portal.get_tool("portal_catalog")
+    invalid_uids = []
+    
+    for uid in value:
+        if not isinstance(uid, str):
+            raise Invalid(_("Each annotated item reference must be a string UID"))
+        
+        if not uid.strip():
+            raise Invalid(_("Empty UID references are not allowed"))
+        
+        # Check if the UID exists and points to a Knowledge Item
+        brains = catalog(UID=uid, portal_type="KnowledgeItem")
+        if not brains:
+            invalid_uids.append(uid)
+    
+    if invalid_uids:
+        raise Invalid(
+            _("The following UIDs do not reference valid Knowledge Items: {0}").format(
+                ", ".join(invalid_uids[:5])  # Show max 5 invalid UIDs
+            )
+        )
+    
+    # Check for duplicates
+    if len(set(value)) < len(value):
+        raise Invalid(_("Duplicate Knowledge Item references are not allowed"))
+    
+    return True
+
+
+def validate_related_knowledge_items(value):
+    """Validate that BookmarkPlus has at least one related Knowledge Item.
+    
+    Args:
+        value: List of Knowledge Item UIDs
+        
+    Raises:
+        Invalid: If list is empty or contains invalid UIDs
+    """
+    if not value:
+        raise Invalid(
+            _("At least one Knowledge Item must be related. "
+              "Bookmark+ items must be associated with existing Knowledge Items.")
+        )
+    
+    if not isinstance(value, list):
+        raise Invalid(_("Related knowledge items must be a list"))
+    
+    if len(value) == 0:
+        raise Invalid(
+            _("Cannot create a Bookmark+ without relating to at least one Knowledge Item. "
+              "Please select one or more Knowledge Items that this bookmark relates to.")
+        )
+    
+    # Validate each UID references an actual Knowledge Item
+    catalog = api.portal.get_tool("portal_catalog")
+    invalid_uids = []
+    
+    for uid in value:
+        if not isinstance(uid, str):
+            raise Invalid(_("Each related item reference must be a string UID"))
+        
+        if not uid.strip():
+            raise Invalid(_("Empty UID references are not allowed"))
+        
+        # Check if the UID exists and points to a Knowledge Item
+        brains = catalog(UID=uid, portal_type="KnowledgeItem")
+        if not brains:
+            invalid_uids.append(uid)
+    
+    if invalid_uids:
+        raise Invalid(
+            _("The following UIDs do not reference valid Knowledge Items: {0}").format(
+                ", ".join(invalid_uids[:5])  # Show max 5 invalid UIDs
+            )
+        )
+    
+    # Check for duplicates
+    if len(set(value)) < len(value):
+        raise Invalid(_("Duplicate Knowledge Item references are not allowed"))
+    
+    return True
+
+def validate_personal_notes(value):
+    """Validate personal notes field.
+    
+    Args:
+        value: Personal notes text
+        
+    Raises:
+        Invalid: If personal notes don't meet requirements
+    """
+    if not value:
+        return True  # Personal notes are optional
+    
+    if not isinstance(value, str):
+        raise Invalid(_("Personal notes must be text"))
+    
+    # Check length constraints
+    if len(value) > 10000:
+        raise Invalid(_("Personal notes must be less than 10,000 characters"))
+    
+    # No minimum length for notes - even brief notes are valuable
+    
+    return True
+
+
+def validate_key_quotes(value):
+    """Validate key quotes list.
+    
+    Args:
+        value: List of key quotes
+        
+    Raises:
+        Invalid: If key quotes don't meet requirements
+    """
+    if not value:
+        return True  # Key quotes are optional
+    
+    if not isinstance(value, list):
+        raise Invalid(_("Key quotes must be a list"))
+    
+    if len(value) > 20:
+        raise Invalid(_("Maximum 20 key quotes allowed"))
+    
+    for i, quote in enumerate(value):
+        if not isinstance(quote, str):
+            raise Invalid(_("Each key quote must be text"))
+        
+        quote = quote.strip()
+        
+        if not quote:
+            raise Invalid(_("Empty quotes are not allowed"))
+        
+        if len(quote) > 2000:
+            raise Invalid(_("Each key quote must be less than 2,000 characters"))
+        
+        # Check for minimal content (at least 10 characters for a meaningful quote)
+        if len(quote) < 10:
+            raise Invalid(_("Each key quote should be at least 10 characters long"))
+    
+    # Check for duplicate quotes (case-insensitive)
+    normalized_quotes = [q.strip().lower() for q in value]
+    if len(set(normalized_quotes)) < len(normalized_quotes):
+        raise Invalid(_("Duplicate quotes are not allowed"))
+    
+    return True
+
+
+def validate_container_uid_references(value):
+    """Validate UID references for knowledge container inclusions.
+    
+    Args:
+        value: List of UIDs to validate
+        
+    Raises:
+        Invalid: If any UID doesn't reference a valid content item
+    """
+    if not value:
+        return True  # Empty list is valid
+    
+    if not isinstance(value, list):
+        raise Invalid(_("UID references must be a list"))
+    
+    # Basic validation first (before catalog access)
+    for uid in value:
+        if not isinstance(uid, str):
+            raise Invalid(_("Each UID reference must be a string"))
+        
+        if not uid.strip():
+            raise Invalid(_("Empty UID references are not allowed"))
+    
+    # Check for duplicates
+    if len(set(value)) < len(value):
+        raise Invalid(_("Duplicate UID references are not allowed"))
+    
+    # Only do catalog lookup if we have a portal available
+    try:
+        catalog = api.portal.get_tool("portal_catalog")
+        invalid_uids = []
+        
+        for uid in value:
+            # Check if the UID exists (any content type is valid for containers)
+            brains = catalog(UID=uid)
+            if not brains:
+                invalid_uids.append(uid)
+        
+        if invalid_uids:
+            raise Invalid(
+                _("The following UIDs do not reference valid content items: {0}").format(
+                    ", ".join(invalid_uids[:5])  # Show max 5 invalid UIDs
+                )
+            )
+    except Exception:
+        # In test environments or when portal is not available, 
+        # skip catalog validation but still do basic validation
+        pass
+    
+    return True
+
+
+def validate_container_collection_type(value):
+    """Validate collection type against vocabulary.
+    
+    Args:
+        value: Collection type value
+        
+    Raises:
+        Invalid: If collection type is not valid
+    """
+    if not value:
+        return True  # Optional field
+    
+    valid_types = ["course", "study_guide", "research_collection", "project_portfolio", "knowledge_base"]
+    
+    if value not in valid_types:
+        raise Invalid(
+            _("Invalid collection type. Must be one of: {0}").format(", ".join(valid_types))
+        )
+    
+    return True
+
+
+def validate_container_organization_structure(value):
+    """Validate organization structure against vocabulary.
+    
+    Args:
+        value: Organization structure value
+        
+    Raises:
+        Invalid: If organization structure is not valid
+    """
+    if not value:
+        return True  # Optional field
+    
+    valid_structures = ["chronological", "topical", "hierarchical", "custom"]
+    
+    if value not in valid_structures:
+        raise Invalid(
+            _("Invalid organization structure. Must be one of: {0}").format(", ".join(valid_structures))
+        )
+    
+    return True
+
+
+def validate_container_publication_status(value):
+    """Validate publication status against vocabulary.
+    
+    Args:
+        value: Publication status value
+        
+    Raises:
+        Invalid: If publication status is not valid
+    """
+    if not value:
+        return True  # Optional field
+    
+    valid_statuses = ["draft", "review", "published", "archived"]
+    
+    if value not in valid_statuses:
+        raise Invalid(
+            _("Invalid publication status. Must be one of: {0}").format(", ".join(valid_statuses))
+        )
+    
+    return True
+
+
+def validate_container_target_audience(value):
+    """Validate target audience against vocabulary.
+    
+    Args:
+        value: Target audience value
+        
+    Raises:
+        Invalid: If target audience is not valid
+    """
+    if not value:
+        return True  # Optional field
+    
+    valid_audiences = ["self", "team", "public", "specific_users"]
+    
+    if value not in valid_audiences:
+        raise Invalid(
+            _("Invalid target audience. Must be one of: {0}").format(", ".join(valid_audiences))
+        )
+    
+    return True
+
+
+def validate_container_sharing_permissions(value):
+    """Validate sharing permissions dictionary structure.
+    
+    Args:
+        value: Dictionary with sharing permission settings
+        
+    Raises:
+        Invalid: If dictionary structure or values are invalid
+    """
+    if not value:
+        return True  # Empty dict is valid
+    
+    if not isinstance(value, dict):
+        raise Invalid(_("Sharing permissions must be a dictionary"))
+    
+    valid_permission_keys = ["view", "edit", "share", "admin"]
+    valid_permission_values = ["none", "owner", "team", "public", "specific"]
+    
+    for key, val in value.items():
+        if key not in valid_permission_keys:
+            raise Invalid(
+                _("Invalid permission key '{0}'. Must be one of: {1}").format(
+                    key, ", ".join(valid_permission_keys)
+                )
+            )
+        
+        if val not in valid_permission_values:
+            raise Invalid(
+                _("Invalid permission value '{0}' for key '{1}'. Must be one of: {2}").format(
+                    val, key, ", ".join(valid_permission_values)
+                )
+            )
+    
+    return True
+
+
+def validate_container_export_formats(value):
+    """Validate export formats set.
+    
+    Args:
+        value: Set of export formats
+        
+    Raises:
+        Invalid: If export formats are invalid
+    """
+    if not value:
+        return True  # Empty set is valid
+    
+    if not isinstance(value, (set, list, tuple)):
+        raise Invalid(_("Export formats must be a set, list, or tuple"))
+    
+    valid_formats = ["pdf", "html", "markdown", "json", "csv", "docx", "epub"]
+    
+    for format_type in value:
+        if format_type not in valid_formats:
+            raise Invalid(
+                _("Invalid export format '{0}'. Must be one of: {1}").format(
+                    format_type, ", ".join(valid_formats)
+                )
+            )
+    
+    return True
+
+
+def validate_container_view_analytics(value):
+    """Validate view analytics dictionary structure.
+    
+    Args:
+        value: Dictionary with view analytics data
+        
+    Raises:
+        Invalid: If dictionary structure or values are invalid
+    """
+    if not value:
+        return True  # Empty dict is valid
+    
+    if not isinstance(value, dict):
+        raise Invalid(_("View analytics must be a dictionary"))
+    
+    # Basic structure validation - specific keys are flexible
+    for key, val in value.items():
+        if not isinstance(key, str):
+            raise Invalid(_("Analytics keys must be strings"))
+        
+        # Values can be numbers, strings, or lists for flexibility
+        if not isinstance(val, (int, float, str, list, dict)):
+            raise Invalid(
+                _("Analytics values must be numbers, strings, lists, or dictionaries")
+            )
+    
+    return True

@@ -31,6 +31,18 @@ from knowledge.curator.content.validators import (
     validate_prerequisite_enables_consistency,
     validate_mastery_threshold_progress_consistency,
     validate_knowledge_item_progress_dict,
+    validate_annotated_knowledge_items,
+    validate_related_knowledge_items,
+    validate_personal_notes,
+    validate_key_quotes,
+    validate_container_uid_references,
+    validate_container_collection_type,
+    validate_container_organization_structure,
+    validate_container_publication_status,
+    validate_container_target_audience,
+    validate_container_sharing_permissions,
+    validate_container_export_formats,
+    validate_container_view_analytics,
 )
 from knowledge.curator.graph.interfaces import IKnowledgeItemConnection
 
@@ -867,6 +879,60 @@ class IResearchNote(IKnowledgeObjectBase):
         default=[],
     )
 
+    # New annotation fields for Knowledge Item annotation system
+    annotated_knowledge_items = schema.List(
+        title=_("Annotated Knowledge Items"),
+        description=_("List of Knowledge Items this research note annotates (minimum one required)"),
+        value_type=schema.TextLine(
+            title=_("Knowledge Item UID"),
+            description=_("UID of the annotated Knowledge Item"),
+        ),
+        required=True,
+        min_length=1,
+        constraint=validate_annotated_knowledge_items,
+    )
+
+    annotation_type = schema.Choice(
+        title=_("Annotation Type"),
+        description=_("Type of annotation for the Knowledge Item"),
+        vocabulary="knowledge.curator.annotation_types_extended",
+        required=True,
+    )
+
+    annotation_scope = schema.Choice(
+        title=_("Annotation Scope"),
+        description=_("Scope of the annotation - specific section or whole item"),
+        vocabulary="knowledge.curator.annotation_scope",
+        required=True,
+    )
+
+    research_question = schema.Text(
+        title=_("Research Question"),
+        description=_("The research question or inquiry this annotation addresses"),
+        required=False,
+    )
+
+    evidence_type = schema.Choice(
+        title=_("Evidence Type"),
+        description=_("Type of evidence supporting this annotation"),
+        vocabulary="knowledge.curator.evidence_types",
+        required=True,
+    )
+
+    confidence_level = schema.Choice(
+        title=_("Confidence Level"),
+        description=_("Level of confidence in this annotation"),
+        vocabulary="knowledge.curator.confidence_levels",
+        required=True,
+    )
+
+    suggests_knowledge_item_updates = schema.Bool(
+        title=_("Suggests Knowledge Item Updates"),
+        description=_("Whether this annotation suggests updates to the Knowledge Item"),
+        required=False,
+        default=False,
+    )
+
     # NOTE: ai_summary, connections, embedding_vector are provided by behaviors
     # to avoid duplication conflicts
 
@@ -1185,20 +1251,102 @@ class IBookmarkPlus(model.Schema):
         required=False,
     )
 
-    read_status = schema.Choice(
-        title=_("Read Status"),
-        description=_("Whether you have read this content"),
-        vocabulary="knowledge.curator.read_status_vocabulary",
-        required=False,
-        default="unread",
-    )
-
     importance = schema.Choice(
         title=_("Importance"),
         description=_("How important is this bookmark"),
         vocabulary="knowledge.curator.importance_vocabulary",
         required=False,
         default="medium",
+    )
+
+    # Knowledge Item Relationship Fields
+    related_knowledge_items = schema.List(
+        title=_("Related Knowledge Items"),
+        description=_("Knowledge Items that this bookmark relates to (at least one required)"),
+        value_type=schema.TextLine(
+            title=_("Knowledge Item UID"),
+            description=_("UID of the related Knowledge Item"),
+        ),
+        required=True,
+        min_length=1,
+        constraint=validate_related_knowledge_items,
+    )
+
+    resource_type = schema.Choice(
+        title=_("Resource Type"),
+        description=_("Type of resource (article, video, podcast, etc.)"),
+        vocabulary="knowledge.curator.bookmark_resource_types",
+        required=True,
+    )
+
+    content_quality = schema.Choice(
+        title=_("Content Quality"),
+        description=_("Quality assessment of the content"),
+        vocabulary="knowledge.curator.content_quality",
+        required=True,
+        default="medium",
+    )
+
+    reading_time_estimate = schema.Int(
+        title=_("Reading Time Estimate"),
+        description=_("Estimated time to consume this resource (in minutes)"),
+        required=False,
+        min=0,
+    )
+
+    supports_learning_goals = schema.List(
+        title=_("Supports Learning Goals"),
+        description=_("Learning Goals that this resource supports"),
+        value_type=schema.TextLine(
+            title=_("Learning Goal UID"),
+            description=_("UID of the supported Learning Goal"),
+        ),
+        required=False,
+        default=[],
+    )
+
+    read_status = schema.Choice(
+        title=_("Read Status"),
+        description=_("Current reading status of this resource"),
+        vocabulary="knowledge.curator.read_status",
+        required=False,
+        default="unread",
+    )
+
+    access_date = schema.Datetime(
+        title=_("Access Date"),
+        description=_("When this resource was first accessed"),
+        required=False,
+        readonly=True,
+    )
+
+    last_reviewed_date = schema.Datetime(
+        title=_("Last Reviewed Date"),
+        description=_("When this resource was last reviewed"),
+        required=False,
+        readonly=True,
+    )
+
+    personal_notes = schema.Text(
+        title=_("Personal Notes"),
+        description=_("Personal reflections, insights, and commentary about this resource"),
+        required=False,
+        max_length=10000,  # Limit to ~10,000 characters for reasonable size
+        constraint=validate_personal_notes,
+    )
+
+    key_quotes = schema.List(
+        title=_("Key Quotes"),
+        description=_("Important excerpts or quotations from the resource content"),
+        value_type=schema.Text(
+            title=_("Quote"),
+            description=_("An important excerpt from the resource"),
+            max_length=2000,  # Limit individual quotes to ~2,000 characters
+        ),
+        required=False,
+        default=[],
+        max_length=20,  # Limit to 20 quotes maximum
+        constraint=validate_key_quotes,
     )
 
     # NOTE: ai_summary, embedding_vector are provided by behaviors
@@ -1369,6 +1517,206 @@ class IKnowledgeItem(model.Schema):
     def validate_mastery_threshold_progress_consistency(data):
         """Ensure learning progress and mastery threshold are consistent."""
         validate_mastery_threshold_progress_consistency(data)
+
+
+@provider(IFormFieldProvider)
+class IKnowledgeContainer(IKnowledgeObjectBase):
+    """Schema for Knowledge Container content type."""
+
+    title = schema.TextLine(
+        title=_("Title"),
+        description=_("Title of the knowledge container"),
+        required=True,
+        constraint=validate_title_length,
+    )
+
+    description = schema.Text(
+        title=_("Description"),
+        description=_("Description of this knowledge container"),
+        required=True,
+        constraint=validate_description_length,
+    )
+
+    # Content inclusion fields - UID references to various content types
+    included_learning_goals = schema.List(
+        title=_("Included Learning Goals"),
+        description=_("Learning Goals included in this container"),
+        value_type=schema.TextLine(
+            title=_("Learning Goal UID"),
+            description=_("UID of the included Learning Goal"),
+        ),
+        required=False,
+        default=[],
+        constraint=validate_container_uid_references,
+    )
+
+    included_knowledge_items = schema.List(
+        title=_("Included Knowledge Items"),
+        description=_("Knowledge Items included in this container"),
+        value_type=schema.TextLine(
+            title=_("Knowledge Item UID"),
+            description=_("UID of the included Knowledge Item"),
+        ),
+        required=False,
+        default=[],
+        constraint=validate_container_uid_references,
+    )
+
+    included_research_notes = schema.List(
+        title=_("Included Research Notes"),
+        description=_("Research Notes included in this container"),
+        value_type=schema.TextLine(
+            title=_("Research Note UID"),
+            description=_("UID of the included Research Note"),
+        ),
+        required=False,
+        default=[],
+        constraint=validate_container_uid_references,
+    )
+
+    included_project_logs = schema.List(
+        title=_("Included Project Logs"),
+        description=_("Project Logs included in this container"),
+        value_type=schema.TextLine(
+            title=_("Project Log UID"),
+            description=_("UID of the included Project Log"),
+        ),
+        required=False,
+        default=[],
+        constraint=validate_container_uid_references,
+    )
+
+    included_bookmarks = schema.List(
+        title=_("Included Bookmarks"),
+        description=_("Bookmark+ items included in this container"),
+        value_type=schema.TextLine(
+            title=_("Bookmark UID"),
+            description=_("UID of the included Bookmark+"),
+        ),
+        required=False,
+        default=[],
+        constraint=validate_container_uid_references,
+    )
+
+    # Container metadata fields
+    collection_type = schema.Choice(
+        title=_("Collection Type"),
+        description=_("Type of collection this container represents"),
+        vocabulary="knowledge.curator.container_collection_types",
+        required=False,
+        default="curated",
+        constraint=validate_container_collection_type,
+    )
+
+    organization_structure = schema.Choice(
+        title=_("Organization Structure"),
+        description=_("How content is organized within this container"),
+        vocabulary="knowledge.curator.container_organization_structures",
+        required=False,
+        default="hierarchical",
+        constraint=validate_container_organization_structure,
+    )
+
+    publication_status = schema.Choice(
+        title=_("Publication Status"),
+        description=_("Publication status of this container"),
+        vocabulary="knowledge.curator.container_publication_statuses",
+        required=False,
+        default="draft",
+        constraint=validate_container_publication_status,
+    )
+
+    target_audience = schema.Choice(
+        title=_("Target Audience"),
+        description=_("Intended audience for this container"),
+        vocabulary="knowledge.curator.container_target_audiences",
+        required=False,
+        default="self",
+        constraint=validate_container_target_audience,
+    )
+
+    sharing_permissions = schema.Dict(
+        title=_("Sharing Permissions"),
+        description=_("Permission settings for sharing this container"),
+        key_type=schema.Choice(
+            title=_("Permission Type"),
+            vocabulary="knowledge.curator.container_permission_types",
+        ),
+        value_type=schema.Choice(
+            title=_("Permission Level"),
+            vocabulary="knowledge.curator.container_permission_levels",
+        ),
+        required=False,
+        default={},
+        constraint=validate_container_sharing_permissions,
+    )
+
+    export_formats = schema.Set(
+        title=_("Export Formats"),
+        description=_("Available export formats for this container"),
+        value_type=schema.Choice(
+            title=_("Export Format"),
+            vocabulary="knowledge.curator.container_export_formats",
+        ),
+        required=False,
+        default=set(),
+        constraint=validate_container_export_formats,
+    )
+
+    view_analytics = schema.Dict(
+        title=_("View Analytics"),
+        description=_("Analytics data for container views and usage"),
+        key_type=schema.TextLine(
+            title=_("Metric Name"),
+        ),
+        value_type=schema.TextLine(
+            title=_("Metric Value"),
+        ),
+        required=False,
+        default={},
+        readonly=True,
+        constraint=validate_container_view_analytics,
+    )
+
+    # Additional metadata for container management
+    created_date = schema.Datetime(
+        title=_("Created Date"),
+        description=_("When this container was created"),
+        required=False,
+        readonly=True,
+    )
+
+    last_modified_date = schema.Datetime(
+        title=_("Last Modified Date"),
+        description=_("When this container was last modified"),
+        required=False,
+        readonly=True,
+    )
+
+    total_items_count = schema.Int(
+        title=_("Total Items Count"),
+        description=_("Total number of items in this container"),
+        required=False,
+        default=0,
+        readonly=True,
+        min=0,
+    )
+
+    container_version = schema.TextLine(
+        title=_("Container Version"),
+        description=_("Version identifier for this container"),
+        required=False,
+        default="1.0",
+    )
+
+    tags = schema.List(
+        title=_("Tags"),
+        description=_("Tags for categorizing this container"),
+        value_type=schema.TextLine(),
+        required=False,
+        default=[],
+        constraint=validate_tags,
+    )
 
 
 # Additional interfaces for the system

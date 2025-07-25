@@ -41,3 +41,44 @@ class ResearchNoteView(BrowserView):
         # This would use the AI service to find similar content
         # For now, return empty list
         return []
+
+    def get_annotated_knowledge_items_details(self):
+        """Get detailed information about annotated Knowledge Items.
+        
+        Returns:
+            list: List of dicts with Knowledge Item details including error handling
+        """
+        return self.context.get_annotated_knowledge_items_details()
+
+    def has_annotated_knowledge_items(self):
+        """Check if this research note has any annotated knowledge items."""
+        return bool(getattr(self.context, 'annotated_knowledge_items', []))
+
+    def get_annotation_type_title(self):
+        """Get human-readable title for the annotation type."""
+        annotation_type = getattr(self.context, 'annotation_type', None)
+        if not annotation_type:
+            return "General Annotation"
+        
+        # Convert snake_case to Title Case
+        return annotation_type.replace('_', ' ').title()
+
+    def get_annotation_scope_title(self):
+        """Get human-readable title for the annotation scope."""
+        annotation_scope = getattr(self.context, 'annotation_scope', None)
+        if not annotation_scope:
+            return "Whole Item"
+        
+        # Convert snake_case to Title Case
+        return annotation_scope.replace('_', ' ').title()
+    
+    def get_suggested_related_notes(self, max_results=5):
+        """Get suggested related Research Notes.
+        
+        Args:
+            max_results (int): Maximum number of suggestions to return
+            
+        Returns:
+            list: List of related note suggestions with relevance scores and reasons
+        """
+        return self.context.suggest_related_notes(max_results=max_results)

@@ -168,3 +168,117 @@ class BookmarkPlusIntegrationTest(unittest.TestCase):
         obj.notes = RichTextValue("Important notes about this resource")
         summary = obj.get_summary_text()
         self.assertIn("Important notes", summary)
+
+    def test_ct_bookmark_plus_personal_notes(self):
+        """Test BookmarkPlus personal notes field."""
+        obj = api.content.create(
+            container=self.portal,
+            type="BookmarkPlus",
+            id="bookmark-personal-notes-test",
+            title="Test Resource",
+            url="https://example.com",
+        )
+        
+        # Test empty personal notes
+        self.assertIsNone(obj.personal_notes)
+        
+        # Test setting personal notes
+        test_notes = "This resource provides excellent insights into Python best practices. I found the section on decorators particularly enlightening."
+        obj.personal_notes = test_notes
+        self.assertEqual(obj.personal_notes, test_notes)
+        
+        # Test long personal notes (should be allowed up to 10,000 characters)
+        long_notes = "A" * 9999
+        obj.personal_notes = long_notes
+        self.assertEqual(len(obj.personal_notes), 9999)
+
+    def test_ct_bookmark_plus_key_quotes(self):
+        """Test BookmarkPlus key quotes field."""
+        obj = api.content.create(
+            container=self.portal,
+            type="BookmarkPlus",
+            id="bookmark-key-quotes-test",
+            title="Test Resource",
+            url="https://example.com",
+        )
+        
+        # Test empty key quotes
+        self.assertEqual(obj.key_quotes, [])
+        
+        # Test adding key quotes
+        quotes = [
+            "Explicit is better than implicit.",
+            "Simple is better than complex.",
+            "Complex is better than complicated."
+        ]
+        obj.key_quotes = quotes
+        self.assertEqual(len(obj.key_quotes), 3)
+        self.assertIn("Explicit is better than implicit.", obj.key_quotes)
+        
+        # Test individual quote length (up to 2000 characters)
+        long_quote = "B" * 1999
+        obj.key_quotes = [long_quote]
+        self.assertEqual(len(obj.key_quotes[0]), 1999)
+        
+        # Test multiple quotes (up to 20)
+        many_quotes = [f"Quote number {i}: This is an important insight from the resource." for i in range(20)]
+        obj.key_quotes = many_quotes
+        self.assertEqual(len(obj.key_quotes), 20)
+    
+    def test_calculate_learning_effectiveness_for_item(self):
+        """Test calculation of learning effectiveness for specific Knowledge Items."""
+        # Create Knowledge Item
+        ki = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="effectiveness-ki",
+            title="Effectiveness Test KI",
+            knowledge_type="procedural",
+            difficulty_level="intermediate",
+            atomic_concepts=["programming"],
+            tags=["python", "programming"]
+        )
+        
+        # Create Bookmark+ with matching characteristics
+        bookmark = api.content.create(
+            container=self.portal,
+            type="BookmarkPlus",
+            id="effectiveness-bookmark",
+            title="Python Programming Guide",
+            description="Comprehensive Python programming resource",
+            url="https://python-guide.com",
+            resource_type="tutorial",
+            supports_knowledge_items=[ki.UID()],
+            quality_metrics={
+                'accuracy': 0.9,
+                'clarity': 0.8,
+                'depth': 0.85,
+                'currency': 0.75
+            },
+            tags=["python", "programming", "tutorial"]
+        )
+        
+        # Test effectiveness calculation
+        effectiveness = bookmark.calculate_learning_effectiveness_for_item(ki.UID())
+        
+        # Should return a score between 0 and 1
+        self.assertGreaterEqual(effectiveness, 0.0)
+        self.assertLessEqual(effectiveness, 1.0)
+        
+        # Should be relatively high due to good matches
+        self.assertGreater(effectiveness, 0.6)
+        
+        # Test with non-supported KI
+        non_supported_ki = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="non-supported-ki",
+            title="Non-supported KI",
+            knowledge_type="factual",
+            atomic_concepts=["chemistry"],
+            tags=["chemistry"]
+        )
+        
+        non_supported_effectiveness = bookmark.calculate_learning_effectiveness_for_item(non_supported_ki.UID())
+        # Should be 0 since KI is not in supports_knowledge_items
+        self.assertEqual(non_supported_effectiveness, 0.0)

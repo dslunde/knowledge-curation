@@ -45,6 +45,12 @@ class AnalyticsService(Service):
             return self.get_bloom_taxonomy_analysis()
         elif self.params[0] == "cognitive-load":
             return self.get_cognitive_load_assessment()
+        elif self.params[0] == "learning-goal-support":
+            return self.get_learning_goal_support_analytics()
+        elif self.params[0] == "goal-coverage-gaps":
+            return self.get_goal_coverage_gaps()
+        elif self.params[0] == "resource-recommendations":
+            return self.get_resource_recommendations()
         else:
             self.request.response.setStatus(404)
             return {"error": "Not found"}
@@ -1425,3 +1431,662 @@ class AnalyticsService(Service):
             })
         
         return cognitive_load_data
+    
+    def get_learning_goal_support_analytics(self):
+        """Get comprehensive analytics on how BookmarkPlus resources support learning goals."""
+        if not api.user.has_permission("View", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+        
+        catalog = api.portal.get_tool("portal_catalog")
+        user = api.user.get_current()
+        
+        # Get all BookmarkPlus resources
+        bookmarks = catalog(
+            Creator=user.getId(),
+            portal_type="BookmarkPlus"
+        )
+        
+        # Get all learning goals
+        goals = catalog(
+            Creator=user.getId(),
+            portal_type="LearningGoal"
+        )
+        
+        analytics_data = {
+            "summary": {
+                "total_resources": len(bookmarks),
+                "total_goals": len(goals),
+                "resources_with_goal_support": 0,
+                "goals_with_resource_support": 0,
+                "average_resources_per_goal": 0.0,
+                "average_goals_per_resource": 0.0,
+                "overall_support_effectiveness": 0.0
+            },
+            "effectiveness_metrics": {
+                "high_effectiveness_resources": [],
+                "low_effectiveness_resources": [],
+                "trending_resources": [],
+                "completion_contributors": []
+            },
+            "goal_support_breakdown": {},
+            "resource_performance": {},
+            "satisfaction_metrics": {
+                "average_satisfaction": 0.0,
+                "satisfaction_distribution": {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0},
+                "highly_rated_resources": []
+            },
+            "usage_patterns": {
+                "most_accessed_resources": [],
+                "consistent_usage_resources": [],
+                "engagement_trends": []
+            }
+        }
+        
+        # Process each bookmark
+        total_effectiveness_scores = []
+        total_satisfaction_scores = []
+        resources_with_support = 0
+        completion_contributions = 0
+        
+        for brain in bookmarks:
+            try:
+                obj = brain.getObject()
+                supported_goals = getattr(obj, 'supports_learning_goals', [])
+                
+                if supported_goals:
+                    resources_with_support += 1
+                    
+                    # Get summary metrics for this resource
+                    summary = obj.get_learning_goal_support_summary()
+                    
+                    resource_data = {
+                        "uid": brain.UID,
+                        "title": brain.Title,
+                        "url": brain.getURL(),
+                        "supported_goals_count": summary['total_goals_supported'],
+                        "goals_with_data": summary['goals_with_data'],
+                        "average_effectiveness": summary['average_effectiveness'],
+                        "average_satisfaction": summary['average_satisfaction'],
+                        "support_rating": summary['overall_support_rating'],
+                        "completion_contributions": summary['completion_contributions'],
+                        "read_status": getattr(obj, 'read_status', 'unread'),
+                        "resource_type": getattr(obj, 'resource_type', 'unknown'),
+                        "content_quality": getattr(obj, 'content_quality', 'medium')
+                    }
+                    
+                    analytics_data["resource_performance"][brain.UID] = resource_data
+                    
+                    # Track effectiveness scores
+                    if summary['average_effectiveness'] > 0:
+                        total_effectiveness_scores.append(summary['average_effectiveness'])
+                        
+                        # Categorize by effectiveness
+                        if summary['average_effectiveness'] >= 0.8:
+                            analytics_data["effectiveness_metrics"]["high_effectiveness_resources"].append(resource_data)
+                        elif summary['average_effectiveness'] <= 0.4:
+                            analytics_data["effectiveness_metrics"]["low_effectiveness_resources"].append(resource_data)
+                    
+                    # Track satisfaction scores
+                    if summary['average_satisfaction'] > 0:
+                        total_satisfaction_scores.append(summary['average_satisfaction'])
+                        
+                        # Update satisfaction distribution
+                        satisfaction_rounded = str(round(summary['average_satisfaction']))
+                        if satisfaction_rounded in analytics_data["satisfaction_metrics"]["satisfaction_distribution"]:
+                            analytics_data["satisfaction_metrics"]["satisfaction_distribution"][satisfaction_rounded] += 1
+                        
+                        # Highly rated resources
+                        if summary['average_satisfaction'] >= 4.0:
+                            analytics_data["satisfaction_metrics"]["highly_rated_resources"].append(resource_data)
+                    
+                    # Track completion contributions
+                    completion_contributions += summary['completion_contributions']
+                    if summary['completion_contributions'] > 0:
+                        analytics_data["effectiveness_metrics"]["completion_contributors"].append(resource_data)
+                    
+                    # Get detailed metrics for each goal
+                    all_goal_metrics = obj.get_all_learning_goal_metrics()
+                    for goal_uid, metrics in all_goal_metrics.items():
+                        if goal_uid not in analytics_data["goal_support_breakdown"]:
+                            # Get goal info
+                            goal_brain = catalog(UID=goal_uid)
+                            if goal_brain:
+                                analytics_data["goal_support_breakdown"][goal_uid] = {
+                                    "goal_title": goal_brain[0].Title,
+                                    "goal_url": goal_brain[0].getURL(),
+                                    "supporting_resources": [],
+                                    "average_effectiveness": 0.0,
+                                    "resource_count": 0,
+                                    "completion_contributors": 0
+                                }
+                        
+                        if goal_uid in analytics_data["goal_support_breakdown"]:
+                            goal_data = analytics_data["goal_support_breakdown"][goal_uid]
+                            goal_data["supporting_resources"].append({
+                                "resource_uid": brain.UID,
+                                "resource_title": brain.Title,
+                                "effectiveness": metrics['average_effectiveness'],
+                                "satisfaction": metrics['average_satisfaction'],
+                                "sessions": metrics['total_sessions'],
+                                "trend": metrics['recent_trend']
+                            })
+                            goal_data["resource_count"] += 1
+                            
+                            # Check for completion contribution
+                            tracking_data = obj.get_learning_goal_support_data(goal_uid)
+                            if tracking_data and tracking_data.get('completion_contributed', False):
+                                goal_data["completion_contributors"] += 1
+                
+            except Exception as e:
+                continue
+        
+        # Calculate summary statistics
+        analytics_data["summary"]["resources_with_goal_support"] = resources_with_support
+        
+        if total_effectiveness_scores:
+            from statistics import mean
+            analytics_data["summary"]["overall_support_effectiveness"] = round(mean(total_effectiveness_scores), 3)
+        
+        if total_satisfaction_scores:
+            from statistics import mean
+            analytics_data["satisfaction_metrics"]["average_satisfaction"] = round(mean(total_satisfaction_scores), 1)
+        
+        # Calculate goal-level averages
+        goals_with_support = 0
+        total_resources_per_goal = 0
+        
+        for goal_uid, goal_data in analytics_data["goal_support_breakdown"].items():
+            if goal_data["resource_count"] > 0:
+                goals_with_support += 1
+                total_resources_per_goal += goal_data["resource_count"]
+                
+                # Calculate average effectiveness for this goal
+                effectiveness_scores = [r["effectiveness"] for r in goal_data["supporting_resources"] if r["effectiveness"] > 0]
+                if effectiveness_scores:
+                    from statistics import mean
+                    goal_data["average_effectiveness"] = round(mean(effectiveness_scores), 3)
+        
+        analytics_data["summary"]["goals_with_resource_support"] = goals_with_support
+        
+        if goals_with_support > 0:
+            analytics_data["summary"]["average_resources_per_goal"] = round(total_resources_per_goal / goals_with_support, 1)
+        
+        if resources_with_support > 0:
+            analytics_data["summary"]["average_goals_per_resource"] = round(
+                sum(len(getattr(catalog(UID=uid)[0].getObject(), 'supports_learning_goals', []))
+                    for uid in analytics_data["resource_performance"].keys()) / resources_with_support, 1
+            )
+        
+        # Identify trending resources (improving effectiveness)
+        for resource_data in analytics_data["resource_performance"].values():
+            try:
+                obj = catalog(UID=resource_data["uid"])[0].getObject()
+                all_metrics = obj.get_all_learning_goal_metrics()
+                
+                improving_count = sum(1 for metrics in all_metrics.values() 
+                                    if metrics['recent_trend'] == 'improving')
+                
+                if improving_count > 0:
+                    resource_data["improving_goals"] = improving_count
+                    analytics_data["effectiveness_metrics"]["trending_resources"].append(resource_data)
+                    
+            except:
+                continue
+        
+        # Sort lists by effectiveness/relevance
+        analytics_data["effectiveness_metrics"]["high_effectiveness_resources"].sort(
+            key=lambda x: x["average_effectiveness"], reverse=True
+        )
+        analytics_data["effectiveness_metrics"]["low_effectiveness_resources"].sort(
+            key=lambda x: x["average_effectiveness"]
+        )
+        analytics_data["satisfaction_metrics"]["highly_rated_resources"].sort(
+            key=lambda x: x["average_satisfaction"], reverse=True
+        )
+        analytics_data["effectiveness_metrics"]["trending_resources"].sort(
+            key=lambda x: x.get("improving_goals", 0), reverse=True
+        )
+        
+        return analytics_data
+    
+    def get_goal_coverage_gaps(self):
+        """Analyze gaps in learning goal coverage and recommend additional resources."""
+        if not api.user.has_permission("View", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+        
+        catalog = api.portal.get_tool("portal_catalog")
+        user = api.user.get_current()
+        
+        # Get all learning goals and bookmarks
+        goals = catalog(
+            Creator=user.getId(),
+            portal_type="LearningGoal"
+        )
+        
+        bookmarks = catalog(
+            Creator=user.getId(),
+            portal_type="BookmarkPlus"
+        )
+        
+        gap_analysis = {
+            "unsupported_goals": [],
+            "under_supported_goals": [],
+            "well_supported_goals": [],
+            "coverage_statistics": {
+                "total_goals": len(goals),
+                "unsupported_count": 0,
+                "under_supported_count": 0,
+                "well_supported_count": 0,
+                "average_resources_per_goal": 0.0
+            },
+            "recommendations": [],
+            "resource_distribution": {
+                "goals_with_no_resources": 0,
+                "goals_with_1_resource": 0,
+                "goals_with_2_3_resources": 0,
+                "goals_with_4_plus_resources": 0
+            }
+        }
+        
+        # Build resource-to-goal mapping
+        goal_to_resources = {}
+        resource_count_distribution = []
+        
+        for goal_brain in goals:
+            goal_uid = goal_brain.UID
+            goal_to_resources[goal_uid] = {
+                "brain": goal_brain,
+                "supporting_resources": [],
+                "total_effectiveness": 0.0,
+                "average_effectiveness": 0.0,
+                "high_quality_resources": 0,
+                "completion_contributors": 0
+            }
+        
+        # Map resources to goals
+        for bookmark_brain in bookmarks:
+            try:
+                obj = bookmark_brain.getObject()
+                supported_goals = getattr(obj, 'supports_learning_goals', [])
+                
+                for goal_uid in supported_goals:
+                    if goal_uid in goal_to_resources:
+                        # Get effectiveness metrics
+                        effectiveness_data = obj.calculate_learning_goal_effectiveness(goal_uid)
+                        
+                        resource_info = {
+                            "uid": bookmark_brain.UID,
+                            "title": bookmark_brain.Title,
+                            "url": bookmark_brain.getURL(),
+                            "resource_type": getattr(obj, 'resource_type', 'unknown'),
+                            "content_quality": getattr(obj, 'content_quality', 'medium'),
+                            "read_status": getattr(obj, 'read_status', 'unread'),
+                            "effectiveness": effectiveness_data['average_effectiveness'] if effectiveness_data else 0.0,
+                            "satisfaction": effectiveness_data['average_satisfaction'] if effectiveness_data else 0.0,
+                            "recommendation_strength": effectiveness_data['recommendation_strength'] if effectiveness_data else 'low'
+                        }
+                        
+                        goal_to_resources[goal_uid]["supporting_resources"].append(resource_info)
+                        
+                        if effectiveness_data:
+                            goal_to_resources[goal_uid]["total_effectiveness"] += effectiveness_data['average_effectiveness']
+                            
+                            if effectiveness_data['recommendation_strength'] == 'high':
+                                goal_to_resources[goal_uid]["high_quality_resources"] += 1
+                            
+                            # Check for completion contribution
+                            tracking_data = obj.get_learning_goal_support_data(goal_uid)
+                            if tracking_data and tracking_data.get('completion_contributed', False):
+                                goal_to_resources[goal_uid]["completion_contributors"] += 1
+                                
+            except:
+                continue
+        
+        # Analyze each goal's coverage
+        total_resource_count = 0
+        
+        for goal_uid, goal_data in goal_to_resources.items():
+            resource_count = len(goal_data["supporting_resources"])
+            total_resource_count += resource_count
+            resource_count_distribution.append(resource_count)
+            
+            # Calculate average effectiveness
+            if goal_data["supporting_resources"]:
+                effectiveness_scores = [r["effectiveness"] for r in goal_data["supporting_resources"] if r["effectiveness"] > 0]
+                if effectiveness_scores:
+                    from statistics import mean
+                    goal_data["average_effectiveness"] = round(mean(effectiveness_scores), 3)
+            
+            goal_info = {
+                "uid": goal_uid,
+                "title": goal_data["brain"].Title,
+                "url": goal_data["brain"].getURL(),
+                "resource_count": resource_count,
+                "average_effectiveness": goal_data["average_effectiveness"],
+                "high_quality_resources": goal_data["high_quality_resources"],
+                "completion_contributors": goal_data["completion_contributors"],
+                "priority": getattr(goal_data["brain"].getObject(), 'priority', 'medium'),
+                "progress": getattr(goal_data["brain"].getObject(), 'progress', 0),
+                "difficulty": getattr(goal_data["brain"].getObject(), 'difficulty_level', 'intermediate')
+            }
+            
+            # Categorize goals
+            if resource_count == 0:
+                gap_analysis["unsupported_goals"].append(goal_info)
+                gap_analysis["coverage_statistics"]["unsupported_count"] += 1
+                gap_analysis["resource_distribution"]["goals_with_no_resources"] += 1
+            elif resource_count <= 2 or goal_data["average_effectiveness"] < 0.6:
+                gap_analysis["under_supported_goals"].append(goal_info)
+                gap_analysis["coverage_statistics"]["under_supported_count"] += 1
+                
+                if resource_count == 1:
+                    gap_analysis["resource_distribution"]["goals_with_1_resource"] += 1
+                elif resource_count <= 3:
+                    gap_analysis["resource_distribution"]["goals_with_2_3_resources"] += 1
+            else:
+                gap_analysis["well_supported_goals"].append(goal_info)
+                gap_analysis["coverage_statistics"]["well_supported_count"] += 1
+                
+                if resource_count >= 4:
+                    gap_analysis["resource_distribution"]["goals_with_4_plus_resources"] += 1
+                else:
+                    gap_analysis["resource_distribution"]["goals_with_2_3_resources"] += 1
+        
+        # Calculate statistics
+        if len(goals) > 0:
+            gap_analysis["coverage_statistics"]["average_resources_per_goal"] = round(total_resource_count / len(goals), 1)
+        
+        # Generate recommendations
+        # Priority 1: Unsupported high-priority goals
+        high_priority_unsupported = [g for g in gap_analysis["unsupported_goals"] 
+                                   if g["priority"] in ["high", "critical"]]
+        if high_priority_unsupported:
+            gap_analysis["recommendations"].append({
+                "type": "critical_gap",
+                "priority": "critical",
+                "title": "High-Priority Goals Without Resources",
+                "description": f"Found {len(high_priority_unsupported)} high-priority learning goals with no supporting resources",
+                "action": "Add at least 2-3 quality resources for each of these goals",
+                "affected_goals": [g["uid"] for g in high_priority_unsupported[:5]]
+            })
+        
+        # Priority 2: Under-supported goals with low effectiveness
+        low_effectiveness_goals = [g for g in gap_analysis["under_supported_goals"] 
+                                 if g["average_effectiveness"] < 0.4 and g["resource_count"] > 0]
+        if low_effectiveness_goals:
+            gap_analysis["recommendations"].append({
+                "type": "quality_gap",
+                "priority": "high",
+                "title": "Goals with Low-Effectiveness Resources",
+                "description": f"Found {len(low_effectiveness_goals)} goals with resources that are not effective",
+                "action": "Replace or supplement with higher-quality resources",
+                "affected_goals": [g["uid"] for g in low_effectiveness_goals[:5]]
+            })
+        
+        # Priority 3: Goals with only one resource
+        single_resource_goals = [g for g in gap_analysis["under_supported_goals"] 
+                               if g["resource_count"] == 1]
+        if single_resource_goals:
+            gap_analysis["recommendations"].append({
+                "type": "diversity_gap",
+                "priority": "medium",
+                "title": "Goals with Single Resource",
+                "description": f"Found {len(single_resource_goals)} goals with only one supporting resource",
+                "action": "Add 1-2 additional resources with different perspectives or formats",
+                "affected_goals": [g["uid"] for g in single_resource_goals[:5]]
+            })
+        
+        # Priority 4: Advanced goals without completion contributors
+        advanced_incomplete_goals = [g for g in gap_analysis["under_supported_goals"] + gap_analysis["well_supported_goals"]
+                                   if g["difficulty"] == "advanced" and g["completion_contributors"] == 0 and g["progress"] < 80]
+        if advanced_incomplete_goals:
+            gap_analysis["recommendations"].append({
+                "type": "completion_gap",
+                "priority": "medium",
+                "title": "Advanced Goals Without Completion-Oriented Resources",
+                "description": f"Found {len(advanced_incomplete_goals)} advanced goals without resources that help with completion",
+                "action": "Add practical, application-oriented resources (projects, exercises, assessments)",
+                "affected_goals": [g["uid"] for g in advanced_incomplete_goals[:5]]
+            })
+        
+        # Sort recommendations by priority
+        priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+        gap_analysis["recommendations"].sort(key=lambda x: priority_order.get(x["priority"], 3))
+        
+        # Sort goal lists by priority and progress
+        gap_analysis["unsupported_goals"].sort(key=lambda x: (priority_order.get(x["priority"], 3), -x["progress"]))
+        gap_analysis["under_supported_goals"].sort(key=lambda x: (priority_order.get(x["priority"], 3), x["average_effectiveness"]))
+        gap_analysis["well_supported_goals"].sort(key=lambda x: -x["average_effectiveness"])
+        
+        return gap_analysis
+    
+    def get_resource_recommendations(self):
+        """Generate personalized resource recommendations based on learning goals and gaps."""
+        if not api.user.has_permission("View", obj=self.context):
+            self.request.response.setStatus(403)
+            return {"error": "Unauthorized"}
+        
+        catalog = api.portal.get_tool("portal_catalog")
+        user = api.user.get_current()
+        
+        # Get gap analysis data
+        gap_analysis = self.get_goal_coverage_gaps()
+        
+        recommendations = {
+            "immediate_actions": [],
+            "suggested_resource_types": {},
+            "learning_path_suggestions": [],
+            "quality_improvements": [],
+            "content_format_recommendations": {},
+            "priority_matrix": {
+                "high_impact_low_effort": [],
+                "high_impact_high_effort": [],
+                "low_impact_low_effort": [],
+                "low_impact_high_effort": []
+            }
+        }
+        
+        # Get existing bookmarks for pattern analysis
+        bookmarks = catalog(
+            Creator=user.getId(),
+            portal_type="BookmarkPlus"
+        )
+        
+        # Analyze existing resource patterns
+        resource_type_effectiveness = {}
+        content_quality_impact = {}
+        
+        for brain in bookmarks:
+            try:
+                obj = brain.getObject()
+                resource_type = getattr(obj, 'resource_type', 'unknown')
+                content_quality = getattr(obj, 'content_quality', 'medium')
+                
+                # Get average effectiveness across all goals
+                all_metrics = obj.get_all_learning_goal_metrics()
+                if all_metrics:
+                    avg_effectiveness = sum(m['average_effectiveness'] for m in all_metrics.values()) / len(all_metrics)
+                    
+                    # Track by resource type
+                    if resource_type not in resource_type_effectiveness:
+                        resource_type_effectiveness[resource_type] = []
+                    resource_type_effectiveness[resource_type].append(avg_effectiveness)
+                    
+                    # Track by content quality
+                    if content_quality not in content_quality_impact:
+                        content_quality_impact[content_quality] = []
+                    content_quality_impact[content_quality].append(avg_effectiveness)
+                    
+            except:
+                continue
+        
+        # Calculate average effectiveness by type and quality
+        for resource_type, scores in resource_type_effectiveness.items():
+            if scores:
+                from statistics import mean
+                avg_score = mean(scores)
+                recommendations["suggested_resource_types"][resource_type] = {
+                    "average_effectiveness": round(avg_score, 3),
+                    "sample_count": len(scores),
+                    "recommendation": "high" if avg_score >= 0.7 else "medium" if avg_score >= 0.5 else "low"
+                }
+        
+        # Generate immediate action recommendations
+        # 1. Address unsupported high-priority goals
+        high_priority_unsupported = [g for g in gap_analysis["unsupported_goals"] 
+                                   if g["priority"] in ["high", "critical"]][:3]
+        
+        for goal in high_priority_unsupported:
+            # Suggest resource types based on difficulty and what works well
+            best_resource_types = sorted(
+                recommendations["suggested_resource_types"].items(),
+                key=lambda x: x[1]["average_effectiveness"],
+                reverse=True
+            )[:2]
+            
+            recommended_types = [rt[0] for rt in best_resource_types] if best_resource_types else ["article", "course"]
+            
+            recommendations["immediate_actions"].append({
+                "type": "add_resources",
+                "priority": "critical",
+                "goal_uid": goal["uid"],
+                "goal_title": goal["title"],
+                "action": f"Add 2-3 resources for '{goal['title']}'",
+                "suggested_resource_types": recommended_types,
+                "reasoning": f"High-priority goal ({goal['priority']}) with no supporting resources",
+                "estimated_effort": "medium"
+            })
+        
+        # 2. Improve low-effectiveness resources
+        low_effectiveness_goals = [g for g in gap_analysis["under_supported_goals"] 
+                                 if g["average_effectiveness"] < 0.4][:2]
+        
+        for goal in low_effectiveness_goals:
+            recommendations["quality_improvements"].append({
+                "type": "improve_quality",
+                "priority": "high",
+                "goal_uid": goal["uid"],
+                "goal_title": goal["title"],
+                "current_effectiveness": goal["average_effectiveness"],
+                "action": f"Replace or supplement low-quality resources for '{goal['title']}'",
+                "target_effectiveness": 0.7,
+                "reasoning": "Current resources are not effectively supporting learning",
+                "estimated_effort": "high"
+            })
+        
+        # 3. Learning path suggestions for connected goals
+        goals_by_difficulty = {}
+        for goal_list in [gap_analysis["unsupported_goals"], gap_analysis["under_supported_goals"]]:
+            for goal in goal_list:
+                difficulty = goal["difficulty"]
+                if difficulty not in goals_by_difficulty:
+                    goals_by_difficulty[difficulty] = []
+                goals_by_difficulty[difficulty].append(goal)
+        
+        # Suggest learning paths from beginner to advanced
+        if "beginner" in goals_by_difficulty and "intermediate" in goals_by_difficulty:
+            recommendations["learning_path_suggestions"].append({
+                "path_name": "Foundation to Intermediate",
+                "description": "Build foundational knowledge before tackling intermediate concepts",
+                "beginner_goals": [g["uid"] for g in goals_by_difficulty["beginner"][:2]],
+                "intermediate_goals": [g["uid"] for g in goals_by_difficulty["intermediate"][:2]],
+                "suggested_sequence": "Complete beginner goals first, then progress to intermediate",
+                "estimated_timeline": "2-3 months"
+            })
+        
+        # 4. Content format recommendations based on learning styles and effectiveness
+        format_preferences = {}
+        
+        # Analyze what formats work best for the user
+        for brain in bookmarks:
+            try:
+                obj = brain.getObject()
+                resource_type = getattr(obj, 'resource_type', 'unknown')
+                read_status = getattr(obj, 'read_status', 'unread')
+                
+                if read_status == 'completed':
+                    if resource_type not in format_preferences:
+                        format_preferences[resource_type] = {"completed": 0, "total": 0}
+                    format_preferences[resource_type]["completed"] += 1
+                
+                if resource_type not in format_preferences:
+                    format_preferences[resource_type] = {"completed": 0, "total": 0}
+                format_preferences[resource_type]["total"] += 1
+                
+            except:
+                continue
+        
+        # Calculate completion rates by format
+        for resource_type, data in format_preferences.items():
+            if data["total"] > 0:
+                completion_rate = data["completed"] / data["total"]
+                recommendations["content_format_recommendations"][resource_type] = {
+                    "completion_rate": round(completion_rate, 2),
+                    "total_resources": data["total"],
+                    "recommendation": "high" if completion_rate >= 0.7 else "medium" if completion_rate >= 0.4 else "low"
+                }
+        
+        # 5. Priority matrix classification
+        for goal in gap_analysis["unsupported_goals"] + gap_analysis["under_supported_goals"]:
+            # Estimate impact based on priority and progress
+            impact_score = 0
+            if goal["priority"] == "critical":
+                impact_score = 4
+            elif goal["priority"] == "high":
+                impact_score = 3
+            elif goal["priority"] == "medium":
+                impact_score = 2
+            else:
+                impact_score = 1
+            
+            # Adjust for progress (less progress = higher impact potential)
+            impact_score += (100 - goal["progress"]) / 25
+            
+            # Estimate effort based on difficulty and current resource count
+            effort_score = 0
+            if goal["difficulty"] == "advanced":
+                effort_score = 3
+            elif goal["difficulty"] == "intermediate":
+                effort_score = 2
+            else:
+                effort_score = 1
+            
+            # More effort needed if no resources exist
+            if goal["resource_count"] == 0:
+                effort_score += 2
+            elif goal["resource_count"] == 1:
+                effort_score += 1
+            
+            # Classify into matrix
+            goal_recommendation = {
+                "goal_uid": goal["uid"],
+                "goal_title": goal["title"],
+                "impact_score": round(impact_score, 1),
+                "effort_score": effort_score,
+                "current_resources": goal["resource_count"],
+                "current_effectiveness": goal["average_effectiveness"]
+            }
+            
+            if impact_score >= 4 and effort_score <= 2:
+                recommendations["priority_matrix"]["high_impact_low_effort"].append(goal_recommendation)
+            elif impact_score >= 4 and effort_score > 2:
+                recommendations["priority_matrix"]["high_impact_high_effort"].append(goal_recommendation)
+            elif impact_score < 4 and effort_score <= 2:
+                recommendations["priority_matrix"]["low_impact_low_effort"].append(goal_recommendation)
+            else:
+                recommendations["priority_matrix"]["low_impact_high_effort"].append(goal_recommendation)
+        
+        # Sort each quadrant
+        for quadrant in recommendations["priority_matrix"].values():
+            quadrant.sort(key=lambda x: x["impact_score"], reverse=True)
+        
+        # Sort resource type recommendations
+        recommendations["suggested_resource_types"] = dict(
+            sorted(recommendations["suggested_resource_types"].items(),
+                  key=lambda x: x[1]["average_effectiveness"],
+                  reverse=True)
+        )
+        
+        return recommendations

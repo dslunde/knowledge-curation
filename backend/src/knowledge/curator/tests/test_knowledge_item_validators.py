@@ -19,6 +19,8 @@ from knowledge.curator.content.validators import (
     validate_circular_dependencies,
     validate_prerequisite_enables_consistency,
     validate_mastery_threshold_progress_consistency,
+    validate_personal_notes,
+    validate_key_quotes,
 )
 
 
@@ -232,6 +234,53 @@ class TestKnowledgeItemInvariants(unittest.TestCase):
         data = MockData(0.8, -0.1)  # Progress out of range
         with self.assertRaises(Invalid):
             validate_mastery_threshold_progress_consistency(data)
+    
+    def test_validate_personal_notes(self):
+        """Test personal notes validation."""
+        # Valid values
+        self.assertTrue(validate_personal_notes(None))  # Optional
+        self.assertTrue(validate_personal_notes(""))  # Empty is OK
+        self.assertTrue(validate_personal_notes("Some personal notes"))
+        self.assertTrue(validate_personal_notes("A" * 9999))  # Just under limit
+        self.assertTrue(validate_personal_notes("A" * 10000))  # At limit
+        
+        # Invalid values
+        with self.assertRaises(Invalid):
+            validate_personal_notes("A" * 10001)  # Over limit
+        with self.assertRaises(Invalid):
+            validate_personal_notes(123)  # Not a string
+        with self.assertRaises(Invalid):
+            validate_personal_notes(["not", "a", "string"])  # Not a string
+    
+    def test_validate_key_quotes(self):
+        """Test key quotes validation."""
+        # Valid values
+        self.assertTrue(validate_key_quotes(None))  # Optional
+        self.assertTrue(validate_key_quotes([]))  # Empty list is OK
+        self.assertTrue(validate_key_quotes(["This is a valid quote"]))
+        self.assertTrue(validate_key_quotes([
+            "First quote here",
+            "Second quote here",
+            "Third quote here"
+        ]))
+        self.assertTrue(validate_key_quotes(["A" * 2000]))  # At limit
+        self.assertTrue(validate_key_quotes([f"Quote {i}: This is valid" for i in range(20)]))  # Max quotes
+        
+        # Invalid values
+        with self.assertRaises(Invalid):
+            validate_key_quotes("not a list")  # Not a list
+        with self.assertRaises(Invalid):
+            validate_key_quotes([123])  # Not strings
+        with self.assertRaises(Invalid):
+            validate_key_quotes([""])  # Empty quote
+        with self.assertRaises(Invalid):
+            validate_key_quotes(["Too short"])  # Less than 10 chars
+        with self.assertRaises(Invalid):
+            validate_key_quotes(["A" * 2001])  # Over individual limit
+        with self.assertRaises(Invalid):
+            validate_key_quotes([f"Quote {i}: This is valid" for i in range(21)])  # Too many quotes
+        with self.assertRaises(Invalid):
+            validate_key_quotes(["Duplicate quote", "Duplicate quote"])  # Duplicates
 
 
 if __name__ == '__main__':

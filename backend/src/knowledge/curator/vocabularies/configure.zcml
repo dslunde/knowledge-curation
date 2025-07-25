@@ -23,6 +23,13 @@
       name="knowledge.curator.read_status_vocabulary"
       component=".ReadStatusVocabularyFactory"
       />
+  
+  <!-- Read status vocabulary (alternate name) -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.read_status"
+      component=".ReadStatusVocabularyFactory"
+      />
 
   <!-- Importance vocabulary -->
   <utility
@@ -198,6 +205,48 @@
       provides="zope.schema.interfaces.IVocabularyFactory"
       name="knowledge.curator.milestone_types"
       component=".MilestoneTypesVocabularyFactory"
+      />
+
+  <!-- Extended annotation types vocabulary for Research Notes -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.annotation_types_extended"
+      component=".AnnotationTypesExtendedVocabularyFactory"
+      />
+
+  <!-- Annotation scope vocabulary -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.annotation_scope"
+      component=".AnnotationScopeVocabularyFactory"
+      />
+
+  <!-- Evidence types vocabulary -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.evidence_types"
+      component=".EvidenceTypesVocabularyFactory"
+      />
+
+  <!-- Confidence levels vocabulary -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.confidence_levels"
+      component=".ConfidenceLevelsVocabularyFactory"
+      />
+
+  <!-- Bookmark resource types vocabulary -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.bookmark_resource_types"
+      component=".BookmarkResourceTypesVocabularyFactory"
+      />
+
+  <!-- Content quality vocabulary -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.content_quality"
+      component=".ContentQualityVocabularyFactory"
       />
 
 </configure>

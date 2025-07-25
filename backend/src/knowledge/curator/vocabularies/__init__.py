@@ -42,8 +42,9 @@ class ReadStatusVocabulary:
     def __call__(self, context):
         terms = [
             SimpleTerm(value="unread", title="Unread"),
-            SimpleTerm(value="reading", title="Reading"),
-            SimpleTerm(value="read", title="Read"),
+            SimpleTerm(value="in_progress", title="In Progress"),
+            SimpleTerm(value="completed", title="Completed"),
+            SimpleTerm(value="archived", title="Archived"),
         ]
         return SimpleVocabulary(terms)
 
@@ -344,6 +345,67 @@ class AnnotationTypesVocabulary:
 
 
 @implementer(IVocabularyFactory)
+class AnnotationTypesExtendedVocabulary:
+    """Extended vocabulary for annotation types used in Research Notes."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="insight", title="Insight"),
+            SimpleTerm(value="question", title="Question"),
+            SimpleTerm(value="critique", title="Critique"),
+            SimpleTerm(value="extension", title="Extension"),
+            SimpleTerm(value="example", title="Example"),
+            SimpleTerm(value="clarification", title="Clarification"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class AnnotationScopeVocabulary:
+    """Vocabulary for annotation scope."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="whole_item", title="Whole Item"),
+            SimpleTerm(value="specific_section", title="Specific Section"),
+            SimpleTerm(value="atomic_concept", title="Atomic Concept"),
+            SimpleTerm(value="metadata", title="Metadata"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class EvidenceTypesVocabulary:
+    """Vocabulary for evidence types."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="empirical", title="Empirical"),
+            SimpleTerm(value="theoretical", title="Theoretical"),
+            SimpleTerm(value="anecdotal", title="Anecdotal"),
+            SimpleTerm(value="experimental", title="Experimental"),
+            SimpleTerm(value="observational", title="Observational"),
+            SimpleTerm(value="statistical", title="Statistical"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class ConfidenceLevelsVocabulary:
+    """Vocabulary for confidence levels."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="very_low", title="Very Low"),
+            SimpleTerm(value="low", title="Low"),
+            SimpleTerm(value="medium", title="Medium"),
+            SimpleTerm(value="high", title="High"),
+            SimpleTerm(value="very_high", title="Very High"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
 class ObjectiveCategoryVocabulary:
     """Vocabulary for learning objective categories."""
 
@@ -459,3 +521,45 @@ CitationFormatsVocabularyFactory = CitationFormatsVocabulary()
 LearningStrategiesVocabularyFactory = LearningStrategiesVocabulary()
 SessionTypesVocabularyFactory = SessionTypesVocabulary()
 MilestoneTypesVocabularyFactory = MilestoneTypesVocabulary()
+AnnotationTypesExtendedVocabularyFactory = AnnotationTypesExtendedVocabulary()
+AnnotationScopeVocabularyFactory = AnnotationScopeVocabulary()
+EvidenceTypesVocabularyFactory = EvidenceTypesVocabulary()
+ConfidenceLevelsVocabularyFactory = ConfidenceLevelsVocabulary()
+
+
+@implementer(IVocabularyFactory)
+class BookmarkResourceTypesVocabulary:
+    """Vocabulary for bookmark resource types."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="article", title="Article"),
+            SimpleTerm(value="video", title="Video"),
+            SimpleTerm(value="podcast", title="Podcast"),
+            SimpleTerm(value="book", title="Book"),
+            SimpleTerm(value="paper", title="Research Paper"),
+            SimpleTerm(value="course", title="Online Course"),
+            SimpleTerm(value="documentation", title="Documentation"),
+            SimpleTerm(value="tutorial", title="Tutorial"),
+            SimpleTerm(value="presentation", title="Presentation"),
+            SimpleTerm(value="tool", title="Tool/Software"),
+            SimpleTerm(value="other", title="Other"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class ContentQualityVocabulary:
+    """Vocabulary for content quality levels."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="low", title="Low Quality"),
+            SimpleTerm(value="medium", title="Medium Quality"),
+            SimpleTerm(value="high", title="High Quality"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+BookmarkResourceTypesVocabularyFactory = BookmarkResourceTypesVocabulary()
+ContentQualityVocabularyFactory = ContentQualityVocabulary()

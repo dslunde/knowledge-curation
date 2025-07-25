@@ -1,0 +1,14 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="knowledge.curator"
+    >
+
+  <class class=".knowledge_container.KnowledgeContainer">
+    <require
+        permission="zope2.View"
+        attributes="add_content_item remove_content_item organize_content update_organization_structure validate_content_references get_collection_summary"
+        />
+  </class>
+
+</configure>

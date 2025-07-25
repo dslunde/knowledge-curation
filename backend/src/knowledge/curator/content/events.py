@@ -1,9 +1,10 @@
-"""Event handlers for Knowledge Item relationships."""
+"""Event handlers for Knowledge Item relationships and BookmarkPlus status tracking."""
 
+from datetime import datetime
 from plone import api
 from zope.component import adapter
-from zope.lifecycleevent.interfaces import IObjectRemovedEvent
-from knowledge.curator.interfaces import IKnowledgeItem
+from zope.lifecycleevent.interfaces import IObjectRemovedEvent, IObjectModifiedEvent
+from knowledge.curator.interfaces import IKnowledgeItem, IBookmarkPlus
 import logging
 
 logger = logging.getLogger('knowledge.curator')
@@ -70,3 +71,39 @@ def validate_knowledge_item_before_deletion(obj, event):
                 f"Knowledge Item '{obj.Title()}' being deleted is a prerequisite for "
                 f"{enabled_count} other items. This may impact learning paths."
             )
+
+
+@adapter(IBookmarkPlus, IObjectModifiedEvent)
+def handle_bookmark_status_change(obj, event):
+    """Handle automatic timestamp updates when bookmark status changes.
+    
+    This event handler ensures that timestamps are properly updated when
+    the read_status field is changed through the Plone UI or API.
+    """
+    # Get the list of modified attributes from the event
+    descriptions = getattr(event, 'descriptions', None)
+    if not descriptions:
+        return
+    
+    # Check if read_status was modified
+    for desc in descriptions:
+        if hasattr(desc, 'attributes') and 'read_status' in desc.attributes:
+            # Get the current status
+            current_status = getattr(obj, 'read_status', 'unread')
+            now = datetime.now()
+            
+            # Update timestamps based on the new status
+            if current_status != 'unread':
+                # Set access_date if not already set (first time accessing)
+                if not getattr(obj, 'access_date', None):
+                    obj.access_date = now
+                    logger.info(f"Set access_date for bookmark {obj.Title()}")
+            
+            if current_status in ['completed', 'archived']:
+                # Update last_reviewed_date when marking as completed or archived
+                obj.last_reviewed_date = now
+                logger.info(f"Updated last_reviewed_date for bookmark {obj.Title()}")
+            
+            # Mark the object as changed to persist the updates
+            obj._p_changed = True
+            break

@@ -103,6 +103,19 @@ class ResearchNoteSerializer(SerializeFolderToJson):
         result["review_frequency"] = getattr(obj, "review_frequency", 30)
         result["confidence_score"] = getattr(obj, "confidence_score", 0.5)
         
+        # Annotation fields
+        result["annotated_knowledge_items"] = getattr(obj, "annotated_knowledge_items", [])
+        result["annotation_type"] = getattr(obj, "annotation_type", None)
+        result["annotation_scope"] = getattr(obj, "annotation_scope", None)
+        result["research_question"] = getattr(obj, "research_question", "")
+        result["evidence_type"] = getattr(obj, "evidence_type", None)
+        result["confidence_level"] = getattr(obj, "confidence_level", None)
+        result["suggests_knowledge_item_updates"] = getattr(obj, "suggests_knowledge_item_updates", False)
+        
+        # Get detailed information about annotated knowledge items
+        if result["annotated_knowledge_items"]:
+            result["annotated_knowledge_items_details"] = obj.get_annotated_knowledge_items_details()
+        
         # Backwards compatibility - connections field
         result["connections"] = getattr(obj, "connections", [])
 
@@ -393,6 +406,20 @@ class BookmarkPlusSerializer(SerializeFolderToJson):
         result["read_status"] = getattr(obj, "read_status", "unread")
         result["importance"] = getattr(obj, "importance", "medium")
         result["ai_summary"] = getattr(obj, "ai_summary", "")
+        
+        # Add date tracking fields
+        access_date = getattr(obj, "access_date", None)
+        result["access_date"] = access_date.isoformat() if access_date else None
+        
+        last_reviewed_date = getattr(obj, "last_reviewed_date", None)
+        result["last_reviewed_date"] = last_reviewed_date.isoformat() if last_reviewed_date else None
+        
+        # Add Knowledge Item relationship fields
+        result["related_knowledge_items"] = getattr(obj, "related_knowledge_items", [])
+        result["resource_type"] = getattr(obj, "resource_type", "")
+        result["content_quality"] = getattr(obj, "content_quality", "medium")
+        result["reading_time_estimate"] = getattr(obj, "reading_time_estimate", None)
+        result["supports_learning_goals"] = getattr(obj, "supports_learning_goals", [])
 
         if include_embeddings and hasattr(obj, "embedding_vector"):
             result["embedding_vector"] = getattr(obj, "embedding_vector", [])

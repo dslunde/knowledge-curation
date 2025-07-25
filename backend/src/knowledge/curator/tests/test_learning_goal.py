@@ -862,3 +862,347 @@ class LearningGoalIntegrationTest(unittest.TestCase):
         result = goal_empty.calculate_overall_progress()
         self.assertEqual(result['overall_percentage'], 0)
         self.assertEqual(result['total_items'], 0)
+    
+    def test_get_next_knowledge_items(self):
+        """Test get_next_knowledge_items method returns properly ordered items."""
+        from plone.app.textfield.value import RichTextValue
+        
+        # Create knowledge items with different mastery levels
+        ki1 = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="next-item-1",
+            title="Basic Math",
+            description="Basic mathematics concepts",
+            content=RichTextValue("Basic math content", "text/plain", "text/html"),
+            knowledge_type="conceptual",
+            difficulty_level="beginner",
+            mastery_threshold=0.7,
+            learning_progress=0.8,  # Already mastered
+            atomic_concepts=["addition", "subtraction"]
+        )
+        
+        ki2 = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="next-item-2",
+            title="Algebra Basics",
+            description="Introduction to algebra",
+            content=RichTextValue("Algebra content", "text/plain", "text/html"),
+            knowledge_type="procedural",
+            difficulty_level="intermediate",
+            mastery_threshold=0.8,
+            learning_progress=0.3,  # Not mastered
+            atomic_concepts=["variables", "equations"]
+        )
+        
+        ki3 = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="next-item-3",
+            title="Advanced Calculus",
+            description="Advanced calculus concepts",
+            content=RichTextValue("Calculus content", "text/plain", "text/html"),
+            knowledge_type="procedural",
+            difficulty_level="advanced",
+            mastery_threshold=0.9,
+            learning_progress=0.1,  # Just started
+            atomic_concepts=["derivatives", "integrals"]
+        )
+        
+        # Create learning goal
+        goal = api.content.create(
+            container=self.portal,
+            type="LearningGoal",
+            id="goal-next-items",
+            title="Mathematics Learning Path",
+            target_knowledge_items=[ki1.UID(), ki2.UID(), ki3.UID()],
+            goal_type="mastery"
+        )
+        
+        # Set up prerequisites: ki1 -> ki2 -> ki3
+        ki2.prerequisite_items = [ki1.UID()]
+        ki3.prerequisite_items = [ki2.UID()]
+        
+        # Test get_next_knowledge_items
+        next_items = goal.get_next_knowledge_items()
+        
+        # Should return ki2 (ki1 is mastered, ki2 is available)
+        # and not ki3 (ki2 prerequisite not mastered)
+        self.assertEqual(len(next_items), 1)
+        self.assertEqual(next_items[0]['uid'], ki2.UID())
+        self.assertEqual(next_items[0]['title'], "Algebra Basics")
+        self.assertTrue(next_items[0]['prerequisites_met'])
+        self.assertEqual(next_items[0]['mastery_gap'], 0.5)  # 0.8 - 0.3
+        
+        # Test with limit parameter
+        next_items_limited = goal.get_next_knowledge_items(limit=0)
+        self.assertEqual(len(next_items_limited), 0)
+        
+        # Test after mastering ki2
+        ki2.learning_progress = 0.9  # Now mastered
+        next_items = goal.get_next_knowledge_items()
+        
+        # Should now return ki3
+        self.assertEqual(len(next_items), 1)
+        self.assertEqual(next_items[0]['uid'], ki3.UID())
+        self.assertEqual(next_items[0]['title'], "Advanced Calculus")
+        
+        # Test with no available items (all mastered)
+        ki3.learning_progress = 1.0
+        next_items = goal.get_next_knowledge_items()
+        self.assertEqual(len(next_items), 0)
+    
+    def test_target_knowledge_items_validation(self):
+        """Test validation of target_knowledge_items field."""
+        from knowledge.curator.content.validators import validate_target_knowledge_items
+        from zope.interface import Invalid
+        
+        # Create valid Knowledge Items
+        ki1 = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="valid-target-1",
+            title="Valid Target 1",
+            knowledge_type="conceptual",
+            atomic_concepts=["concept1"]
+        )
+        
+        ki2 = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="valid-target-2",
+            title="Valid Target 2",
+            knowledge_type="procedural",
+            atomic_concepts=["procedure1"]
+        )
+        
+        # Test with valid UIDs
+        result = validate_target_knowledge_items([ki1.UID(), ki2.UID()])
+        self.assertTrue(result)
+        
+        # Test with empty list - should fail
+        with self.assertRaises(Invalid) as cm:
+            validate_target_knowledge_items([])
+        self.assertIn("at least one target Knowledge Item", str(cm.exception))
+        
+        # Test with invalid UID - should fail
+        with self.assertRaises(Invalid) as cm:
+            validate_target_knowledge_items(["invalid-uid"])
+        self.assertIn("do not reference valid Knowledge Items", str(cm.exception))
+        
+        # Test with duplicate UIDs - should fail
+        with self.assertRaises(Invalid) as cm:
+            validate_target_knowledge_items([ki1.UID(), ki1.UID()])
+        self.assertIn("Duplicate", str(cm.exception))
+        
+        # Create non-Knowledge Item content
+        research_note = api.content.create(
+            container=self.portal,
+            type="ResearchNote",
+            id="not-a-ki-target",
+            title="Not a KI",
+            annotated_knowledge_items=[ki1.UID()],
+            annotation_type="general",
+            evidence_type="empirical",
+            confidence_level="medium"
+        )
+        
+        # Test with wrong content type - should fail
+        with self.assertRaises(Invalid) as cm:
+            validate_target_knowledge_items([research_note.UID()])
+        self.assertIn("do not reference valid Knowledge Items", str(cm.exception))
+    
+    def test_knowledge_item_connection_management(self):
+        """Test Knowledge Item connection management methods."""
+        from plone.app.textfield.value import RichTextValue
+        
+        # Create knowledge items
+        ki1 = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="conn-item-1",
+            title="Foundation Knowledge",
+            description="Foundation concepts",
+            content=RichTextValue("Foundation content", "text/plain", "text/html"),
+            knowledge_type="conceptual",
+            atomic_concepts=["foundation"]
+        )
+        
+        ki2 = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="conn-item-2",
+            title="Building Knowledge",
+            description="Building on foundation",
+            content=RichTextValue("Building content", "text/plain", "text/html"),
+            knowledge_type="procedural",
+            atomic_concepts=["building"]
+        )
+        
+        ki3 = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="conn-item-3",
+            title="Advanced Knowledge",
+            description="Advanced concepts",
+            content=RichTextValue("Advanced content", "text/plain", "text/html"),
+            knowledge_type="metacognitive",
+            atomic_concepts=["advanced"]
+        )
+        
+        # Create learning goal
+        goal = api.content.create(
+            container=self.portal,
+            type="LearningGoal",
+            id="goal-connections",
+            title="Connection Management Test",
+            target_knowledge_items=[ki1.UID(), ki2.UID(), ki3.UID()]
+        )
+        
+        # Test add_knowledge_item_connection
+        success = goal.add_knowledge_item_connection(
+            source_uid=ki1.UID(),
+            target_uid=ki2.UID(),
+            connection_type="prerequisite",
+            strength=0.8,
+            mastery_requirement=0.7
+        )
+        self.assertTrue(success)
+        self.assertEqual(len(goal.knowledge_item_connections), 1)
+        
+        # Test duplicate connection prevention
+        success = goal.add_knowledge_item_connection(
+            source_uid=ki1.UID(),
+            target_uid=ki2.UID(),
+            connection_type="builds_on",  # Different type, same items
+            strength=0.5,
+            mastery_requirement=0.6
+        )
+        self.assertFalse(success)  # Should prevent duplicate
+        self.assertEqual(len(goal.knowledge_item_connections), 1)
+        
+        # Test add another valid connection
+        success = goal.add_knowledge_item_connection(
+            source_uid=ki2.UID(),
+            target_uid=ki3.UID(),
+            connection_type="builds_on",
+            strength=0.6,
+            mastery_requirement=0.8
+        )
+        self.assertTrue(success)
+        self.assertEqual(len(goal.knowledge_item_connections), 2)
+        
+        # Test remove_knowledge_item_connection
+        success = goal.remove_knowledge_item_connection(
+            source_uid=ki1.UID(),
+            target_uid=ki2.UID()
+        )
+        self.assertTrue(success)
+        self.assertEqual(len(goal.knowledge_item_connections), 1)
+        
+        # Test remove non-existent connection
+        success = goal.remove_knowledge_item_connection(
+            source_uid=ki1.UID(),
+            target_uid=ki3.UID()
+        )
+        self.assertFalse(success)
+        self.assertEqual(len(goal.knowledge_item_connections), 1)
+        
+        # Test get_knowledge_item_connections_for_item
+        connections = goal.get_knowledge_item_connections_for_item(ki2.UID())
+        self.assertEqual(len(connections), 1)
+        self.assertEqual(connections[0]['source_item_uid'], ki2.UID())
+        self.assertEqual(connections[0]['target_item_uid'], ki3.UID())
+        
+        # Test update_connection_strength
+        success = goal.update_connection_strength(
+            source_uid=ki2.UID(),
+            target_uid=ki3.UID(),
+            new_strength=0.9,
+            new_mastery_requirement=0.85
+        )
+        self.assertTrue(success)
+        
+        # Verify update
+        connections = goal.get_knowledge_item_connections_for_item(ki2.UID())
+        self.assertEqual(connections[0]['strength'], 0.9)
+        self.assertEqual(connections[0]['mastery_requirement'], 0.85)
+    
+    def test_learning_goal_knowledge_item_synchronization(self):
+        """Test synchronization between Learning Goal and Knowledge Item fields."""
+        from plone.app.textfield.value import RichTextValue
+        
+        # Create knowledge items
+        ki1 = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="sync-item-1",
+            title="Synchronized Item 1",
+            content=RichTextValue("Sync content 1", "text/plain", "text/html"),
+            knowledge_type="conceptual",
+            difficulty_level="beginner",
+            mastery_threshold=0.7,
+            learning_progress=0.3,
+            atomic_concepts=["sync1"]
+        )
+        
+        ki2 = api.content.create(
+            container=self.portal,
+            type="KnowledgeItem",
+            id="sync-item-2",
+            title="Synchronized Item 2",
+            content=RichTextValue("Sync content 2", "text/plain", "text/html"),
+            knowledge_type="procedural",
+            difficulty_level="intermediate",
+            mastery_threshold=0.8,
+            learning_progress=0.6,
+            atomic_concepts=["sync2"]
+        )
+        
+        # Create learning goal
+        goal = api.content.create(
+            container=self.portal,
+            type="LearningGoal",
+            id="goal-sync",
+            title="Synchronization Test Goal",
+            target_knowledge_items=[ki1.UID(), ki2.UID()],
+            goal_type="mastery",
+            difficulty_level="intermediate"
+        )
+        
+        # Test sync_with_knowledge_items method
+        changes = goal.sync_with_knowledge_items()
+        
+        # Should detect changes and update goal
+        self.assertGreater(len(changes), 0)
+        
+        # Check that goal properties were updated based on Knowledge Items
+        # Difficulty should be updated to match the highest KI difficulty
+        self.assertEqual(goal.difficulty_level, "intermediate")
+        
+        # Test get_knowledge_items_summary
+        summary = goal.get_knowledge_items_summary()
+        self.assertEqual(summary['total_items'], 2)
+        self.assertEqual(summary['conceptual_items'], 1)
+        self.assertEqual(summary['procedural_items'], 1)
+        self.assertEqual(summary['average_progress'], 0.45)  # (0.3 + 0.6) / 2
+        self.assertEqual(summary['mastered_items'], 0)
+        
+        # Test after mastering one item
+        ki1.learning_progress = 0.8  # Above mastery threshold
+        summary = goal.get_knowledge_items_summary()
+        self.assertEqual(summary['mastered_items'], 1)
+        self.assertEqual(summary['average_progress'], 0.7)  # (0.8 + 0.6) / 2
+        
+        # Test validate_knowledge_item_references
+        is_valid, errors = goal.validate_knowledge_item_references()
+        self.assertTrue(is_valid)
+        self.assertEqual(len(errors), 0)
+        
+        # Test with invalid reference
+        goal.target_knowledge_items.append("invalid-uid")
+        is_valid, errors = goal.validate_knowledge_item_references()
+        self.assertFalse(is_valid)
+        self.assertGreater(len(errors), 0)
+        self.assertIn("invalid-uid", errors[0])
