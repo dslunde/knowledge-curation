@@ -402,7 +402,7 @@ class BookmarkPlusSerializer(SerializeFolderToJson):
         )
 
         result["url"] = getattr(obj, "url", "")
-        result["notes"] = obj.notes.raw if hasattr(obj, "notes") else ""
+        result["notes"] = getattr(obj, "notes", "")  # Fixed: notes is a Text field, not RichText
         result["read_status"] = getattr(obj, "read_status", "unread")
         result["importance"] = getattr(obj, "importance", "medium")
         result["ai_summary"] = getattr(obj, "ai_summary", "")

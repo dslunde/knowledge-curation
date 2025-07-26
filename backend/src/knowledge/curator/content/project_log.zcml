@@ -7,7 +7,7 @@
   <class class=".project_log.ProjectLog">
     <require
         permission="zope2.View"
-        attributes="add_entry update_entry get_entries_by_tag get_recent_entries add_deliverable add_learning update_status get_duration"
+        attributes="add_entry update_entry get_recent_entries add_deliverable update_status get_duration"
         />
   </class>
 
