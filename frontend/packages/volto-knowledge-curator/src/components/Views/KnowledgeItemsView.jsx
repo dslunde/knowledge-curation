@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Icon, Label, Loader, Container, Header, Message } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import config from '@plone/volto/registry';
@@ -8,9 +8,18 @@ import config from '@plone/volto/registry';
 const KnowledgeItemsView = (props) => {
   const intl = useIntl();
   const dispatch = useDispatch();
+  const history = useHistory();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const handleCreateKnowledgeItem = () => {
+    history.push('/add?type=KnowledgeItem');
+  };
+
+  const handleCreateLearningGoal = () => {
+    history.push('/add?type=LearningGoal');
+  };
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -107,8 +116,7 @@ const KnowledgeItemsView = (props) => {
           <Button 
             primary 
             size="large"
-            as={Link}
-            to="/++add++KnowledgeItem"
+            onClick={handleCreateKnowledgeItem}
             style={{ marginRight: '1rem' }}
           >
             <Icon name="plus" />
@@ -118,8 +126,7 @@ const KnowledgeItemsView = (props) => {
             basic
             inverted
             size="large"
-            as={Link}
-            to="/++add++LearningGoal"
+            onClick={handleCreateLearningGoal}
           >
             <Icon name="target" />
             Set Learning Goal
@@ -143,7 +150,7 @@ const KnowledgeItemsView = (props) => {
             No Knowledge Items Found
           </Header>
           <p>Start building your knowledge base by creating your first Knowledge Item.</p>
-          <Button primary as={Link} to="/++add++KnowledgeItem">
+          <Button primary onClick={handleCreateKnowledgeItem}>
             <Icon name="plus" />
             Create Knowledge Item
           </Button>
@@ -266,8 +273,7 @@ const KnowledgeItemsView = (props) => {
               </Card.Description>
               <Button 
                 primary 
-                as={Link} 
-                to="/++add++KnowledgeItem"
+                onClick={handleCreateKnowledgeItem}
               >
                 <Icon name="plus" />
                 Create

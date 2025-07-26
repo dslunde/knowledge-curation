@@ -1,9 +1,20 @@
 import React from 'react';
 import { Container, Header, Button, Statistic, Grid, Icon, Placeholder } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import './HeroSection.css';
 
 const HeroSection = ({ stats = {}, loading = false }) => {
+  const history = useHistory();
+
+  const handleCreateKnowledgeItem = () => {
+    history.push('/add?type=KnowledgeItem');
+  };
+
+  const handleCreateLearningGoal = () => {
+    history.push('/add?type=LearningGoal');
+  };
+
   const {
     totalKnowledgeItems = 0,
     totalContainers = 0,
@@ -41,8 +52,7 @@ const HeroSection = ({ stats = {}, loading = false }) => {
                   <Button 
                     primary 
                     size="large"
-                    as={Link}
-                    to="/++add++KnowledgeItem"
+                    onClick={handleCreateKnowledgeItem}
                     className="primary-action"
                   >
                     Create Knowledge Item
@@ -51,8 +61,7 @@ const HeroSection = ({ stats = {}, loading = false }) => {
                   <Button 
                     secondary
                     size="large"
-                    as={Link}
-                    to="/++add++LearningGoal"
+                    onClick={handleCreateLearningGoal}
                     className="secondary-action"
                   >
                     Define Learning Goal

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Icon, Label, Loader, Container, Header } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useSelector, useDispatch } from 'react-redux';
 import { searchContent } from '@plone/volto/actions';
@@ -8,6 +9,7 @@ import { searchContent } from '@plone/volto/actions';
 const KnowledgeItemsBlock = ({ data, ...props }) => {
   const intl = useIntl();
   const dispatch = useDispatch();
+  const history = useHistory();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,6 +46,10 @@ const KnowledgeItemsBlock = ({ data, ...props }) => {
       setLoading(false);
     }
   }, [searchResults]);
+
+  const handleCreateKnowledgeItem = () => {
+    history.push('/add?type=KnowledgeItem');
+  };
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty?.toLowerCase()) {
@@ -167,8 +173,7 @@ const KnowledgeItemsBlock = ({ data, ...props }) => {
               </Card.Description>
               <Button 
                 primary 
-                as={Link} 
-                to="/++add++KnowledgeItem"
+                onClick={handleCreateKnowledgeItem}
                 style={{ marginTop: 'auto' }}
               >
                 <Icon name="plus" />
