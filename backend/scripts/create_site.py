@@ -28,6 +28,7 @@ def asbool(s):
 
 DELETE_EXISTING = asbool(os.getenv("DELETE_EXISTING"))
 EXAMPLE_CONTENT = asbool(os.getenv("EXAMPLE_CONTENT", "1"))
+CREATE_DEMO_DATA = asbool(os.getenv("CREATE_DEMO_DATA", "1"))  # Default to True for demo
 
 admin_user = os.environ.get("PLONE_SITE_ID", "admin")
 admin_pass = os.environ.get("PLONE_SITE_PASSWORD", "admin")
@@ -36,6 +37,8 @@ site_title = os.environ.get("PLONE_SITE_TITLE", "Personal Knowledge Curation")
 
 print("=== CREATE SITE SCRIPT STARTING ===")
 print(f"DELETE_EXISTING: {DELETE_EXISTING}")
+print(f"EXAMPLE_CONTENT: {EXAMPLE_CONTENT}")
+print(f"CREATE_DEMO_DATA: {CREATE_DEMO_DATA}")
 print(f"portal_id: {portal_id}")
 
 # Set up the request environment
@@ -91,7 +94,38 @@ if site_id not in app.objectIds():
 
     app._p_jar.sync()
     print("Site creation completed")
+    
+    # Create demo data if requested
+    if CREATE_DEMO_DATA:
+        print("\n=== CREATING DEMO DATA ===")
+        try:
+            # Import and execute demo data creation
+            from knowledge.curator.scripts.create_demo_data import create_demo_data
+            
+            # Execute demo data creation in the context of the newly created site
+            create_demo_data()
+            print("Demo data creation completed successfully!")
+            
+        except Exception as e:
+            print(f"ERROR creating demo data: {e}")
+            import traceback
+            traceback.print_exc()
+            print("Continuing without demo data...")
 else:
     print(f"Site {site_id} already exists and DELETE_EXISTING is False")
+    
+    # Still try to create demo data if requested and site exists
+    if CREATE_DEMO_DATA:
+        print("\n=== CREATING DEMO DATA FOR EXISTING SITE ===")
+        try:
+            from knowledge.curator.scripts.create_demo_data import create_demo_data
+            create_demo_data()
+            print("Demo data creation completed successfully!")
+            
+        except Exception as e:
+            print(f"ERROR creating demo data: {e}")
+            import traceback
+            traceback.print_exc()
+            print("Continuing without demo data...")
 
 print("=== CREATE SITE SCRIPT COMPLETED ===")

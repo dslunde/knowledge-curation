@@ -1,1 +1,1 @@
-"""Scripts for Plone Knowledge System."""
+"""Knowledge Curator scripts package."""

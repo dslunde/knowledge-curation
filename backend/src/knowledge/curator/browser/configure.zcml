@@ -2,8 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:plone="http://namespaces.plone.org/plone"
-    i18n_domain="knowledge.curator"
-    >
+    i18n_domain="knowledge.curator">
 
   <!-- Set overrides folder for Just-a-Bunch-Of-Templates product -->
   <include

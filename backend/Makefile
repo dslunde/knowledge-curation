@@ -94,6 +94,18 @@ console: $(VENV_FOLDER) instance/etc/zope.ini ## Start a console into a Plone in
 create-site: $(VENV_FOLDER) instance/etc/zope.ini ## Create a new site from scratch
 	@$(BIN_FOLDER)/zconsole run instance/etc/zope.conf ./scripts/create_site.py
 
+.PHONY: create-demo-data
+create-demo-data: $(VENV_FOLDER) instance/etc/zope.ini ## Create demo data for React learning scenario
+	@echo "$(GREEN)==> Creating demo data for Knowledge Curator $(RESET)"
+	@CREATE_DEMO_DATA=1 $(BIN_FOLDER)/zconsole run instance/etc/zope.conf ./scripts/create_site.py
+
+.PHONY: start-with-demo
+start-with-demo: $(VENV_FOLDER) config ## Start Plone with fresh demo data
+	@echo "$(GREEN)==> Creating fresh site with demo data $(RESET)"
+	@DELETE_EXISTING=1 CREATE_DEMO_DATA=1 $(BIN_FOLDER)/zconsole run instance/etc/zope.conf ./scripts/create_site.py
+	@echo "$(GREEN)==> Starting Plone Backend with demo data $(RESET)"
+	@$(BIN_FOLDER)/runwsgi instance/etc/zope.ini
+
 # Example Content
 .PHONY: update-example-content
 update-example-content: $(VENV_FOLDER) ## Export example content inside package

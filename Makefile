@@ -69,6 +69,14 @@ backend-build:  ## Build Backend
 backend-create-site: ## Create a Plone site with default content
 	$(MAKE) -C "./backend/" create-site
 
+.PHONY: backend-create-demo-data
+backend-create-demo-data: ## Create demo data for React learning scenario
+	$(MAKE) -C "./backend/" create-demo-data
+
+.PHONY: backend-start-with-demo
+backend-start-with-demo: ## Start Backend with fresh demo data
+	$(MAKE) -C "./backend/" start-with-demo
+
 .PHONY: backend-update-example-content
 backend-update-example-content: ## Export example content inside package
 	$(MAKE) -C "./backend/" update-example-content
@@ -222,12 +230,36 @@ health-check:  ## Check Health of All Running Services
 ###########################################
 # Quick Development
 ###########################################
+.PHONY: start
+start:  ## Start: Knowledge Curator with demo data (alias for quick-start)
+	$(MAKE) quick-start
+
 .PHONY: quick-start
-quick-start:  ## Quick Start: Full integration environment in one command
-	@echo "🚀 Starting Knowledge Curator Development Environment..."
+quick-start:  ## Quick Start: Full integration environment with demo data
+	@echo "🚀 Starting Knowledge Curator Development Environment with Demo Data..."
 	$(MAKE) integration-start
 	@echo ""
-	@echo "✅ Knowledge Curator is ready!"
+	@echo "✅ Knowledge Curator is ready with React Learning Demo!"
+	@echo "📚 Demo Scenario: React Development Mastery Learning Path"
+	@echo "🌐 Main Site: http://knowledge-curator.localhost"
+	@echo "🔧 Classic UI: http://knowledge-curator.localhost/ClassicUI (admin/admin)"
+	@echo "📡 API: http://knowledge-curator.localhost/++api++"
+	@echo "🧠 Vector DB: http://localhost:6333"
+	@echo "📧 Email Test: http://localhost:8025"
+	@echo ""
+	@echo "📝 Demo includes:"
+	@echo "  - 8 Knowledge Items (JavaScript, React concepts)"
+	@echo "  - 1 Learning Goal (React Development Mastery)"
+	@echo "  - 1 Project Log (Portfolio Website Project)"
+	@echo "  - 2 Research Notes (Best practices, Hook questions)"
+	@echo "  - 3 Bookmark+ resources (Documentation, guides)"
+
+.PHONY: quick-start-clean
+quick-start-clean:  ## Quick Start: Full integration environment without demo data
+	@echo "🚀 Starting Knowledge Curator Development Environment (Clean)..."
+	CREATE_DEMO_DATA=0 $(MAKE) integration-start
+	@echo ""
+	@echo "✅ Knowledge Curator is ready (no demo data)!"
 	@echo "🌐 Main Site: http://knowledge-curator.localhost"
 	@echo "🔧 Classic UI: http://knowledge-curator.localhost/ClassicUI (admin/admin)"
 	@echo "📡 API: http://knowledge-curator.localhost/++api++"

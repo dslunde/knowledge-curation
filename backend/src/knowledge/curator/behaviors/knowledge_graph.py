@@ -182,6 +182,26 @@ class KnowledgeGraphBehavior:
         self.context.related_concepts = value
 
     @property
+    def concept_weight(self):
+        """Get concept weight."""
+        return getattr(self.context, "concept_weight", 1.0)
+
+    @concept_weight.setter
+    def concept_weight(self, value):
+        """Set concept weight."""
+        self.context.concept_weight = value
+
+    @property
+    def graph_metadata(self):
+        """Get graph metadata."""
+        return getattr(self.context, "graph_metadata", {})
+
+    @graph_metadata.setter
+    def graph_metadata(self, value):
+        """Set graph metadata."""
+        self.context.graph_metadata = value
+
+    @property
     def centrality_score(self):
         """Get centrality score."""
         return getattr(self.context, "centrality_score", 0.0)

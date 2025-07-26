@@ -1,0 +1,181 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="knowledge.curator">
+
+<body>
+
+<metal:content-core fill-slot="content-core">
+    <metal:block define-macro="content-core"
+                 tal:define="knowledge_items view/get_knowledge_items;
+                           content_summary view/get_content_summary;
+                           learning_stats view/get_learning_stats;">
+
+        <!-- Hero Section -->
+        <div class="hero-section p-4 mb-4 bg-light rounded-3">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold">🧠 Knowledge Curator</h1>
+                <p class="col-md-8 fs-4">React Development Mastery Learning Path</p>
+                <p class="lead">
+                    A comprehensive knowledge management system with 
+                    <strong tal:content="learning_stats/total_items">8</strong> Knowledge Items 
+                    ready for exploration and learning.
+                </p>
+                <a class="btn btn-primary btn-lg" href="#knowledge-items" role="button">
+                    🚀 Start Learning
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics Overview -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">📚 Knowledge Items</h5>
+                        <h2 class="text-primary" tal:content="learning_stats/total_items">8</h2>
+                        <p class="card-text">Atomic units of knowledge</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">🎯 Learning Goals</h5>
+                        <h2 class="text-success" tal:content="content_summary/LearningGoal/count">1</h2>
+                        <p class="card-text">Structured learning paths</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">📝 Research Notes</h5>
+                        <h2 class="text-info" tal:content="content_summary/ResearchNote/count">2</h2>
+                        <p class="card-text">Personal insights & annotations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Knowledge Items Section -->
+        <section id="knowledge-items" class="mb-5">
+            <h2 class="mb-4">🧩 Knowledge Items</h2>
+            <p class="text-muted mb-4">
+                Explore the complete React development curriculum, from fundamentals to advanced patterns.
+            </p>
+            
+            <div class="row">
+                <tal:repeat tal:repeat="item knowledge_items">
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title">
+                                        <a tal:attributes="href item/url" 
+                                           tal:content="item/title"
+                                           class="text-decoration-none">
+                                           Knowledge Item Title
+                                        </a>
+                                    </h5>
+                                    <span class="badge rounded-pill"
+                                          tal:attributes="class python: 'badge rounded-pill bg-' + {
+                                              'beginner': 'success', 
+                                              'intermediate': 'warning', 
+                                              'advanced': 'danger'
+                                          }.get(item['difficulty_level'], 'secondary')"
+                                          tal:content="item/difficulty_level">
+                                        difficulty
+                                    </span>
+                                </div>
+                                
+                                <p class="card-text text-muted" tal:content="item/description">
+                                    Knowledge item description
+                                </p>
+                                
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <span class="badge bg-light text-dark" 
+                                                  tal:content="item/knowledge_type">
+                                                Type
+                                            </span>
+                                        </small>
+                                        <small class="text-muted" 
+                                               tal:content="python: item['created'].strftime('%b %d')">
+                                            Created
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <div class="d-grid">
+                                    <a tal:attributes="href item/url" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        📖 Study This Item
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tal:repeat>
+            </div>
+        </section>
+
+        <!-- Learning Path Visualization -->
+        <section class="mb-5">
+            <h2 class="mb-4">🗺️ Learning Path Overview</h2>
+            <div class="alert alert-info">
+                <h5 class="alert-heading">📈 Your Learning Journey</h5>
+                <p>The React Development Mastery path is structured in three phases:</p>
+                <ol>
+                    <li><strong>Foundation Phase:</strong> JavaScript, HTML/CSS fundamentals</li>
+                    <li><strong>Core React Phase:</strong> Components, JSX, props, and state management</li>
+                    <li><strong>Advanced Phase:</strong> Hooks, performance optimization, and best practices</li>
+                </ol>
+                <hr>
+                <p class="mb-0">
+                    🎯 <strong>Goal:</strong> Build production-ready React applications with confidence
+                </p>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="mb-5">
+            <h2 class="mb-4">⚡ Quick Actions</h2>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <a href="http://localhost:8080/Plone/++add++KnowledgeItem" 
+                       class="btn btn-outline-primary w-100">
+                        <i class="fa fa-plus"></i> Add Knowledge Item
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="http://localhost:8080/Plone/++add++LearningGoal" 
+                       class="btn btn-outline-success w-100">
+                        <i class="fa fa-target"></i> Create Learning Goal
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="http://localhost:8080/Plone/++add++ResearchNote" 
+                       class="btn btn-outline-info w-100">
+                        <i class="fa fa-sticky-note"></i> Add Research Note
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="http://localhost:8080/Plone/++add++BookmarkPlus" 
+                       class="btn btn-outline-warning w-100">
+                        <i class="fa fa-bookmark"></i> Add Resource
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </metal:block>
+</metal:content-core>
+
+</body>
+</html> 

@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="knowledge.curator">
+
+<body>
+
+<metal:content-core fill-slot="content-core">
+    <metal:block define-macro="content-core">
+
+        <h1 tal:content="context/title">Content Title</h1>
+        
+        <p tal:condition="context/description" 
+           tal:content="context/description"
+           class="lead">
+            Content Description
+        </p>
+        
+        <div tal:condition="context/content"
+             tal:content="structure context/content/output">
+            Content Body
+        </div>
+
+    </metal:block>
+</metal:content-core>
+
+</body>
+</html> 

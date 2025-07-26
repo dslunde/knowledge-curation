@@ -7,6 +7,28 @@
 
 A knowledge curation tool built on Plone.
 
+## Getting Started
+
+### Quick Start with Demo Data (Recommended)
+
+Experience Knowledge Curator with a complete React learning scenario:
+
+```bash
+make start
+# or 
+make quick-start
+```
+
+This starts the full system with comprehensive demo data showcasing the Knowledge Item-centric architecture. See [DEMO_DATA.md](DEMO_DATA.md) for details.
+
+### Quick Start without Demo Data
+
+For a clean development environment:
+
+```bash
+make quick-start-clean
+```
+
 ## Quick Start 🏁
 
 ### Prerequisites ✅
