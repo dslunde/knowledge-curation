@@ -9,8 +9,8 @@ const KnowledgeItemCarousel = ({ items = [], loading = false }) => {
   const history = useHistory();
 
   const handleAddNew = () => {
-    // Navigate to the Knowledge Item creation form
-    history.push('/++add++KnowledgeItem');
+    // Navigate to the Knowledge Item creation form using Volto pattern
+    history.push('/add?type=KnowledgeItem');
   };
 
   const getDifficultyColor = (difficulty) => {

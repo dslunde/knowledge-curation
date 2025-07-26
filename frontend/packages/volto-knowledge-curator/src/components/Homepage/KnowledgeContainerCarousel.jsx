@@ -8,8 +8,8 @@ const KnowledgeContainerCarousel = ({ containers = [], loading = false }) => {
   const history = useHistory();
 
   const handleAddNew = () => {
-    // Navigate to the Knowledge Container creation form
-    history.push('/++add++KnowledgeContainer');
+    // Navigate to the Knowledge Container creation form using Volto pattern
+    history.push('/add?type=KnowledgeContainer');
   };
 
   const getCollectionTypeColor = (type) => {
