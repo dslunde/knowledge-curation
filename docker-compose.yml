@@ -124,6 +124,7 @@ services:
       - plone-internal
     environment:
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/Plone
+      RAZZLE_LOGIN_REQUIRED: "true"
     depends_on:
       - backend
     labels:
@@ -177,7 +178,7 @@ services:
       - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
       ## VHM rewrite /++api++/
       - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.regex=^/\\+\\+api\\+\\+($$|/.*)"
-      - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.replacement=/VirtualHostBase/http/knowledge-curator.localhost/Plone/++api++/VirtualHostRoot$$1"
+      - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.replacement=/Plone/++api++$$1"
 
       ## VHM rewrite /ClassicUI/
       - "traefik.http.middlewares.mw-backend-vhm-classic.replacepathregex.regex=^/ClassicUI($$|/.*)"
@@ -191,11 +192,15 @@ services:
       - traefik.http.middlewares.mw-backend-auth.basicauth.users=admin:$$apr1$$uZPT5Fgu$$AmlIdamxT5ipBvPlsdfD70
       # Routers
       ## /++api++/
-      ### Router: Varnish Public
+      ### Router: Public API (rewritten to Plone path)
       - traefik.http.routers.rt-backend-api-public.rule=Host(`knowledge-curator.localhost`) && PathPrefix(`/++api++`)
       - traefik.http.routers.rt-backend-api-public.entrypoints=http
-      - traefik.http.routers.rt-backend-api-public.service=svc-varnish
-      - traefik.http.routers.rt-backend-api-public.middlewares=gzip,cors
+      - traefik.http.routers.rt-backend-api-public.service=svc-backend
+      - traefik.http.routers.rt-backend-api-public.middlewares=gzip,cors,mw-backend-api-vhm
+
+      ## Path rewrite middleware
+      - "traefik.http.middlewares.mw-backend-api-vhm.replacepathregex.regex=^/\\+\\+api\\+\\+(.*)$"
+      - "traefik.http.middlewares.mw-backend-api-vhm.replacepathregex.replacement=/VirtualHostBase/http/knowledge-curator.localhost/Plone/++api++/VirtualHostRoot/_vh_/++api++$1"
 
       ### Router: Internal
       - traefik.http.routers.rt-backend-api-internal.rule=Host(`knowledge-curator.localhost`) && PathPrefix(`/++api++`) && Headers(`X-Varnish-Routed`, `1`)
