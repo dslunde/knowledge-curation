@@ -9,6 +9,7 @@ import {
   BookmarkPlusEdit,
   KnowledgeItemView,
   KnowledgeItemEdit,
+  HomePage,
 } from './components';
 
 const applyConfig = (config) => {
@@ -26,6 +27,8 @@ const applyConfig = (config) => {
       ProjectLog: ProjectLogView,
       BookmarkPlus: BookmarkPlusView,
       KnowledgeItem: KnowledgeItemView,
+      // Override the Plone Site homepage
+      'Plone Site': HomePage,
     },
     layoutViews: {
       ...config.views.layoutViews,
@@ -34,6 +37,8 @@ const applyConfig = (config) => {
       ProjectLog: ProjectLogView,
       BookmarkPlus: BookmarkPlusView,
       KnowledgeItem: KnowledgeItemView,
+      // Override the Plone Site homepage in layout views too
+      'Plone Site': HomePage,
     },
   };
 

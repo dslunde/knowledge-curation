@@ -10,6 +10,18 @@ export { default as BookmarkPlusEdit } from './BookmarkPlus/Edit';
 export { default as KnowledgeItemView } from './KnowledgeItem/View';
 export { default as KnowledgeItemEdit } from './KnowledgeItem/Edit';
 
+// Views
+export { default as KnowledgeItemsView } from './Views/KnowledgeItemsView';
+
+// Homepage Components
+export { default as HomePage } from './Homepage/HomePage';
+export { default as KnowledgeItemCarousel } from './Homepage/KnowledgeItemCarousel';
+export { default as KnowledgeContainerCarousel } from './Homepage/KnowledgeContainerCarousel';
+export { default as HeroSection } from './Homepage/HeroSection';
+
+// Blocks
+export { default as KnowledgeItemsBlock } from './Blocks/KnowledgeItemsBlock';
+
 // Widgets
 export { default as AIFeaturesWidget } from './Widgets/AIFeaturesWidget';
 export { default as KnowledgeGraphWidget } from './Widgets/KnowledgeGraphWidget';
