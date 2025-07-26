@@ -171,9 +171,10 @@ services:
 
       # Middlewares
       ## CORS middleware
-      - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
+      - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=http://knowledge-curator.localhost:8080"
       - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,OPTIONS,PUT,PATCH,POST,DELETE"
-      - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
+      - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=Accept,Authorization,Content-Type,X-Custom-Header"
+      - "traefik.http.middlewares.cors.headers.accessControlAllowCredentials=true"
       ## VHM rewrite /++api++/
       - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.regex=^/\\+\\+api\\+\\+($$|/.*)"
       - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.replacement=/VirtualHostBase/http/knowledge-curator.localhost/Plone/++api++/VirtualHostRoot$$1"
