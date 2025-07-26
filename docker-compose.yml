@@ -61,7 +61,8 @@ services:
     image: traefik:v2.11
     profiles: ["web", "full", "integration"]
     ports:
-      - 80:80
+      # Change host port to 8080 to avoid conflicts / reset issues on macOS
+      - 8080:80
     networks:
       - knowledge-net
       - plone-internal
@@ -117,7 +118,7 @@ services:
     build:
       context: ./frontend
       args:
-        - VOLTO_VERSION=${VOLTO_VERSION}
+        - VOLTO_VERSION=${VOLTO_VERSION:-18.0}
     profiles: ["web", "full", "integration"]
     networks:
       - plone-internal
@@ -146,7 +147,7 @@ services:
     build:
       context: ./backend
       args:
-        - PLONE_VERSION=${PLONE_VERSION}
+        - PLONE_VERSION=${PLONE_VERSION:-6.0}
     profiles: ["web", "full", "integration"]
     networks:
       - plone-internal
@@ -158,6 +159,7 @@ services:
       QDRANT_PORT: "6333"
       DELETE_EXISTING: "${DELETE_EXISTING:-0}"
       CREATE_DEMO_DATA: "${CREATE_DEMO_DATA:-1}"  # Enable demo data by default
+      SITE: "Plone"  # Automatically create a Plone site with this ID
     depends_on:
       - db
     labels:
@@ -167,6 +169,10 @@ services:
       - traefik.http.services.svc-backend.loadbalancer.server.port=8080
 
       # Middlewares
+      ## CORS middleware
+      - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=*"
+      - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=GET,OPTIONS,PUT,PATCH,POST,DELETE"
+      - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=*"
       ## VHM rewrite /++api++/
       - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.regex=^/\\+\\+api\\+\\+($$|/.*)"
       - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.replacement=/VirtualHostBase/http/knowledge-curator.localhost/Plone/++api++/VirtualHostRoot$$1"
@@ -188,18 +194,18 @@ services:
       - traefik.http.routers.rt-backend-api-public.rule=Host(`knowledge-curator.localhost`) && PathPrefix(`/++api++`)
       - traefik.http.routers.rt-backend-api-public.entrypoints=http
       - traefik.http.routers.rt-backend-api-public.service=svc-varnish
-      - traefik.http.routers.rt-backend-api-public.middlewares=gzip
+      - traefik.http.routers.rt-backend-api-public.middlewares=gzip,cors
 
       ### Router: Internal
       - traefik.http.routers.rt-backend-api-internal.rule=Host(`knowledge-curator.localhost`) && PathPrefix(`/++api++`) && Headers(`X-Varnish-Routed`, `1`)
       - traefik.http.routers.rt-backend-api-internal.entrypoints=http
       - traefik.http.routers.rt-backend-api-internal.service=svc-backend
-      - traefik.http.routers.rt-backend-api-internal.middlewares=gzip,mw-backend-vhm-api
+      - traefik.http.routers.rt-backend-api-internal.middlewares=gzip,mw-backend-vhm-api,cors
       ## /ClassicUI
       - traefik.http.routers.rt-backend-classic.rule=Host(`knowledge-curator.localhost`) && PathPrefix(`/ClassicUI`)
       - traefik.http.routers.rt-backend-classic.entrypoints=http
       - traefik.http.routers.rt-backend-classic.service=svc-backend
-      - traefik.http.routers.rt-backend-classic.middlewares=gzip,mw-backend-auth,mw-backend-vhm-classic
+      - traefik.http.routers.rt-backend-classic.middlewares=gzip,mw-backend-auth,mw-backend-vhm-classic,cors
 
   db:
     image: postgres:14.15

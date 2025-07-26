@@ -173,7 +173,7 @@ ai-status:  ## AI Services: Check Status
 web-start:  ## Web Services: Start Web Application (Frontend, Backend, DB)
 	@echo "Start Web Application services"
 	DELETE_EXISTING=$(DELETE_EXISTING) VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose --profile web up -d --build
-	@echo "Now visit: http://knowledge-curator.localhost"
+	@echo "Now visit: http://knowledge-curator.localhost:8080"
 
 .PHONY: web-stop
 web-stop:  ## Web Services: Stop Web Application
@@ -241,9 +241,9 @@ quick-start:  ## Quick Start: Full integration environment with demo data
 	@echo ""
 	@echo "✅ Knowledge Curator is ready with React Learning Demo!"
 	@echo "📚 Demo Scenario: React Development Mastery Learning Path"
-	@echo "🌐 Main Site: http://knowledge-curator.localhost"
-	@echo "🔧 Classic UI: http://knowledge-curator.localhost/ClassicUI (admin/admin)"
-	@echo "📡 API: http://knowledge-curator.localhost/++api++"
+	@echo "🌐 Main Site: http://knowledge-curator.localhost:8080"
+	@echo "🔧 Classic UI: http://knowledge-curator.localhost:8080/ClassicUI (admin/admin)"
+	@echo "📡 API: http://knowledge-curator.localhost:8080/++api++"
 	@echo "🧠 Vector DB: http://localhost:6333"
 	@echo "📧 Email Test: http://localhost:8025"
 	@echo ""
@@ -260,9 +260,9 @@ quick-start-clean:  ## Quick Start: Full integration environment without demo da
 	CREATE_DEMO_DATA=0 $(MAKE) integration-start
 	@echo ""
 	@echo "✅ Knowledge Curator is ready (no demo data)!"
-	@echo "🌐 Main Site: http://knowledge-curator.localhost"
-	@echo "🔧 Classic UI: http://knowledge-curator.localhost/ClassicUI (admin/admin)"
-	@echo "📡 API: http://knowledge-curator.localhost/++api++"
+	@echo "🌐 Main Site: http://knowledge-curator.localhost:8080"
+	@echo "🔧 Classic UI: http://knowledge-curator.localhost:8080/ClassicUI (admin/admin)"
+	@echo "📡 API: http://knowledge-curator.localhost:8080/++api++"
 	@echo "🧠 Vector DB: http://localhost:6333"
 	@echo "📧 Email Test: http://localhost:8025"
 
@@ -285,7 +285,7 @@ stack-create-site:  ## Local Stack: Create a new site
 stack-start:  ## Local Stack: Start Services
 	@echo "Start local Docker stack"
 	DELETE_EXISTING=$(DELETE_EXISTING) VOLTO_VERSION=$(VOLTO_VERSION) PLONE_VERSION=$(PLONE_VERSION) docker compose -f docker-compose.yml up -d --build
-	@echo "Now visit: http://knowledge-curator.localhost"
+	@echo "Now visit: http://knowledge-curator.localhost:8080"
 
 .PHONY: stack-status
 stack-status:  ## Local Stack: Check Status

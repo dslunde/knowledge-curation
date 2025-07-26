@@ -3,9 +3,9 @@ vcl 4.0;
 import std;
 import directors;
 
-backend traefik_loadbalancer {
-    .host = "traefik";
-    .port = "80";
+backend backend_loadbalancer {
+    .host = "backend";
+    .port = "8080";
     .connect_timeout = 2s;
     .first_byte_timeout = 300s;
     .between_bytes_timeout  = 60s;
@@ -76,7 +76,7 @@ sub process_redirects{
 
 sub vcl_init {
   new cluster_loadbalancer = directors.round_robin();
-  cluster_loadbalancer.add_backend(traefik_loadbalancer);
+  cluster_loadbalancer.add_backend(backend_loadbalancer);
 }
 
 sub vcl_recv {
