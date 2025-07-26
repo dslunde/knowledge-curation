@@ -92,6 +92,7 @@
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 4;
+  line-clamp: 4; /* Standard property for compatibility */
   -webkit-box-orient: vertical;
   margin-bottom: 1rem;
 }
@@ -165,6 +166,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: 8px !important;
+  /* Fix alignment with regular cards */
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .knowledge-container-carousel .add-new-card:hover {

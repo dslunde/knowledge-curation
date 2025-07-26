@@ -139,6 +139,7 @@
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3; /* Standard property for compatibility */
   -webkit-box-orient: vertical;
 }
 
@@ -188,6 +189,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: 8px !important;
+  /* Fix alignment with regular cards */
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .add-new-card:hover {
@@ -198,6 +202,9 @@
 }
 
 .add-new-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   padding: 2rem;
 }
@@ -212,17 +219,19 @@
 }
 
 .add-new-title {
-  color: #2c3e50 !important;
-  margin-bottom: 1rem !important;
-  font-weight: 600 !important;
-  font-size: 1.125rem !important;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0084ff;
+  margin-bottom: 0.75rem;
 }
 
-.add-new-content .description {
-  color: #6c757d !important;
+.add-new-description {
   font-size: 0.9rem;
+  color: #666;
   line-height: 1.4;
 }
+
+
 
 /* Professional Carousel Controls */
 .carousel-controls {
