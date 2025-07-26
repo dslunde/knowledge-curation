@@ -464,10 +464,10 @@ class KnowledgeItemSerializer(SerializeFolderToJson):
             self.request.get("include_embeddings", "false").lower() == "true"
         )
 
-        # Core fields
+        # Core fields - convert PersistentList to list
         result["content"] = obj.content.raw if hasattr(obj, "content") else ""
         result["knowledge_type"] = getattr(obj, "knowledge_type", "")
-        result["atomic_concepts"] = getattr(obj, "atomic_concepts", [])
+        result["atomic_concepts"] = list(getattr(obj, "atomic_concepts", []))  # Convert PersistentList
         result["source_url"] = getattr(obj, "source_url", "")
         result["ai_summary"] = getattr(obj, "ai_summary", "")
         result["relevance_score"] = getattr(obj, "relevance_score", 0.0)
@@ -480,13 +480,14 @@ class KnowledgeItemSerializer(SerializeFolderToJson):
             result["last_reviewed"] = result["last_reviewed"].isoformat()
         result["difficulty_level"] = getattr(obj, "difficulty_level", "intermediate")
         
-        # Relationship fields
-        result["prerequisite_items"] = getattr(obj, "prerequisite_items", [])
-        result["enables_items"] = getattr(obj, "enables_items", [])
+        # Relationship fields - convert PersistentList to list
+        result["prerequisite_items"] = list(getattr(obj, "prerequisite_items", []))
+        result["enables_items"] = list(getattr(obj, "enables_items", []))
         
-        # Include embedding vector if requested
+        # Include embedding vector if requested - convert PersistentList to list
         if include_embeddings and hasattr(obj, "embedding_vector"):
-            result["embedding_vector"] = getattr(obj, "embedding_vector", [])
+            embedding_vector = getattr(obj, "embedding_vector", [])
+            result["embedding_vector"] = list(embedding_vector) if embedding_vector else []
 
         # Add prerequisite details
         if result["prerequisite_items"]:
@@ -550,5 +551,44 @@ class KnowledgeItemSerializer(SerializeFolderToJson):
         progress = result["learning_progress"]
         threshold = result["mastery_threshold"]
         result["is_mastered"] = progress >= threshold
+
+        # Add behavior fields - convert PersistentList objects to regular lists
+        # Knowledge Graph Behavior fields
+        relationships = getattr(obj, "relationships", [])
+        if relationships:
+            result["relationships"] = [
+                {
+                    "source_uid": rel.get("source_uid"),
+                    "target_uid": rel.get("target_uid"),
+                    "relationship_type": rel.get("relationship_type", "related"),
+                    "strength": rel.get("strength", 0.5),
+                    "metadata": rel.get("metadata", {}),
+                    "created": rel.get("created").isoformat() if rel.get("created") and hasattr(rel.get("created"), 'isoformat') else rel.get("created"),
+                    "confidence": rel.get("confidence", 1.0)
+                }
+                for rel in relationships
+            ]
+        else:
+            result["relationships"] = []
+
+        # Legacy connections field - convert PersistentList
+        result["connections"] = list(getattr(obj, "connections", []))
+        
+        # AI Enhanced Behavior fields - convert PersistentList
+        result["ai_tags"] = list(getattr(obj, "ai_tags", []))
+        
+        extracted_concepts = getattr(obj, "extracted_concepts", [])
+        if extracted_concepts:
+            result["extracted_concepts"] = [
+                {
+                    "text": concept.get("text", ""),
+                    "confidence": concept.get("confidence", 0.0),
+                    "category": concept.get("category", ""),
+                    "source": concept.get("source", "")
+                }
+                for concept in extracted_concepts
+            ]
+        else:
+            result["extracted_concepts"] = []
 
         return result
