@@ -136,7 +136,8 @@ services:
       ### Router: Varnish Public
       - traefik.http.routers.rt-frontend-public.rule=Host(`knowledge-curator.localhost`)
       - traefik.http.routers.rt-frontend-public.entrypoints=http
-      - traefik.http.routers.rt-frontend-public.service=svc-varnish
+      # Serve Volto directly at / instead of ClassicUI
+      - traefik.http.routers.rt-frontend-public.service=svc-frontend
       - traefik.http.routers.rt-frontend-public.middlewares=gzip
       ### Router: Internal
       - traefik.http.routers.rt-frontend-internal.rule=Host(`knowledge-curator.localhost`) && Headers(`X-Varnish-Routed`, `1`)
