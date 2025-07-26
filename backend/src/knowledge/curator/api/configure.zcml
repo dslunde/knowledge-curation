@@ -137,4 +137,24 @@
       name="@enhancement-queue"
       />
 
+  <!-- Knowledge Container API -->
+  <plone:service
+      method="GET,POST,PUT,DELETE"
+      accept="application/json"
+      factory=".knowledge_container.KnowledgeContainerCollectionService"
+      for="*"
+      permission="zope2.View"
+      name="@knowledge-containers"
+      />
+
+  <!-- Knowledge Container Analytics API -->
+  <plone:service
+      method="GET"
+      accept="application/json"
+      factory=".knowledge_container.KnowledgeContainerAnalyticsService"
+      for="*"
+      permission="zope2.View"
+      name="@container-analytics"
+      />
+
 </configure>

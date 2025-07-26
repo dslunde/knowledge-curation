@@ -563,3 +563,126 @@ class ContentQualityVocabulary:
 
 BookmarkResourceTypesVocabularyFactory = BookmarkResourceTypesVocabulary()
 ContentQualityVocabularyFactory = ContentQualityVocabulary()
+
+
+@implementer(IVocabularyFactory)
+class ContainerCollectionTypesVocabulary:
+    """Vocabulary for Knowledge Container collection types."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="course", title="Course"),
+            SimpleTerm(value="study_guide", title="Study Guide"),
+            SimpleTerm(value="research_collection", title="Research Collection"),
+            SimpleTerm(value="project_portfolio", title="Project Portfolio"),
+            SimpleTerm(value="knowledge_base", title="Knowledge Base"),
+            SimpleTerm(value="curated", title="Curated Collection"),
+            SimpleTerm(value="collaborative", title="Collaborative Collection"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class ContainerOrganizationStructuresVocabulary:
+    """Vocabulary for Knowledge Container organization structures."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="chronological", title="Chronological"),
+            SimpleTerm(value="topical", title="Topical"),
+            SimpleTerm(value="hierarchical", title="Hierarchical"),
+            SimpleTerm(value="network", title="Network"),
+            SimpleTerm(value="linear", title="Linear"),
+            SimpleTerm(value="matrix", title="Matrix"),
+            SimpleTerm(value="free_form", title="Free Form"),
+            SimpleTerm(value="custom", title="Custom"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class ContainerPublicationStatusesVocabulary:
+    """Vocabulary for Knowledge Container publication statuses."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="draft", title="Draft"),
+            SimpleTerm(value="review", title="Under Review"),
+            SimpleTerm(value="published", title="Published"),
+            SimpleTerm(value="archived", title="Archived"),
+            SimpleTerm(value="private", title="Private"),
+            SimpleTerm(value="shared", title="Shared"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class ContainerTargetAudiencesVocabulary:
+    """Vocabulary for Knowledge Container target audiences."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="self", title="Self"),
+            SimpleTerm(value="team", title="Team"),
+            SimpleTerm(value="public", title="Public"),
+            SimpleTerm(value="academic", title="Academic Community"),
+            SimpleTerm(value="professional", title="Professional Network"),
+            SimpleTerm(value="specific_users", title="Specific Users"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class ContainerPermissionTypesVocabulary:
+    """Vocabulary for Knowledge Container permission types."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="view", title="View"),
+            SimpleTerm(value="comment", title="Comment"),
+            SimpleTerm(value="edit", title="Edit"),
+            SimpleTerm(value="manage", title="Manage"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class ContainerPermissionLevelsVocabulary:
+    """Vocabulary for Knowledge Container permission levels."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="none", title="No Access"),
+            SimpleTerm(value="view", title="View Only"),
+            SimpleTerm(value="comment", title="Comment"),
+            SimpleTerm(value="edit", title="Edit Access"),
+            SimpleTerm(value="admin", title="Full Admin"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+@implementer(IVocabularyFactory)
+class ContainerExportFormatsVocabulary:
+    """Vocabulary for Knowledge Container export formats."""
+
+    def __call__(self, context):
+        terms = [
+            SimpleTerm(value="html", title="HTML"),
+            SimpleTerm(value="pdf", title="PDF"),
+            SimpleTerm(value="markdown", title="Markdown"),
+            SimpleTerm(value="latex", title="LaTeX"),
+            SimpleTerm(value="docx", title="Word Document"),
+            SimpleTerm(value="json", title="JSON"),
+            SimpleTerm(value="epub", title="EPUB"),
+        ]
+        return SimpleVocabulary(terms)
+
+
+# Factory instances for Knowledge Container vocabularies
+ContainerCollectionTypesVocabularyFactory = ContainerCollectionTypesVocabulary()
+ContainerOrganizationStructuresVocabularyFactory = ContainerOrganizationStructuresVocabulary()
+ContainerPublicationStatusesVocabularyFactory = ContainerPublicationStatusesVocabulary()
+ContainerTargetAudiencesVocabularyFactory = ContainerTargetAudiencesVocabulary()
+ContainerPermissionTypesVocabularyFactory = ContainerPermissionTypesVocabulary()
+ContainerPermissionLevelsVocabularyFactory = ContainerPermissionLevelsVocabulary()
+ContainerExportFormatsVocabularyFactory = ContainerExportFormatsVocabulary()

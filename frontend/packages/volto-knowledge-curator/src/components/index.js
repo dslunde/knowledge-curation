@@ -9,6 +9,8 @@ export { default as BookmarkPlusView } from './BookmarkPlus/View';
 export { default as BookmarkPlusEdit } from './BookmarkPlus/Edit';
 export { default as KnowledgeItemView } from './KnowledgeItem/View';
 export { default as KnowledgeItemEdit } from './KnowledgeItem/Edit';
+export { default as KnowledgeContainerView } from './KnowledgeContainer/View';
+export { default as KnowledgeContainerEdit } from './KnowledgeContainer/Edit';
 
 // Views
 export { default as KnowledgeItemsView } from './Views/KnowledgeItemsView';
@@ -38,6 +40,13 @@ export { default as ResearchLineageVisualizer } from './ResearchNote/ResearchLin
 export { default as MilestoneTracker } from './LearningGoal/MilestoneTracker';
 export { default as SMARTObjectiveEditor } from './LearningGoal/SMARTObjectiveEditor';
 export { default as CompetencyDashboard } from './LearningGoal/CompetencyDashboard';
+
+// KnowledgeContainer Components
+export { default as ContentCollectionManager } from './KnowledgeContainer/ContentCollectionManager';
+export { default as OrganizationStructureEditor } from './KnowledgeContainer/OrganizationStructureEditor';
+export { default as SharingPermissionsManager } from './KnowledgeContainer/SharingPermissionsManager';
+export { default as ExportOptionsManager } from './KnowledgeContainer/ExportOptionsManager';
+export { default as ContainerAnalytics } from './KnowledgeContainer/ContainerAnalytics';
 
 // Structured Object Editors
 export { default as KeyInsightEditor } from './StructuredObjects/KeyInsightEditor';

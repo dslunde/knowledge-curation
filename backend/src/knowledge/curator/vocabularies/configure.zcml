@@ -249,4 +249,47 @@
       component=".ContentQualityVocabularyFactory"
       />
 
+  <!-- Knowledge Container vocabularies -->
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.container_collection_types"
+      component=".ContainerCollectionTypesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.container_organization_structures"
+      component=".ContainerOrganizationStructuresVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.container_publication_statuses"
+      component=".ContainerPublicationStatusesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.container_target_audiences"
+      component=".ContainerTargetAudiencesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.container_permission_types"
+      component=".ContainerPermissionTypesVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.container_permission_levels"
+      component=".ContainerPermissionLevelsVocabularyFactory"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      name="knowledge.curator.container_export_formats"
+      component=".ContainerExportFormatsVocabularyFactory"
+      />
+
 </configure>
