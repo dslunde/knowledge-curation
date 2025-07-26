@@ -28,6 +28,9 @@
     <type type_id="KnowledgeItem">
       <bound-workflow workflow_id="knowledge_workflow" />
     </type>
+    <type type_id="KnowledgeContainer">
+      <bound-workflow workflow_id="knowledge_workflow" />
+    </type>
   </bindings>
 
 </object>

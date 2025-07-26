@@ -18,6 +18,7 @@ class NodeType(Enum):
     LEARNING_GOAL = "LearningGoal"
     PROJECT_LOG = "ProjectLog"
     BOOKMARK_PLUS = "BookmarkPlus"
+    KNOWLEDGE_CONTAINER = "KnowledgeContainer"  # Collection and publication management
     CONCEPT = "Concept"
     TAG = "Tag"
     PERSON = "Person"

@@ -79,7 +79,7 @@ def get_vector_config():
 
 
 # Configuration constants
-SUPPORTED_CONTENT_TYPES = ["KnowledgeItem", "BookmarkPlus", "ResearchNote", "LearningGoal", "ProjectLog"]
+SUPPORTED_CONTENT_TYPES = ["KnowledgeItem", "BookmarkPlus", "ResearchNote", "LearningGoal", "ProjectLog", "KnowledgeContainer"]
 
 INDEXED_WORKFLOW_STATES = ["private", "process", "reviewed", "published"]
 

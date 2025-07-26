@@ -10,6 +10,7 @@ from zope.interface import implementer
 from zope.publisher.interfaces import IPublishTraverse
 import json
 import logging
+from knowledge.curator.validation import validate_knowledge_container
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +87,60 @@ class KnowledgeContainerCollectionService(KnowledgeContainerService):
         
         self.request.response.setStatus(404)
         return {"error": "Not found"}
+
+    def _validate_container(self, container):
+        """Validate container using comprehensive validation systems."""
+        try:
+            validation_result = validate_knowledge_container(container)
+            
+            # Return the comprehensive validation result
+            return {
+                'validation_complete': True,
+                'timestamp': validation_result['timestamp'],
+                'container_uid': validation_result['container_uid'],
+                'overall_valid': validation_result['overall_valid'],
+                'academic_standards': validation_result['validation_results'].get('academic_standards', {}),
+                'container_integrity': validation_result['validation_results'].get('container_integrity', {}),
+                'knowledge_sovereignty': validation_result['validation_results'].get('knowledge_sovereignty', {}),
+                'summary': self._generate_validation_summary(validation_result)
+            }
+            
+        except Exception as e:
+            logger.error(f"Error validating container: {e}")
+            self.request.response.setStatus(500)
+            return {"error": f"Validation failed: {str(e)}"}
+
+    def _generate_validation_summary(self, validation_result) -> dict:
+        """Generate a human-readable summary of validation results."""
+        summary = {
+            'overall_status': 'valid' if validation_result['overall_valid'] else 'invalid',
+            'academic_score': 0.0,
+            'integrity_score': 0.0,
+            'sovereignty_score': 0.0,
+            'total_warnings': 0,
+            'total_errors': 0,
+            'recommendations': []
+        }
+        
+        # Extract scores and issues
+        academic = validation_result['validation_results'].get('academic_standards', {})
+        integrity = validation_result['validation_results'].get('container_integrity', {})
+        sovereignty = validation_result['validation_results'].get('knowledge_sovereignty', {})
+        
+        summary['academic_score'] = academic.get('academic_score', 0.0)
+        summary['integrity_score'] = integrity.get('integrity_score', 0.0)
+        summary['sovereignty_score'] = sovereignty.get('sovereignty_score', 0.0)
+        
+        # Count warnings and errors
+        for result in [academic, integrity, sovereignty]:
+            summary['total_warnings'] += len(result.get('warnings', []))
+            summary['total_errors'] += len(result.get('errors', []))
+            summary['recommendations'].extend(result.get('recommendations', []))
+        
+        # Add specific compliance issues
+        summary['recommendations'].extend(sovereignty.get('compliance_issues', []))
+        
+        return summary
 
     def _list_containers(self):
         """List all Knowledge Containers accessible to the current user."""
