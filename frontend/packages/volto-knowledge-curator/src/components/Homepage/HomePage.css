@@ -1,80 +1,173 @@
+/* Academic Professional Homepage Styling */
 .knowledge-curator-homepage {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: #fafbfc;
+  color: #2c3e50;
+  font-family: 'Inter', 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Knowledge Sections */
+.knowledge-section {
+  margin: 3rem 0;
+  padding: 0;
 }
 
 .section-header {
-  margin-bottom: 2rem !important;
-  border-bottom: 3px solid #0084ff;
+  margin-bottom: 2.5rem !important;
   padding-bottom: 1rem;
+  border-bottom: 2px solid #e8ecef;
+  color: #2c3e50;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 .section-header .sub.header {
-  color: #666;
+  color: #6c757d;
   font-weight: 400;
-  margin-top: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+  max-width: 80%;
 }
 
-.stats-section {
+/* Analytics Section */
+.analytics-section {
   margin-top: 4rem !important;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem !important;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+.analytics-panel {
+  background: #ffffff !important;
+  border: 1px solid #e8ecef !important;
+  border-radius: 8px !important;
+  padding: 2rem !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  transition: box-shadow 0.2s ease;
 }
 
-.stat-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
+.analytics-panel:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.analytics-header {
+  color: #2c3e50 !important;
+  font-weight: 600 !important;
+  margin-bottom: 1.5rem !important;
+  font-size: 1.25rem !important;
+  letter-spacing: -0.025em;
+}
+
+/* Statistics Styling */
+.knowledge-statistics,
+.difficulty-statistics {
+  justify-content: space-around !important;
+}
+
+.knowledge-statistics .statistic,
+.difficulty-statistics .statistic {
+  margin: 0 !important;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+.knowledge-statistics .statistic .value,
+.difficulty-statistics .statistic .value {
+  color: #495057 !important;
+  font-weight: 700 !important;
+  font-size: 2rem !important;
 }
 
-.stat-number {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #0084ff;
-  line-height: 1;
-}
-
-.stat-label {
-  color: #666;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+.knowledge-statistics .statistic .label,
+.difficulty-statistics .statistic .label {
+  color: #6c757d !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  margin-top: 0.5rem !important;
 }
 
-/* Responsive adjustments */
+/* Professional color scheme for statistics */
+.knowledge-statistics .statistic:first-child .value {
+  color: #2c5aa0 !important;
+}
+
+.knowledge-statistics .statistic:last-child .value {
+  color: #6c757d !important;
+}
+
+.difficulty-statistics .statistic:nth-child(1) .value {
+  color: #28a745 !important;
+}
+
+.difficulty-statistics .statistic:nth-child(2) .value {
+  color: #ffc107 !important;
+}
+
+.difficulty-statistics .statistic:nth-child(3) .value {
+  color: #dc3545 !important;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .section-header {
-    text-align: center;
+  .knowledge-section {
+    margin: 2rem 0;
   }
   
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .section-header {
+    text-align: left;
+    margin-bottom: 2rem !important;
+  }
+  
+  .section-header .sub.header {
+    max-width: 100%;
+    font-size: 0.9rem;
+  }
+  
+  .analytics-section {
+    margin-top: 3rem !important;
+  }
+  
+  .analytics-panel {
+    padding: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .analytics-header {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .knowledge-statistics .statistic .value,
+  .difficulty-statistics .statistic .value {
+    font-size: 1.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .knowledge-curator-homepage {
+    font-size: 0.9rem;
+  }
+  
+  .section-header {
+    font-size: 1.5rem !important;
+  }
+  
+  .section-header .sub.header {
+    font-size: 0.85rem;
+  }
+  
+  .analytics-panel {
+    padding: 1.25rem !important;
+  }
+  
+  .knowledge-statistics,
+  .difficulty-statistics {
+    flex-direction: column !important;
     gap: 1rem;
   }
   
-  .stat-card {
-    padding: 1rem;
-  }
-  
-  .stat-number {
-    font-size: 2rem;
+  .knowledge-statistics .statistic,
+  .difficulty-statistics .statistic {
+    margin-bottom: 1rem !important;
   }
 } 

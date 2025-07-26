@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Header, Segment, Message } from 'semantic-ui-react';
+import { Container, Header, Segment, Message, Grid, Statistic } from 'semantic-ui-react';
 import { useIntl } from 'react-intl';
 import { useSelector, useDispatch } from 'react-redux';
 import { searchContent } from '@plone/volto/actions';
@@ -91,8 +91,8 @@ const HomePage = () => {
     return (
       <Container>
         <Message negative>
-          <Message.Header>Error Loading Content</Message.Header>
-          <p>{error}</p>
+          <Message.Header>Content Loading Error</Message.Header>
+          <p>Unable to retrieve knowledge base content: {error}</p>
         </Message>
       </Container>
     );
@@ -100,16 +100,16 @@ const HomePage = () => {
 
   return (
     <div className="knowledge-curator-homepage">
-      {/* Hero Section */}
+      {/* Academic Header Section */}
       <HeroSection stats={stats} loading={loading} />
 
       <Container>
-        {/* Knowledge Containers Section */}
-        <Segment basic>
+        {/* Knowledge Collections Section */}
+        <section className="knowledge-section">
           <Header as="h2" className="section-header">
-            🗂️ Knowledge Containers
+            Knowledge Collections
             <Header.Subheader>
-              Organized collections of knowledge for structured learning
+              Curated repositories of structured intellectual content organized for systematic study and research
             </Header.Subheader>
           </Header>
           
@@ -117,14 +117,14 @@ const HomePage = () => {
             containers={knowledgeContainers}
             loading={loading}
           />
-        </Segment>
+        </section>
 
         {/* Knowledge Items Section */}
-        <Segment basic>
+        <section className="knowledge-section">
           <Header as="h2" className="section-header">
-            🧩 Knowledge Items
+            Knowledge Items
             <Header.Subheader>
-              Atomic units of knowledge - building blocks for learning
+              Atomic units of validated knowledge serving as foundational elements for intellectual synthesis
             </Header.Subheader>
           </Header>
           
@@ -132,31 +132,49 @@ const HomePage = () => {
             items={knowledgeItems}
             loading={loading}
           />
-        </Segment>
+        </section>
 
-        {/* Quick Stats Section */}
+        {/* Knowledge Base Analytics */}
         {!loading && (
-          <Segment basic className="stats-section">
-            <Header as="h3">📊 Quick Overview</Header>
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-number">{stats.totalKnowledgeItems}</div>
-                <div className="stat-label">Knowledge Items</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">{stats.totalContainers}</div>
-                <div className="stat-label">Collections</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">{stats.difficultyCounts.beginner || 0}</div>
-                <div className="stat-label">Beginner Items</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">{stats.difficultyCounts.advanced || 0}</div>
-                <div className="stat-label">Advanced Items</div>
-              </div>
-            </div>
-          </Segment>
+          <section className="analytics-section">
+            <Grid columns={2} stackable>
+              <Grid.Column>
+                <Segment className="analytics-panel">
+                  <Header as="h3" className="analytics-header">Knowledge Base Metrics</Header>
+                  <Statistic.Group size="small" className="knowledge-statistics">
+                    <Statistic>
+                      <Statistic.Value>{stats.totalKnowledgeItems}</Statistic.Value>
+                      <Statistic.Label>Total Knowledge Items</Statistic.Label>
+                    </Statistic>
+                    <Statistic>
+                      <Statistic.Value>{stats.totalContainers}</Statistic.Value>
+                      <Statistic.Label>Active Collections</Statistic.Label>
+                    </Statistic>
+                  </Statistic.Group>
+                </Segment>
+              </Grid.Column>
+              
+              <Grid.Column>
+                <Segment className="analytics-panel">
+                  <Header as="h3" className="analytics-header">Difficulty Distribution</Header>
+                  <Statistic.Group size="small" className="difficulty-statistics">
+                    <Statistic>
+                      <Statistic.Value>{stats.difficultyCounts.beginner || 0}</Statistic.Value>
+                      <Statistic.Label>Foundational</Statistic.Label>
+                    </Statistic>
+                    <Statistic>
+                      <Statistic.Value>{stats.difficultyCounts.intermediate || 0}</Statistic.Value>
+                      <Statistic.Label>Intermediate</Statistic.Label>
+                    </Statistic>
+                    <Statistic>
+                      <Statistic.Value>{stats.difficultyCounts.advanced || 0}</Statistic.Value>
+                      <Statistic.Label>Advanced</Statistic.Label>
+                    </Statistic>
+                  </Statistic.Group>
+                </Segment>
+              </Grid.Column>
+            </Grid>
+          </section>
         )}
       </Container>
     </div>

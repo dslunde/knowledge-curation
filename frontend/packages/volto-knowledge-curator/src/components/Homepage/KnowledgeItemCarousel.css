@@ -1,6 +1,7 @@
+/* Academic Professional Knowledge Item Carousel */
 .knowledge-item-carousel {
   position: relative;
-  padding: 1rem 0;
+  padding: 1.5rem 0;
 }
 
 .carousel-container {
@@ -13,7 +14,7 @@
   gap: 1.5rem;
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 1rem 0;
+  padding: 1rem 0 1.5rem 0;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
@@ -22,60 +23,166 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* Professional Knowledge Item Cards */
 .knowledge-item-card {
-  flex: 0 0 280px;
-  height: 320px;
+  flex: 0 0 320px;
+  height: 280px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+  border: 1px solid #e8ecef !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  background: #ffffff !important;
 }
 
 .knowledge-item-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  border-color: #d1d5db !important;
+}
+
+.knowledge-item-card .content {
+  padding: 1.5rem !important;
+  height: calc(100% - 60px);
+  display: flex;
+  flex-direction: column;
 }
 
 .item-title {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.1rem !important;
-  line-height: 1.3 !important;
-  height: 3rem;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 1.125rem !important;
+  line-height: 1.4 !important;
+  height: auto;
+  min-height: 3rem;
   overflow: hidden;
+  margin-bottom: 1rem !important;
+  color: #2c3e50 !important;
+  font-weight: 600 !important;
+}
+
+.item-title .icon {
+  color: #6c757d !important;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
 }
 
 .item-meta {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin: 0.5rem 0;
+  margin: 0.75rem 0 1rem 0;
+}
+
+.item-meta .label {
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 4px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Professional difficulty colors */
+.item-meta .label.green {
+  background: #d4edda !important;
+  color: #155724 !important;
+  border: 1px solid #c3e6cb !important;
+}
+
+.item-meta .label.yellow {
+  background: #fff3cd !important;
+  color: #856404 !important;
+  border: 1px solid #ffeeba !important;
+}
+
+.item-meta .label.red {
+  background: #f8d7da !important;
+  color: #721c24 !important;
+  border: 1px solid #f5c6cb !important;
+}
+
+.item-meta .label.grey {
+  background: #e9ecef !important;
+  color: #495057 !important;
+  border: 1px solid #ced4da !important;
+}
+
+.item-meta .label.basic {
+  background: #f8f9fa !important;
+  color: #6c757d !important;
+  border: 1px solid #e9ecef !important;
+}
+
+.knowledge-item-card .description {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #495057;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .item-actions {
   display: flex;
   gap: 0.5rem;
   justify-content: space-between;
+  padding: 1rem 1.5rem !important;
+  background: #f8f9fa !important;
+  border-top: 1px solid #e9ecef !important;
+  border-radius: 0 0 8px 8px;
 }
 
+.item-actions .button {
+  font-size: 0.875rem !important;
+  padding: 0.5rem 1rem !important;
+  font-weight: 500 !important;
+}
+
+.item-actions .button.basic.blue {
+  background: transparent !important;
+  color: #2c5aa0 !important;
+  border: 1px solid #2c5aa0 !important;
+}
+
+.item-actions .button.basic.blue:hover {
+  background: #2c5aa0 !important;
+  color: white !important;
+}
+
+.item-actions .button.basic.grey {
+  background: transparent !important;
+  color: #6c757d !important;
+  border: 1px solid #ced4da !important;
+}
+
+.item-actions .button.basic.grey:hover {
+  background: #6c757d !important;
+  color: white !important;
+}
+
+/* Professional Add New Card */
 .add-new-card {
-  flex: 0 0 280px;
-  height: 320px;
-  border: 2px dashed #0084ff !important;
-  background: rgba(0, 132, 255, 0.05) !important;
+  flex: 0 0 320px;
+  height: 280px;
+  border: 2px dashed #ced4da !important;
+  background: #f8f9fa !important;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  border-radius: 12px !important;
+  border-radius: 8px !important;
 }
 
 .add-new-card:hover {
-  background: rgba(0, 132, 255, 0.1) !important;
-  border-color: #0066cc !important;
+  background: #e9ecef !important;
+  border-color: #adb5bd !important;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
 }
 
 .add-new-content {
@@ -87,11 +194,25 @@
   margin-bottom: 1rem;
 }
 
-.add-new-title {
-  color: #0084ff !important;
-  margin-bottom: 1rem !important;
+.add-new-icon .icon {
+  color: #6c757d !important;
+  font-size: 3rem !important;
 }
 
+.add-new-title {
+  color: #2c3e50 !important;
+  margin-bottom: 1rem !important;
+  font-weight: 600 !important;
+  font-size: 1.125rem !important;
+}
+
+.add-new-content .description {
+  color: #6c757d !important;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Professional Carousel Controls */
 .carousel-controls {
   position: absolute;
   top: 50%;
@@ -101,20 +222,28 @@
   justify-content: space-between;
   pointer-events: none;
   z-index: 10;
+  transform: translateY(-50%);
 }
 
 .carousel-prev,
 .carousel-next {
   pointer-events: all;
-  background: white !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15) !important;
+  background: #ffffff !important;
+  color: #495057 !important;
+  border: 1px solid #e8ecef !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
   transition: all 0.2s ease;
+  width: 40px !important;
+  height: 40px !important;
 }
 
 .carousel-prev:hover,
 .carousel-next:hover {
   background: #f8f9fa !important;
-  transform: scale(1.1);
+  color: #2c3e50 !important;
+  border-color: #d1d5db !important;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 .carousel-prev {
@@ -125,20 +254,31 @@
   margin-right: -20px;
 }
 
-/* Loading state */
+/* Loading State */
 .knowledge-item-carousel.loading {
-  min-height: 320px;
+  min-height: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
 }
 
-/* Responsive adjustments */
+.knowledge-item-carousel.loading .loader {
+  color: #6c757d !important;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+  .knowledge-item-carousel {
+    padding: 1rem 0;
+  }
+  
   .knowledge-item-card,
   .add-new-card {
-    flex: 0 0 250px;
-    height: 280px;
+    flex: 0 0 280px;
+    height: 260px;
   }
   
   .carousel-controls {
@@ -147,22 +287,63 @@
   
   .carousel-track {
     gap: 1rem;
+    padding: 0.75rem 0 1rem 0;
+  }
+  
+  .item-title {
+    font-size: 1rem !important;
+    min-height: 2.5rem;
+  }
+  
+  .knowledge-item-card .content {
+    padding: 1.25rem !important;
+    height: calc(100% - 50px);
+  }
+  
+  .item-actions {
+    padding: 0.75rem 1.25rem !important;
+  }
+  
+  .add-new-content {
+    padding: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .knowledge-item-card,
   .add-new-card {
-    flex: 0 0 220px;
-    height: 260px;
+    flex: 0 0 260px;
+    height: 240px;
   }
   
   .item-title {
-    font-size: 1rem !important;
-    height: 2.5rem;
+    font-size: 0.95rem !important;
+    min-height: 2.25rem;
+  }
+  
+  .knowledge-item-card .content {
+    padding: 1rem !important;
+    height: calc(100% - 45px);
+  }
+  
+  .item-actions {
+    padding: 0.5rem 1rem !important;
+  }
+  
+  .item-actions .button {
+    font-size: 0.8rem !important;
+    padding: 0.4rem 0.8rem !important;
   }
   
   .add-new-content {
-    padding: 1.5rem;
+    padding: 1.25rem;
+  }
+  
+  .add-new-title {
+    font-size: 1rem !important;
+  }
+  
+  .add-new-icon .icon {
+    font-size: 2.5rem !important;
   }
 } 
