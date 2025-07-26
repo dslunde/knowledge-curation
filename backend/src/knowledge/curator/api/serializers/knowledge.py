@@ -29,7 +29,7 @@ class ResearchNoteSerializer(SerializeFolderToJson):
             self.request.get("include_embeddings", "false").lower() == "true"
         )
 
-        result["content"] = obj.content.raw if hasattr(obj, "content") else ""
+        result["content"] = obj.content.raw if hasattr(obj, "content") and hasattr(obj.content, "raw") else getattr(obj, "content", "")
         result["source_url"] = getattr(obj, "source_url", "")
         result["ai_summary"] = getattr(obj, "ai_summary", "")
         
@@ -465,7 +465,7 @@ class KnowledgeItemSerializer(SerializeFolderToJson):
         )
 
         # Core fields - convert PersistentList to list
-        result["content"] = obj.content.raw if hasattr(obj, "content") else ""
+        result["content"] = obj.content.raw if hasattr(obj, "content") and hasattr(obj.content, "raw") else getattr(obj, "content", "")
         result["knowledge_type"] = getattr(obj, "knowledge_type", "")
         result["atomic_concepts"] = list(getattr(obj, "atomic_concepts", []))  # Convert PersistentList
         result["source_url"] = getattr(obj, "source_url", "")
