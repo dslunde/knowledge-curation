@@ -11,6 +11,7 @@
 
 .carousel-track {
   display: flex;
+  align-items: flex-start; /* Ensure all cards align at the top */
   gap: 1.5rem;
   overflow-x: auto;
   scroll-behavior: smooth;
@@ -26,13 +27,16 @@
 /* Professional Knowledge Item Cards */
 .knowledge-item-card {
   flex: 0 0 320px;
-  height: 280px;
+  height: 280px !important;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   border-radius: 8px !important;
   border: 1px solid #e8ecef !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
   background: #ffffff !important;
+  /* Fix the Semantic UI margin issue that causes first card misalignment */
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .knowledge-item-card:hover {
@@ -41,11 +45,23 @@
   border-color: #d1d5db !important;
 }
 
-.knowledge-item-card .content {
+/* Work with Semantic UI's Card.Content structure */
+.knowledge-item-card > .content {
   padding: 1.5rem !important;
-  height: calc(100% - 60px);
-  display: flex;
-  flex-direction: column;
+  flex-grow: 1 !important;
+  height: calc(100% - 70px) !important; /* Account for bottom actions */
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.knowledge-item-card > .content.extra {
+  padding: 1rem 1.5rem !important;
+  background: #f8f9fa !important;
+  border-top: 1px solid #e9ecef !important;
+  border-radius: 0 0 8px 8px;
+  height: 70px !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
 }
 
 .item-title {
@@ -130,10 +146,6 @@
   display: flex;
   gap: 0.5rem;
   justify-content: space-between;
-  padding: 1rem 1.5rem !important;
-  background: #f8f9fa !important;
-  border-top: 1px solid #e9ecef !important;
-  border-radius: 0 0 8px 8px;
 }
 
 .item-actions .button {

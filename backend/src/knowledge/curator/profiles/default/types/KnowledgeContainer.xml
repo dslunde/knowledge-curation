@@ -32,8 +32,8 @@
   </property>
   <property name="default_view_fallback">False</property>
   <property name="add_permission">knowledge.curator.AddKnowledgeContainer</property>
-  <property name="klass">plone.dexterity.content.Container</property>
-  <property name="schema" />
+  <property name="klass">knowledge.curator.content.knowledge_container.KnowledgeContainer</property>
+  <property name="schema">knowledge.curator.interfaces.IKnowledgeContainer</property>
   <property name="model_source" />
   <property name="model_file" />
   <property name="behaviors">
