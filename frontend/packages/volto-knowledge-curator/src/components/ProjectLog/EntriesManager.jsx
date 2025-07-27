@@ -13,6 +13,7 @@ import {
 } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import ProjectLogEntryEditor from '../StructuredObjects/ProjectLogEntryEditor';
+import DeleteConfirmationModal from '../shared/DeleteConfirmationModal';
 
 const entryTypeColors = {
   progress: 'blue',
@@ -33,6 +34,7 @@ const EntriesManager = ({
   const [editingEntry, setEditingEntry] = useState(null);
   const [filterType, setFilterType] = useState('all');
   const [sortOrder, setSortOrder] = useState('newest');
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, entryId: null, entryTitle: '' });
 
   const handleAddEntry = useCallback(() => {
     const newEntry = {
@@ -61,6 +63,13 @@ const EntriesManager = ({
   const handleRemoveEntry = useCallback((id) => {
     onChange(value.filter(e => e.id !== id));
   }, [value, onChange]);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (deleteConfirm.entryId) {
+      handleRemoveEntry(deleteConfirm.entryId);
+      setDeleteConfirm({ open: false, entryId: null, entryTitle: '' });
+    }
+  }, [deleteConfirm.entryId, handleRemoveEntry]);
 
   const getFilteredAndSortedEntries = () => {
     let entries = [...value];
@@ -176,9 +185,11 @@ const EntriesManager = ({
                   <Button 
                     icon="trash" 
                     onClick={() => {
-                      if (window.confirm('Delete this entry?')) {
-                        handleRemoveEntry(entry.id);
-                      }
+                      setDeleteConfirm({
+                        open: true,
+                        entryId: entry.id,
+                        entryTitle: entry.title || `${entry.entry_type} entry`
+                      });
                     }}
                   />
                 </Button.Group>
@@ -281,6 +292,15 @@ const EntriesManager = ({
           </Message.Content>
         </Message>
       )}
+
+      <DeleteConfirmationModal
+        open={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, entryId: null, entryTitle: '' })}
+        onConfirm={handleConfirmDelete}
+        itemTitle={deleteConfirm.entryTitle}
+        itemType="entry"
+        severity="medium"
+      />
     </Segment>
   );
 };

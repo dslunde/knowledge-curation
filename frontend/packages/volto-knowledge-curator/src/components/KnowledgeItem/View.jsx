@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Segment, Header, Label, Icon, Button } from 'semantic-ui-react';
 import { FormattedDate } from 'react-intl';
+import ContentDeleteAction from '../shared/ContentDeleteAction';
 
 const KnowledgeItemView = ({ content }) => {
   const {
@@ -117,6 +118,26 @@ const KnowledgeItemView = ({ content }) => {
           </p>
         </Segment>
       )}
+
+      {/* Content Actions */}
+      <Segment basic clearing>
+        <Header as="h4">Actions</Header>
+        <Button.Group>
+          <Button
+            icon="edit"
+            content="Edit"
+            primary
+            onClick={() => {
+              window.location.href = `${content['@id']}/edit`;
+            }}
+          />
+          <ContentDeleteAction
+            content={content}
+            buttonType="button"
+            size="medium"
+          />
+        </Button.Group>
+      </Segment>
 
       <Segment basic clearing>
         <div style={{ marginTop: '20px', fontSize: '0.9em', color: '#999' }}>

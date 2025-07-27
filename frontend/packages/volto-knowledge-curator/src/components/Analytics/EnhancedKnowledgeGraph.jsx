@@ -23,6 +23,7 @@ import {
 import { Network } from 'vis-network';
 import { DataSet } from 'vis-data';
 import PropTypes from 'prop-types';
+import DeleteConfirmationModal from '../shared/DeleteConfirmationModal';
 
 const relationshipTypes = {
   related: { color: '#2185d0', dashes: false, label: 'Related' },
@@ -67,6 +68,7 @@ const EnhancedKnowledgeGraph = ({
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [layoutMode, setLayoutMode] = useState('hierarchical');
   const [clusterBy, setClusterBy] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, relationshipId: null, relationshipTitle: '' });
 
   // Prepare network data
   const networkData = useMemo(() => {
@@ -359,6 +361,14 @@ const EnhancedKnowledgeGraph = ({
         });
         network.stabilize();
         break;
+    }
+  };
+
+  // Delete confirmation handler
+  const handleConfirmDelete = () => {
+    if (deleteConfirm.relationshipId && onRelationshipDelete) {
+      onRelationshipDelete(deleteConfirm.relationshipId);
+      setDeleteConfirm({ open: false, relationshipId: null, relationshipTitle: '' });
     }
   };
 
@@ -768,8 +778,12 @@ const EnhancedKnowledgeGraph = ({
                     content="Delete"
                     color="red"
                     onClick={() => {
-                      if (onRelationshipDelete && window.confirm('Delete this relationship?')) {
-                        onRelationshipDelete(selectedEdge.id);
+                      if (onRelationshipDelete) {
+                        setDeleteConfirm({
+                          open: true,
+                          relationshipId: selectedEdge.id,
+                          relationshipTitle: `${relationshipTypes[selectedEdge.relationship_type]?.label || 'Unknown'} relationship`
+                        });
                       }
                     }}
                   />
@@ -793,6 +807,15 @@ const EnhancedKnowledgeGraph = ({
 
       {renderSidebar()}
       {renderRelationshipModal()}
+      
+      <DeleteConfirmationModal
+        open={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, relationshipId: null, relationshipTitle: '' })}
+        onConfirm={handleConfirmDelete}
+        itemTitle={deleteConfirm.relationshipTitle}
+        itemType="relationship"
+        severity="medium"
+      />
     </Segment>
   );
 };
