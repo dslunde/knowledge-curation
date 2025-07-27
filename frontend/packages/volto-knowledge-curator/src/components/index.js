@@ -56,6 +56,8 @@ export { default as AnnotationEditor } from './StructuredObjects/AnnotationEdito
 
 // Shared Components
 export { default as BaseStructuredEditor } from './shared/BaseStructuredEditor';
+export { default as ContentDeleteAction } from './shared/ContentDeleteAction';
+export { default as DeleteConfirmationModal } from './shared/DeleteConfirmationModal';
 
 // Analytics Components
 export { 

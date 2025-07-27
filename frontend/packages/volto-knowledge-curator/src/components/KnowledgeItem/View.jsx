@@ -1,157 +1,111 @@
 import React from 'react';
-import { Container, Segment, Header, Label, Icon, Button } from 'semantic-ui-react';
-import { FormattedDate } from 'react-intl';
-import ContentDeleteAction from '../shared/ContentDeleteAction';
+import { Container, Header, Button } from 'semantic-ui-react';
 
 const KnowledgeItemView = ({ content }) => {
-  const {
-    title,
-    description,
-    text,
-    tags = [],
-    source_url,
-    embedding_vector = [],
-    ai_summary,
-    relevance_score,
-    attachment,
-    created,
-    modified,
-  } = content;
+  // Safety check
+  if (!content) {
+    return (
+      <Container>
+        <Header as="h1">Content not found</Header>
+      </Container>
+    );
+  }
+  
+  const title = content.title || 'Untitled';
+
+  const handleEdit = () => {
+    if (content['@id']) {
+      window.location.href = `${content['@id']}/edit`;
+    }
+  };
+
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
+      if (content['@id']) {
+        fetch(content['@id'], {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(response => {
+          if (response.ok) {
+            const pathParts = content['@id'].split('/');
+            const parentPath = pathParts.slice(0, -1).join('/') || '/';
+            window.location.href = parentPath;
+          } else {
+            alert('Failed to delete content. Please try again.');
+          }
+        })
+        .catch(error => {
+          console.error('Delete error:', error);
+          alert('Failed to delete content. Please try again.');
+        });
+      }
+    }
+  };
 
   return (
     <Container>
       <Header as="h1">{title}</Header>
       
-      {description && (
-        <Segment>
+      {/* Summary Section */}
+      {content.description && (
+        <div style={{ margin: '20px 0', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
           <Header as="h3">Summary</Header>
-          <p>{description}</p>
-        </Segment>
+          <p>{content.description}</p>
+        </div>
       )}
 
-      {text && (
-        <Segment>
+      {/* Content Section */}
+      {content.text && content.text.data && (
+        <div style={{ margin: '20px 0', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
           <Header as="h3">Content</Header>
-          <div dangerouslySetInnerHTML={{ __html: text.data }} />
-        </Segment>
+          <div dangerouslySetInnerHTML={{ __html: content.text.data }} />
+        </div>
       )}
 
-      {source_url && (
-        <Segment>
-          <Header as="h4">
-            <Icon name="linkify" />
-            Source
-          </Header>
-          <p>
-            <a href={source_url} target="_blank" rel="noopener noreferrer">
-              {source_url}
-            </a>
-          </p>
-        </Segment>
-      )}
-
-      {attachment && (
-        <Segment>
-          <Header as="h4">
-            <Icon name="file" />
-            Attachment
-          </Header>
-          <p>
-            <a href={attachment.download} download>
-              <Icon name="download" />
-              {attachment.filename}
-            </a>
-            {attachment.size && <span> ({(attachment.size / 1024).toFixed(1)} KB)</span>}
-          </p>
-        </Segment>
-      )}
-
-      {ai_summary && (
-        <Segment color="blue">
-          <Header as="h4">
-            <Icon name="brain" />
-            AI Summary
-          </Header>
-          <p>{ai_summary}</p>
-        </Segment>
-      )}
-
-      {relevance_score !== undefined && relevance_score > 0 && (
-        <Segment color="purple">
-          <Header as="h4">
-            <Icon name="star" />
-            Relevance Score
-          </Header>
+      {/* Tags Section */}
+      {content.tags && content.tags.length > 0 && (
+        <div style={{ margin: '20px 0', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+          <Header as="h4">Tags</Header>
           <div>
-            <Label color="purple" size="medium">
-              {(relevance_score * 100).toFixed(1)}%
-            </Label>
-          </div>
-        </Segment>
-      )}
-
-      {tags && tags.length > 0 && (
-        <Segment>
-          <Header as="h4">
-            <Icon name="tags" />
-            Tags
-          </Header>
-          <div>
-            {tags.map((tag, index) => (
-              <Label key={index} color="teal" size="small" style={{ marginRight: '5px' }}>
+            {content.tags.map((tag, index) => (
+              <span
+                key={index}
+                style={{
+                  display: 'inline-block',
+                  backgroundColor: '#00b5ad',
+                  color: 'white',
+                  padding: '4px 8px',
+                  margin: '2px',
+                  borderRadius: '3px',
+                  fontSize: '12px'
+                }}
+              >
                 {tag}
-              </Label>
+              </span>
             ))}
           </div>
-        </Segment>
-      )}
-
-      {embedding_vector && embedding_vector.length > 0 && (
-        <Segment color="grey">
-          <Header as="h4">
-            <Icon name="code" />
-            AI Features
-          </Header>
-          <p>
-            <Icon name="vector square" />
-            Embedding Vector: {embedding_vector.length} dimensions
-          </p>
-        </Segment>
-      )}
-
-      {/* Content Actions */}
-      <Segment basic clearing>
-        <Header as="h4">Actions</Header>
-        <Button.Group>
-          <Button
-            icon="edit"
-            content="Edit"
-            primary
-            onClick={() => {
-              window.location.href = `${content['@id']}/edit`;
-            }}
-          />
-          <ContentDeleteAction
-            content={content}
-            buttonType="button"
-            size="medium"
-          />
-        </Button.Group>
-      </Segment>
-
-      <Segment basic clearing>
-        <div style={{ marginTop: '20px', fontSize: '0.9em', color: '#999' }}>
-          <Icon name="clock" />
-          Created: <FormattedDate value={created} />
-          {modified && modified !== created && (
-            <>
-              {' • '}
-              <Icon name="edit" />
-              Modified: <FormattedDate value={modified} />
-            </>
-          )}
         </div>
-      </Segment>
+      )}
+
+      {/* Actions Section */}
+      <div style={{ margin: '20px 0', padding: '20px', border: '1px solid #ddd' }}>
+        <Header as="h4">Actions</Header>
+        <Button
+          content="Edit"
+          primary
+          onClick={handleEdit}
+          style={{ marginRight: '10px' }}
+        />
+        <Button
+          content="Delete"
+          color="red"
+          onClick={handleDelete}
+        />
+      </div>
     </Container>
   );
 };
