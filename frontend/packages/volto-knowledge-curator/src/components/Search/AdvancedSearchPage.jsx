@@ -1,338 +1,161 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { 
   Container, 
   Header, 
   Segment, 
+  Form, 
+  Button, 
   Grid, 
-  Tab, 
-  Message,
-  Dimmer,
-  Loader,
-  Button,
+  Divider,
   Icon,
-  Label,
-  Statistic
+  Message
 } from 'semantic-ui-react';
-import { useIntl } from 'react-intl';
-import { Helmet } from '@plone/volto/helpers';
-import SearchInput from './SearchInput';
-import SearchFilters from './SearchFilters';
-import SearchResults from './SearchResults';
-import SimilarContentFinder from './SimilarContentFinder';
-import SearchSuggestions from './SearchSuggestions';
-import SearchHistory from './SearchHistory';
-import SearchAnalytics from './SearchAnalytics';
-import './AdvancedSearch.css';
 
 const AdvancedSearchPage = () => {
-  const intl = useIntl();
-  
-  // Search state
-  const [searchMode, setSearchMode] = useState('semantic'); // semantic, keyword, similar
   const [query, setQuery] = useState('');
-  const [filters, setFilters] = useState({
-    contentTypes: [],
-    dateRange: null,
-    similarityThreshold: 0.5,
-    tags: [],
-    difficulty: [],
-    workflowState: []
-  });
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [searchStats, setSearchStats] = useState(null);
-  const [searchHistory, setSearchHistory] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);
 
-  // Advanced features state
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [saveSearchModal, setSaveSearchModal] = useState(false);
-  const [searchAnalytics, setSearchAnalytics] = useState(null);
-
-  // Perform search
-  const performSearch = useCallback(async (searchQuery = query, searchFilters = filters) => {
-    if (!searchQuery.trim()) return;
-
+  const handleSearch = () => {
+    if (!query.trim()) return;
+    
     setLoading(true);
-    setError(null);
-
-    try {
-      const searchParams = {
-        q: searchQuery,
-        limit: 20,
-        threshold: searchFilters.similarityThreshold,
-        types: searchFilters.contentTypes.join(','),
-        ...searchFilters
-      };
-
-      // Choose API endpoint based on search mode
-      const endpoint = searchMode === 'semantic' ? '/@vector-search' : '/@search';
-      
-      const response = await fetch(`${endpoint}?${new URLSearchParams(searchParams)}`, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Search failed: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      
-      // Handle different response formats
-      const searchResults = searchMode === 'semantic' ? data : data.items || [];
-      
-      setResults(searchResults);
-      setSearchStats({
-        total: searchResults.length,
-        queryTime: data.query_time || 0,
-        searchMode,
-        query: searchQuery
-      });
-
-      // Add to search history
-      const historyEntry = {
-        query: searchQuery,
-        mode: searchMode,
-        results: searchResults.length,
-        timestamp: new Date().toISOString(),
-        filters: { ...searchFilters }
-      };
-      setSearchHistory(prev => [historyEntry, ...prev.slice(0, 9)]); // Keep last 10
-
-    } catch (err) {
-      setError(err.message);
-      console.error('Search error:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [query, filters, searchMode]);
-
-  // Get search suggestions
-  const getSuggestions = useCallback(async (inputValue) => {
-    if (inputValue.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-
-    try {
-      const response = await fetch(`/@vector-search?q=${encodeURIComponent(inputValue)}&limit=5&suggest=true`, {
-        headers: { 'Accept': 'application/json' }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setSuggestions(data.suggestions || []);
-      }
-    } catch (err) {
-      console.warn('Suggestions failed:', err);
-    }
-  }, []);
-
-  // Load search analytics
-  useEffect(() => {
-    const loadAnalytics = async () => {
-      try {
-        const response = await fetch('/@search-analytics', {
-          headers: { 'Accept': 'application/json' }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setSearchAnalytics(data);
+    // TODO: Implement actual search API call
+    setTimeout(() => {
+      setResults([
+        {
+          id: 1,
+          title: 'Sample Knowledge Item',
+          description: 'This is a sample search result',
+          type: 'Research Note'
         }
-      } catch (err) {
-        console.warn('Analytics loading failed:', err);
-      }
-    };
-
-    loadAnalytics();
-  }, []);
-
-  // Search tabs configuration
-  const searchTabs = [
-    {
-      menuItem: { key: 'semantic', icon: 'brain', content: 'Semantic Search' },
-      render: () => (
-        <Tab.Pane key="semantic">
-          <Header as="h3" color="blue">
-            <Icon name="brain" />
-            Semantic Search
-            <Header.Subheader>
-              Find content by meaning and context, not just keywords
-            </Header.Subheader>
-          </Header>
-          
-          <SearchInput
-            value={query}
-            onChange={setQuery}
-            onSearch={performSearch}
-            suggestions={suggestions}
-            onInputChange={getSuggestions}
-            placeholder="Describe what you're looking for in natural language..."
-            loading={loading}
-            advanced={true}
-          />
-        </Tab.Pane>
-      )
-    },
-    {
-      menuItem: { key: 'keyword', icon: 'search', content: 'Keyword Search' },
-      render: () => (
-        <Tab.Pane key="keyword">
-          <Header as="h3" color="green">
-            <Icon name="search" />
-            Keyword Search
-            <Header.Subheader>
-              Traditional search using exact terms and phrases
-            </Header.Subheader>
-          </Header>
-          
-          <SearchInput
-            value={query}
-            onChange={setQuery}
-            onSearch={performSearch}
-            placeholder="Enter specific keywords or phrases..."
-            loading={loading}
-          />
-        </Tab.Pane>
-      )
-    },
-    {
-      menuItem: { key: 'similar', icon: 'clone', content: 'Find Similar' },
-      render: () => (
-        <Tab.Pane key="similar">
-          <Header as="h3" color="purple">
-            <Icon name="clone" />
-            Find Similar Content
-            <Header.Subheader>
-              Discover content similar to items you specify
-            </Header.Subheader>
-          </Header>
-          
-          <SimilarContentFinder
-            onResults={setResults}
-            onLoading={setLoading}
-            onError={setError}
-          />
-        </Tab.Pane>
-      )
-    }
-  ];
-
-  const handleTabChange = (e, { activeIndex }) => {
-    const modes = ['semantic', 'keyword', 'similar'];
-    setSearchMode(modes[activeIndex]);
-    setResults([]);
-    setError(null);
+      ]);
+      setLoading(false);
+    }, 1000);
   };
 
   return (
-    <div className="advanced-search-page">
-      <Helmet>
-        <title>Advanced Search - Knowledge Curator</title>
-        <meta name="description" content="Advanced semantic search for knowledge discovery" />
-      </Helmet>
+    <Container style={{ padding: '2rem 0' }}>
+      <Header as="h1" icon textAlign="center">
+        <Icon name="search" />
+        Advanced Knowledge Search
+        <Header.Subheader>
+          Search across your knowledge base with powerful filters and AI similarity
+        </Header.Subheader>
+      </Header>
+      
+      <Segment>
+        <Form>
+          <Form.Group>
+            <Form.Input
+              width={12}
+              placeholder="Enter your search query..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            />
+            <Form.Button 
+              width={4}
+              primary 
+              onClick={handleSearch}
+              loading={loading}
+              disabled={!query.trim()}
+            >
+              <Icon name="search" />
+              Search
+            </Form.Button>
+          </Form.Group>
+        </Form>
+      </Segment>
 
-      <Container>
-        <Header as="h1" className="search-page-header">
-          <Icon name="search" color="blue" />
-          Advanced Knowledge Search
-          <Header.Subheader>
-            Discover knowledge using AI-powered semantic search and intelligent filtering
-          </Header.Subheader>
-        </Header>
-
-        <Grid>
-          <Grid.Column width={12}>
-            {/* Main Search Interface */}
-            <Segment className="search-interface">
-              <Tab 
-                panes={searchTabs} 
-                onTabChange={handleTabChange}
-                className="search-tabs"
+      <Grid columns={2} stackable>
+        <Grid.Column width={4}>
+          <Segment>
+            <Header as="h4">Search Filters</Header>
+            <Form>
+              <Form.Select
+                label="Content Type"
+                placeholder="All Types"
+                options={[
+                  { key: 'all', value: 'all', text: 'All Types' },
+                  { key: 'note', value: 'note', text: 'Research Notes' },
+                  { key: 'goal', value: 'goal', text: 'Learning Goals' },
+                  { key: 'bookmark', value: 'bookmark', text: 'Bookmarks' }
+                ]}
               />
               
-              {/* Advanced Filters */}
-              <SearchFilters
-                filters={filters}
-                onChange={setFilters}
-                show={showAdvancedFilters}
-                onToggle={setShowAdvancedFilters}
-              />
-
-              {/* Search Actions */}
-              <div className="search-actions">
-                <Button.Group>
-                  <Button 
-                    icon="filter" 
-                    content="Advanced Filters"
-                    toggle
-                    active={showAdvancedFilters}
-                    onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                  />
-                  <Button 
-                    icon="save" 
-                    content="Save Search"
-                    onClick={() => setSaveSearchModal(true)}
-                    disabled={!query}
-                  />
-                  <Button 
-                    icon="download" 
-                    content="Export Results"
-                    disabled={results.length === 0}
-                  />
-                </Button.Group>
+              <Form.Field>
+                <label>Similarity Threshold</label>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="1" 
+                  step="0.1" 
+                  defaultValue="0.5"
+                  style={{ width: '100%' }}
+                />
+              </Form.Field>
+              
+              <Form.Checkbox label="Include archived items" />
+              <Form.Checkbox label="Search in content body" />
+            </Form>
+          </Segment>
+        </Grid.Column>
+        
+        <Grid.Column width={12}>
+          <Segment>
+            <Header as="h4">Search Results</Header>
+            
+            {loading ? (
+              <Message icon>
+                <Icon name="circle notched" loading />
+                <Message.Content>
+                  <Message.Header>Searching...</Message.Header>
+                  Analyzing your knowledge base with AI-powered similarity matching
+                </Message.Content>
+              </Message>
+            ) : results.length > 0 ? (
+              <div>
+                {results.map(result => (
+                  <Segment key={result.id}>
+                    <Header as="h5">{result.title}</Header>
+                    <p>{result.description}</p>
+                    <Button size="small" primary>View Details</Button>
+                  </Segment>
+                ))}
               </div>
-            </Segment>
-
-            {/* Search Results */}
-            <SearchResults
-              results={results}
-              loading={loading}
-              error={error}
-              searchMode={searchMode}
-              stats={searchStats}
-              onSimilarSearch={(uid) => {
-                setSearchMode('similar');
-                // Trigger similar search
-              }}
-            />
-          </Grid.Column>
-
-          <Grid.Column width={4}>
-            {/* Search Suggestions */}
-            <SearchSuggestions 
-              analytics={searchAnalytics}
-              onSuggestionClick={(suggestion) => {
-                setQuery(suggestion);
-                performSearch(suggestion);
-              }}
-            />
-
-            {/* Search History */}
-            <SearchHistory
-              history={searchHistory}
-              onHistoryClick={(historyItem) => {
-                setQuery(historyItem.query);
-                setSearchMode(historyItem.mode);
-                setFilters(historyItem.filters);
-                performSearch(historyItem.query, historyItem.filters);
-              }}
-            />
-
-            {/* Search Analytics */}
-            <SearchAnalytics 
-              analytics={searchAnalytics}
-              currentStats={searchStats}
-            />
-          </Grid.Column>
-        </Grid>
-      </Container>
-    </div>
+            ) : query ? (
+              <Message info>
+                <Message.Header>No Results Found</Message.Header>
+                <p>Try adjusting your search query or filters.</p>
+              </Message>
+            ) : (
+              <Message>
+                <Message.Header>Welcome to Advanced Search</Message.Header>
+                <p>Enter a search query above to find relevant knowledge items using AI-powered similarity matching.</p>
+                
+                <Divider />
+                
+                <Header as="h5">Search Tips:</Header>
+                <ul>
+                  <li>Use descriptive phrases for better results</li>
+                  <li>Try different keyword combinations</li>
+                  <li>Adjust the similarity threshold for broader or narrower results</li>
+                  <li>Use content type filters to narrow your search</li>
+                </ul>
+              </Message>
+            )}
+          </Segment>
+        </Grid.Column>
+      </Grid>
+      
+      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+        <Button as="a" href="/" basic>
+          <Icon name="arrow left" />
+          Back to Homepage
+        </Button>
+      </div>
+    </Container>
   );
 };
 

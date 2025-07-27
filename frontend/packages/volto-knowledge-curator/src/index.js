@@ -53,6 +53,15 @@ const applyConfig = (config) => {
     KnowledgeItem: KnowledgeItemEdit,
   };
 
+  // Configure pure frontend routes that don't fetch content
+  config.settings.nonContentRoutes = [
+    ...(config.settings.nonContentRoutes || []),
+    '/advanced-search',
+    '/search',
+  ];
+
+  // Remove the broken internalApiPath configuration
+
   // Add Advanced Search route
   config.addonRoutes = [
     ...(config.addonRoutes || []),
@@ -62,17 +71,10 @@ const applyConfig = (config) => {
       exact: true,
     },
     {
-      path: '/search',
+      path: '/search', 
       component: AdvancedSearchPage,
       exact: true,
     },
-  ];
-
-  // Add search to navigation items
-  config.settings.nonContentRoutes = [
-    ...(config.settings.nonContentRoutes || []),
-    '/advanced-search',
-    '/search',
   ];
 
   return config;

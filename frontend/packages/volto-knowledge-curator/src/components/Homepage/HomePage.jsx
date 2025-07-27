@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Header, Segment, Message, Grid, Statistic } from 'semantic-ui-react';
+import { Header, Segment, Message, Grid, Statistic } from 'semantic-ui-react';
 import { useIntl } from 'react-intl';
 import { useSelector, useDispatch } from 'react-redux';
 import { searchContent } from '@plone/volto/actions';
 import KnowledgeItemCarousel from './KnowledgeItemCarousel';
 import KnowledgeContainerCarousel from './KnowledgeContainerCarousel';
 import HeroSection from './HeroSection';
-import { SearchWidget } from '../Search';
+import SearchWidget from '../Search/SearchWidget';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -90,12 +90,12 @@ const HomePage = () => {
 
   if (error) {
     return (
-      <Container>
+      <div className="ui container">
         <Message negative>
           <Message.Header>Content Loading Error</Message.Header>
           <p>Unable to retrieve knowledge base content: {error}</p>
         </Message>
-      </Container>
+      </div>
     );
   }
 
@@ -104,7 +104,7 @@ const HomePage = () => {
       {/* Academic Header Section */}
       <HeroSection stats={stats} loading={loading} />
 
-      <Container>
+      <div className="ui container">
         {/* Advanced Search Widget */}
         <section className="search-section">
           <SearchWidget />
@@ -139,6 +139,8 @@ const HomePage = () => {
             loading={loading}
           />
         </section>
+
+
 
         {/* Knowledge Base Analytics */}
         {!loading && (
@@ -182,7 +184,7 @@ const HomePage = () => {
             </Grid>
           </section>
         )}
-      </Container>
+      </div>
     </div>
   );
 };
