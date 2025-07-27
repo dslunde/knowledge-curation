@@ -507,30 +507,22 @@ def validate_knowledge_item_progress_dict(value):
 
 
 def validate_annotated_knowledge_items(value):
-    """Validate that Research Note has at least one annotated Knowledge Item.
+    """Validate annotated Knowledge Items list for Research Notes.
     
     Args:
-        value: List of Knowledge Item UIDs
+        value: List of Knowledge Item UIDs (can be empty for standalone research notes)
         
     Raises:
-        Invalid: If list is empty or contains invalid UIDs
+        Invalid: If list contains invalid UIDs
     """
+    # Allow empty lists for standalone research notes
     if not value:
-        raise Invalid(
-            _("At least one Knowledge Item must be annotated. "
-              "Research Notes must be associated with existing Knowledge Items.")
-        )
+        return True
     
     if not isinstance(value, list):
         raise Invalid(_("Annotated knowledge items must be a list"))
     
-    if len(value) == 0:
-        raise Invalid(
-            _("Cannot create a Research Note without annotating at least one Knowledge Item. "
-              "Please select one or more Knowledge Items to annotate.")
-        )
-    
-    # Validate each UID references an actual Knowledge Item
+    # If list is provided, validate each UID references an actual Knowledge Item
     catalog = api.portal.get_tool("portal_catalog")
     invalid_uids = []
     

@@ -78,10 +78,10 @@ def get_vector_config():
     return config
 
 
-# Configuration constants
-SUPPORTED_CONTENT_TYPES = ["KnowledgeItem", "BookmarkPlus", "ResearchNote", "LearningGoal", "ProjectLog", "KnowledgeContainer"]
+# Configuration constants - Only vectorize specific content types as requested
+SUPPORTED_CONTENT_TYPES = ["KnowledgeItem", "BookmarkPlus", "ResearchNote"]
 
-INDEXED_WORKFLOW_STATES = ["private", "process", "reviewed", "published"]
+INDEXED_WORKFLOW_STATES = ["capture", "private", "process", "reviewed", "published"]
 
 # Model configurations with their dimensions
 EMBEDDING_MODELS = {

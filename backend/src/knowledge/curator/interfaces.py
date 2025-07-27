@@ -114,6 +114,7 @@ class IKnowledgeObjectBase(model.Schema):
         description=_("Authors of this content"),
         value_type=schema.Object(schema=Interface),  # IAuthor will be defined below
         required=False,
+        default=[],  # Add default for REST API compatibility
     )
     
     publication_date = schema.Date(
@@ -887,8 +888,9 @@ class IResearchNote(IKnowledgeObjectBase):
             title=_("Knowledge Item UID"),
             description=_("UID of the annotated Knowledge Item"),
         ),
-        required=True,
-        min_length=1,
+        required=False,  # Changed to allow creation without annotation target
+        min_length=0,    # Allow empty for standalone research notes
+        default=[],      # Default to empty list
         constraint=validate_annotated_knowledge_items,
     )
 
@@ -896,14 +898,16 @@ class IResearchNote(IKnowledgeObjectBase):
         title=_("Annotation Type"),
         description=_("Type of annotation for the Knowledge Item"),
         vocabulary="knowledge.curator.annotation_types_extended",
-        required=True,
+        required=False,  # Changed to optional
+        default="insight",  # Use valid vocabulary value
     )
 
     annotation_scope = schema.Choice(
         title=_("Annotation Scope"),
         description=_("Scope of the annotation - specific section or whole item"),
         vocabulary="knowledge.curator.annotation_scope",
-        required=True,
+        required=False,  # Changed to optional
+        default="whole_item",  # Sensible default
     )
 
     research_question = schema.Text(
@@ -916,14 +920,16 @@ class IResearchNote(IKnowledgeObjectBase):
         title=_("Evidence Type"),
         description=_("Type of evidence supporting this annotation"),
         vocabulary="knowledge.curator.evidence_types",
-        required=True,
+        required=False,  # Changed to optional
+        default="theoretical",  # Sensible default
     )
 
     confidence_level = schema.Choice(
         title=_("Confidence Level"),
         description=_("Level of confidence in this annotation"),
         vocabulary="knowledge.curator.confidence_levels",
-        required=True,
+        required=False,  # Changed to optional
+        default="medium",  # Sensible default
     )
 
     suggests_knowledge_item_updates = schema.Bool(
