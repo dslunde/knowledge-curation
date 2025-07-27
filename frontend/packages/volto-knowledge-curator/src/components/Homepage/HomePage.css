@@ -1,173 +1,222 @@
-/* Academic Professional Homepage Styling */
+/* Knowledge Curator Homepage Styles */
 .knowledge-curator-homepage {
   min-height: 100vh;
-  background: #fafbfc;
-  color: #2c3e50;
-  font-family: 'Inter', 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
-/* Knowledge Sections */
-.knowledge-section {
+/* Search Section */
+.search-section {
   margin: 3rem 0;
-  padding: 0;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
+.search-widget {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 2rem !important;
+}
+
+.search-widget-input {
+  margin: 1.5rem 0;
+}
+
+.search-features {
+  margin: 2rem 0;
+  padding: 1rem 0;
+}
+
+.search-features .column {
+  padding: 1rem !important;
+}
+
+.feature-text {
+  margin-top: 0.5rem;
+  color: #495057;
+}
+
+.search-examples {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.example-labels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.search-example-label {
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+}
+
+.search-example-label:hover {
+  background-color: #2185d0 !important;
+  color: white !important;
+  transform: translateY(-1px);
+}
+
+.advanced-search-link {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+/* Section Headers */
 .section-header {
-  margin-bottom: 2.5rem !important;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #e8ecef;
+  margin: 2.5rem 0 1.5rem 0 !important;
   color: #2c3e50;
-  font-weight: 600;
-  letter-spacing: -0.025em;
+  border-bottom: 3px solid #3498db;
+  padding-bottom: 0.5rem;
 }
 
 .section-header .sub.header {
-  color: #6c757d;
-  font-weight: 400;
-  font-size: 1rem;
-  line-height: 1.5;
-  margin-top: 0.75rem;
-  max-width: 80%;
+  color: #6c757d !important;
+  font-weight: 400 !important;
+  margin-top: 0.5rem !important;
+  font-style: italic;
+}
+
+/* Knowledge Section */
+.knowledge-section {
+  margin: 2rem 0;
+  padding: 1.5rem 0;
 }
 
 /* Analytics Section */
 .analytics-section {
-  margin-top: 4rem !important;
-  margin-bottom: 2rem !important;
+  margin: 3rem 0;
+  padding: 2rem 0;
 }
 
 .analytics-panel {
-  background: #ffffff !important;
-  border: 1px solid #e8ecef !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+  border: 1px solid #dee2e6 !important;
   border-radius: 8px !important;
-  padding: 2rem !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-  transition: box-shadow 0.2s ease;
+  padding: 1.5rem !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .analytics-panel:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1) !important;
 }
 
 .analytics-header {
-  color: #2c3e50 !important;
-  font-weight: 600 !important;
-  margin-bottom: 1.5rem !important;
-  font-size: 1.25rem !important;
-  letter-spacing: -0.025em;
+  color: #495057 !important;
+  margin-bottom: 1rem !important;
+  text-align: center;
 }
 
-/* Statistics Styling */
 .knowledge-statistics,
 .difficulty-statistics {
-  justify-content: space-around !important;
+  justify-content: center !important;
 }
 
 .knowledge-statistics .statistic,
 .difficulty-statistics .statistic {
-  margin: 0 !important;
-  text-align: center;
+  margin: 0 1rem !important;
 }
 
 .knowledge-statistics .statistic .value,
 .difficulty-statistics .statistic .value {
-  color: #495057 !important;
+  color: #2185d0 !important;
   font-weight: 700 !important;
-  font-size: 2rem !important;
 }
 
 .knowledge-statistics .statistic .label,
 .difficulty-statistics .statistic .label {
   color: #6c757d !important;
-  font-size: 0.875rem !important;
+  font-size: 0.9rem !important;
   font-weight: 500 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 0.5rem !important;
-}
-
-/* Professional color scheme for statistics */
-.knowledge-statistics .statistic:first-child .value {
-  color: #2c5aa0 !important;
-}
-
-.knowledge-statistics .statistic:last-child .value {
-  color: #6c757d !important;
-}
-
-.difficulty-statistics .statistic:nth-child(1) .value {
-  color: #28a745 !important;
-}
-
-.difficulty-statistics .statistic:nth-child(2) .value {
-  color: #ffc107 !important;
-}
-
-.difficulty-statistics .statistic:nth-child(3) .value {
-  color: #dc3545 !important;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .knowledge-section {
+  .search-section {
     margin: 2rem 0;
+    padding: 1rem;
+  }
+  
+  .search-widget {
+    padding: 1rem !important;
+  }
+  
+  .search-features {
+    margin: 1rem 0;
   }
   
   .section-header {
-    text-align: left;
-    margin-bottom: 2rem !important;
-  }
-  
-  .section-header .sub.header {
-    max-width: 100%;
-    font-size: 0.9rem;
+    text-align: center;
+    margin: 2rem 0 1rem 0 !important;
   }
   
   .analytics-section {
-    margin-top: 3rem !important;
+    margin: 2rem 0;
+    padding: 1rem 0;
   }
   
   .analytics-panel {
-    padding: 1.5rem !important;
-    margin-bottom: 1rem !important;
+    padding: 1rem !important;
+    margin-bottom: 1rem;
   }
   
-  .analytics-header {
-    font-size: 1.1rem !important;
-    margin-bottom: 1rem !important;
-  }
-  
-  .knowledge-statistics .statistic .value,
-  .difficulty-statistics .statistic .value {
-    font-size: 1.75rem !important;
+  .example-labels {
+    justify-content: center;
   }
 }
 
-@media (max-width: 480px) {
-  .knowledge-curator-homepage {
-    font-size: 0.9rem;
+/* Animation effects */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  .section-header {
-    font-size: 1.5rem !important;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .section-header .sub.header {
-    font-size: 0.85rem;
+}
+
+.search-section,
+.knowledge-section,
+.analytics-section {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.search-section {
+  animation-delay: 0.1s;
+}
+
+.knowledge-section:nth-of-type(3) {
+  animation-delay: 0.2s;
+}
+
+.knowledge-section:nth-of-type(4) {
+  animation-delay: 0.3s;
+}
+
+.analytics-section {
+  animation-delay: 0.4s;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
   }
-  
-  .analytics-panel {
-    padding: 1.25rem !important;
-  }
-  
-  .knowledge-statistics,
-  .difficulty-statistics {
-    flex-direction: column !important;
-    gap: 1rem;
-  }
-  
-  .knowledge-statistics .statistic,
-  .difficulty-statistics .statistic {
-    margin-bottom: 1rem !important;
+  100% {
+    background-position: -200% 0;
   }
 } 

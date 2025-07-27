@@ -6,6 +6,7 @@ import { searchContent } from '@plone/volto/actions';
 import KnowledgeItemCarousel from './KnowledgeItemCarousel';
 import KnowledgeContainerCarousel from './KnowledgeContainerCarousel';
 import HeroSection from './HeroSection';
+import SearchWidget from '../Search/SearchWidget';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -104,6 +105,11 @@ const HomePage = () => {
       <HeroSection stats={stats} loading={loading} />
 
       <Container>
+        {/* Advanced Search Widget */}
+        <section className="search-section">
+          <SearchWidget />
+        </section>
+
         {/* Knowledge Collections Section */}
         <section className="knowledge-section">
           <Header as="h2" className="section-header">

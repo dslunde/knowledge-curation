@@ -10,6 +10,7 @@ import {
   KnowledgeItemView,
   KnowledgeItemEdit,
   HomePage,
+  AdvancedSearchPage,
 } from './components';
 
 const applyConfig = (config) => {
@@ -51,6 +52,28 @@ const applyConfig = (config) => {
     BookmarkPlus: BookmarkPlusEdit,
     KnowledgeItem: KnowledgeItemEdit,
   };
+
+  // Add Advanced Search route
+  config.addonRoutes = [
+    ...(config.addonRoutes || []),
+    {
+      path: '/advanced-search',
+      component: AdvancedSearchPage,
+      exact: true,
+    },
+    {
+      path: '/search',
+      component: AdvancedSearchPage,
+      exact: true,
+    },
+  ];
+
+  // Add search to navigation items
+  config.settings.nonContentRoutes = [
+    ...(config.settings.nonContentRoutes || []),
+    '/advanced-search',
+    '/search',
+  ];
 
   return config;
 };

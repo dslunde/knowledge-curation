@@ -21,6 +21,18 @@ export { default as KnowledgeItemCarousel } from './Homepage/KnowledgeItemCarous
 export { default as KnowledgeContainerCarousel } from './Homepage/KnowledgeContainerCarousel';
 export { default as HeroSection } from './Homepage/HeroSection';
 
+// Advanced Search Components
+export { 
+  AdvancedSearchPage,
+  SearchInput,
+  SearchResults,
+  SearchFilters,
+  SimilarContentFinder,
+  SearchSuggestions,
+  SearchHistory,
+  SearchAnalytics
+} from './Search';
+
 // Blocks
 export { default as KnowledgeItemsBlock } from './Blocks/KnowledgeItemsBlock';
 
