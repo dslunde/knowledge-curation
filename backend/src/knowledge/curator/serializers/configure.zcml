@@ -7,4 +7,7 @@
       name="knowledge.curator.summary_serializer_metadata"
       />
 
+  <!-- Knowledge Curator Field Deserializer -->
+  <adapter factory=".spaced_repetition.KnowledgeCuratorFieldDeserializer" />
+
 </configure>
