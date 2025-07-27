@@ -8,18 +8,19 @@ import {
   Grid,
   Message
 } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 const SearchWidget = ({ 
   compact = false, 
   showExamples = true 
 }) => {
   const [query, setQuery] = useState('');
+  const history = useHistory();
 
   const handleSearch = () => {
     if (query.trim()) {
       // Navigate to advanced search with query
-      window.location.href = `/advanced-search?q=${encodeURIComponent(query)}`;
+      history.push(`/advanced-search?q=${encodeURIComponent(query)}`);
     }
   };
 

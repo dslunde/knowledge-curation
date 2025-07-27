@@ -6,7 +6,7 @@ import { searchContent } from '@plone/volto/actions';
 import KnowledgeItemCarousel from './KnowledgeItemCarousel';
 import KnowledgeContainerCarousel from './KnowledgeContainerCarousel';
 import HeroSection from './HeroSection';
-import SearchWidget from '../Search/SearchWidget';
+import { SearchWidget } from '../index';
 import './HomePage.css';
 
 const HomePage = () => {

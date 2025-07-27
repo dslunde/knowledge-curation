@@ -60,20 +60,15 @@ const applyConfig = (config) => {
     '/search',
   ];
 
-  // Remove the broken internalApiPath configuration
-
-  // Add Advanced Search route
+  // Register route views using the proper Volto pattern
   config.addonRoutes = [
-    ...(config.addonRoutes || []),
     {
       path: '/advanced-search',
       component: AdvancedSearchPage,
-      exact: true,
     },
     {
-      path: '/search', 
+      path: '/search',
       component: AdvancedSearchPage,
-      exact: true,
     },
   ];
 
