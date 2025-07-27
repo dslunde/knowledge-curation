@@ -20,9 +20,6 @@ const KnowledgeItemView = ({ content }) => {
   };
 
   const handleDelete = () => {
-    console.log('Content object:', content);
-    console.log('Content @id:', content['@id']);
-    
     if (window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
       if (content['@id']) {
         // Construct the proper API URL
@@ -38,8 +35,6 @@ const KnowledgeItemView = ({ content }) => {
           apiUrl = `${url.origin}/++api++/${itemSlug}`;
         }
         
-        console.log('Attempting to delete with URL:', apiUrl);
-        
         fetch(apiUrl, {
           method: 'DELETE',
           headers: {
@@ -48,12 +43,10 @@ const KnowledgeItemView = ({ content }) => {
           },
         })
         .then(response => {
-          console.log('Delete response:', response);
           if (response.ok) {
-            // Navigate to home page instead of trying to calculate parent
+            // Navigate to home page after successful deletion
             window.location.href = '/';
           } else {
-            console.error('Delete failed with status:', response.status);
             alert(`Failed to delete content. Status: ${response.status}`);
           }
         })
