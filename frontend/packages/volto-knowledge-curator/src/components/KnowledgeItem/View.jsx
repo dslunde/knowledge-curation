@@ -20,9 +20,27 @@ const KnowledgeItemView = ({ content }) => {
   };
 
   const handleDelete = () => {
+    console.log('Content object:', content);
+    console.log('Content @id:', content['@id']);
+    
     if (window.confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
       if (content['@id']) {
-        fetch(content['@id'], {
+        // Construct the proper API URL
+        let apiUrl = content['@id'];
+        
+        // If the URL doesn't contain ++api++, we need to add it
+        if (!apiUrl.includes('++api++')) {
+          // Get the base URL and add ++api++
+          const url = new URL(window.location.href);
+          const basePath = url.pathname;
+          const segments = basePath.split('/').filter(Boolean);
+          const itemSlug = segments[segments.length - 1];
+          apiUrl = `${url.origin}/++api++/${itemSlug}`;
+        }
+        
+        console.log('Attempting to delete with URL:', apiUrl);
+        
+        fetch(apiUrl, {
           method: 'DELETE',
           headers: {
             'Accept': 'application/json',
@@ -30,12 +48,13 @@ const KnowledgeItemView = ({ content }) => {
           },
         })
         .then(response => {
+          console.log('Delete response:', response);
           if (response.ok) {
-            const pathParts = content['@id'].split('/');
-            const parentPath = pathParts.slice(0, -1).join('/') || '/';
-            window.location.href = parentPath;
+            // Navigate to home page instead of trying to calculate parent
+            window.location.href = '/';
           } else {
-            alert('Failed to delete content. Please try again.');
+            console.error('Delete failed with status:', response.status);
+            alert(`Failed to delete content. Status: ${response.status}`);
           }
         })
         .catch(error => {
