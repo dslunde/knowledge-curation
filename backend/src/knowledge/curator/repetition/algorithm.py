@@ -53,6 +53,9 @@ class SM2Algorithm:
         if quality < 0 or quality > 5:
             raise ValueError(f"Quality must be between 0 and 5, got {quality}")
 
+        # Validate and clamp ease factor to valid bounds
+        ease_factor = max(cls.MIN_EASE_FACTOR, min(cls.MAX_EASE_FACTOR, ease_factor))
+
         # Calculate new ease factor
         new_ease_factor = cls._calculate_ease_factor(ease_factor, quality)
 
