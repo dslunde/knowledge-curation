@@ -1,0 +1,150 @@
+{
+  "test_session": {
+    "start_time": "2025-07-27T17:56:35.188064",
+    "test_suite_version": "1.0.0",
+    "verbose": true,
+    "fix_issues": true,
+    "end_time": "2025-07-27T17:56:40.647879"
+  },
+  "infrastructure_tests": {
+    "QDrant Connectivity": {
+      "passed": true,
+      "timestamp": "2025-07-27T17:56:35.204003",
+      "details": {
+        "qdrant_accessible": true,
+        "collections_endpoint": true,
+        "available_collections": [
+          {
+            "name": "plone_knowledge"
+          }
+        ]
+      }
+    },
+    "Plone Backend Connectivity": {
+      "passed": true,
+      "timestamp": "2025-07-27T17:56:35.273398",
+      "details": {
+        "plone_accessible": true,
+        "api_endpoints": {
+          "++api++/@vector-management/health": {
+            "status_code": 404,
+            "accessible": true
+          },
+          "++api++/@vector-management/stats": {
+            "status_code": 404,
+            "accessible": true
+          }
+        }
+      }
+    }
+  },
+  "vector_storage_tests": {
+    "Vector Management Health": {
+      "passed": false,
+      "timestamp": "2025-07-27T17:56:35.305212",
+      "details": {
+        "status_code": 404
+      },
+      "error": "Vector management health check failed: HTTP 404"
+    },
+    "Vector Database Statistics": {
+      "passed": false,
+      "timestamp": "2025-07-27T17:56:35.329205",
+      "details": {
+        "status_code": 404
+      },
+      "error": "Stats retrieval failed: HTTP 404"
+    }
+  },
+  "api_endpoint_tests": {
+    "Semantic Search API": {
+      "passed": true,
+      "timestamp": "2025-07-27T17:56:39.515316",
+      "details": {
+        "search_results": {
+          "machine learning algorithms": {
+            "success": true,
+            "items_found": 0,
+            "first_few_results": []
+          },
+          "cognitive science research": {
+            "success": true,
+            "items_found": 0,
+            "first_few_results": []
+          },
+          "knowledge management systems": {
+            "success": true,
+            "items_found": 0,
+            "first_few_results": []
+          }
+        },
+        "successful_searches": 3,
+        "total_queries": 3
+      }
+    },
+    "Similar Content API": {
+      "passed": false,
+      "timestamp": "2025-07-27T17:56:39.522933",
+      "details": {
+        "no_content_available": true
+      },
+      "error": "No Knowledge Items available for similarity testing"
+    }
+  },
+  "search_functionality_tests": {
+    "Advanced Search Interface": {
+      "passed": true,
+      "timestamp": "2025-07-27T17:56:39.551417",
+      "details": {
+        "page_accessible": true,
+        "is_react_page": true,
+        "search_indicators_found": {
+          "advanced-search-container": true,
+          "search-input": true,
+          "vector": false,
+          "similarity": true
+        },
+        "page_size_bytes": 53929
+      }
+    }
+  },
+  "integration_tests": {
+    "End-to-End Search Workflow": {
+      "passed": false,
+      "timestamp": "2025-07-27T17:56:40.647395",
+      "details": {
+        "workflow_steps": {
+          "content_available": {
+            "success": true,
+            "count": 0
+          },
+          "vectors_available": {
+            "success": false,
+            "status_code": 404
+          },
+          "search_functional": {
+            "success": true,
+            "results_count": 0
+          }
+        },
+        "all_steps_successful": false
+      }
+    }
+  },
+  "summary": {
+    "total_tests": 8,
+    "passed_tests": 4,
+    "failed_tests": 4,
+    "success_rate": 50.0,
+    "duration_seconds": 5.459704637527466,
+    "overall_success": false
+  },
+  "recommendations": [
+    {
+      "category": "Vector Storage",
+      "priority": "HIGH",
+      "issue": "Vector management system unhealthy",
+      "action": "Run vector database initialization: POST to @@vector-management/initialize"
+    }
+  ]
+}
