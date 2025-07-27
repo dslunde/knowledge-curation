@@ -27,6 +27,7 @@ export {
   SearchInput,
   SearchResults,
   SearchFilters,
+  SearchWidget,
   SimilarContentFinder,
   SearchSuggestions,
   SearchHistory,

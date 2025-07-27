@@ -9,7 +9,6 @@ import {
   Icon,
   Label,
   Button,
-  Slider,
   Accordion,
   Message,
   Divider
@@ -198,12 +197,15 @@ const SearchFilters = ({
                 Similarity Threshold: {((filters.similarityThreshold || 0.5) * 100).toFixed(0)}%
               </label>
               <div className="threshold-slider">
-                <Slider
+                <input
+                  type="range"
                   min={0}
                   max={1}
                   step={0.1}
                   value={filters.similarityThreshold || 0.5}
-                  onChange={(value) => handleThresholdChange(value)}
+                  onChange={(e) => handleThresholdChange(parseFloat(e.target.value))}
+                  className="ui slider"
+                  style={{ width: '100%', marginBottom: '0.5rem' }}
                 />
                 <div className="threshold-labels">
                   <span>Less Similar</span>
