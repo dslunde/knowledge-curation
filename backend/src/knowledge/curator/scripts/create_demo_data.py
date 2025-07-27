@@ -611,6 +611,37 @@ def create_demo_data():
         research_notes = create_research_notes(portal, knowledge_items)
         bookmarks = create_bookmarks(portal, knowledge_items)
         
+        # Initialize and populate vector database
+        print("\n=== INITIALIZING VECTOR DATABASE ===")
+        try:
+            from knowledge.curator.vector.management import VectorCollectionManager
+            
+            # Initialize the vector database collection
+            manager = VectorCollectionManager()
+            print("Initializing vector database collection...")
+            success = manager.initialize_database()
+            
+            if success:
+                print("✅ Vector database collection initialized")
+                
+                # Rebuild the index with all created content
+                print("Building vector index from demo content...")
+                result = manager.rebuild_index(
+                    content_types=["KnowledgeItem", "BookmarkPlus", "ResearchNote", "LearningGoal", "ProjectLog"],
+                    clear_first=True
+                )
+                
+                if result.get("success"):
+                    print(f"✅ Vector index built successfully - {result['processed']} items indexed")
+                else:
+                    print(f"⚠️ Vector index build failed: {result.get('error', 'Unknown error')}")
+            else:
+                print("⚠️ Vector database initialization failed")
+                
+        except Exception as e:
+            print(f"❌ Vector database setup error: {e}")
+            print("Demo data will be created without vector search capabilities")
+        
         # Commit the transaction
         transaction.commit()
         
